@@ -14,7 +14,7 @@ LIBS	= ../../lib/libutil.a
 LIB_DIR	= ../../lib
 INC_DIR	= ../../include
 
-.c.o:;	$(CC) $(CFLAGS) -c $*.c
+.c.o:;	$(CC) -fPIC $(CFLAGS) -c $*.c
 
 all: $(LIB)
 
@@ -31,12 +31,10 @@ tests:	test dns_rr_to_pa_test dns_rr_to_sa_test dns_sa_to_rr_test \
 root_tests:
 
 $(LIB):	$(OBJS)
-	$(AR) $(ARFL) $(LIB) $?
-	$(RANLIB) $(LIB)
+	gcc -shared -Wl,-soname,libpostfix-dns.so.1 -o $(LIB) $(OBJS) $(LIBS) $(SYSLIBS)
 
 $(LIB_DIR)/$(LIB): $(LIB)
 	cp $(LIB) $(LIB_DIR)
-	$(RANLIB) $(LIB_DIR)/$(LIB)
 
 update: $(LIB_DIR)/$(LIB) $(HDRS)
 	-for i in $(HDRS); \

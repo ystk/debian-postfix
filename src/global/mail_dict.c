@@ -45,6 +45,7 @@ typedef struct {
 
 static const DICT_OPEN_INFO dict_open_info[] = {
     DICT_TYPE_PROXY, dict_proxy_open,
+#ifndef MAX_DYNAMIC_MAPS
 #ifdef HAS_LDAP
     DICT_TYPE_LDAP, dict_ldap_open,
 #endif
@@ -54,6 +55,7 @@ static const DICT_OPEN_INFO dict_open_info[] = {
 #ifdef HAS_PGSQL
     DICT_TYPE_PGSQL, dict_pgsql_open,
 #endif
+#endif /* MAX_DYNAMIC_MAPS */
     0,
 };
 

@@ -44,6 +44,8 @@
 /*	DICT	*(*open) (const char *, int, int);
 /*
 /*	ARGV	*dict_mapnames()
+/*
+/*	void (*)() dict_mkmap_func(const char *dict_type)
 /* DESCRIPTION
 /*	This module implements a low-level interface to multiple
 /*	physical dictionary types.
@@ -159,6 +161,9 @@
 /*
 /*	dict_mapnames() returns a sorted list with the names of all available
 /*	dictionary types.
+/*
+/*	dict_mkmap_func() returns a pointer to the mkmap setup function
+/*	for the given map type, as given in /etc/dynamicmaps.cf
 /* DIAGNOSTICS
 /*	Fatal error: open error, unsupported dictionary type, attempt to
 /*	update non-writable dictionary.
@@ -182,6 +187,9 @@
 #ifdef STRCASECMP_IN_STRINGS_H
 #include <strings.h>
 #endif
+
+#include <sys/stat.h>
+#include <unistd.h>
 
 /* Utility library. */
 
@@ -208,6 +216,27 @@
 #include <split_at.h>
 #include <htable.h>
 
+#ifndef NO_DYNAMIC_MAPS
+#include <load_lib.h>
+#include <vstring.h>
+#include <vstream.h>
+#include <vstring_vstream.h>
+#include <mvect.h>
+
+ /*
+  * Interface for dynamic map loading.
+  */
+typedef struct {
+    const char  *pattern;
+    const char  *soname;
+    const char  *openfunc;
+    const char  *mkmapfunc;
+} DLINFO;
+
+static DLINFO *dict_dlinfo;
+static DLINFO *dict_open_dlfind(const char *type);
+#endif
+
  /*
   * lookup table for available map types.
   */
@@ -217,13 +246,17 @@ typedef struct {
 } DICT_OPEN_INFO;
 
 static const DICT_OPEN_INFO dict_open_info[] = {
+#ifndef MAX_DYNAMIC_MAPS
 #ifdef HAS_CDB
     DICT_TYPE_CDB, dict_cdb_open,
 #endif
+#endif /* MAX_DYNAMIC_MAPS */
     DICT_TYPE_ENVIRON, dict_env_open,
     DICT_TYPE_HT, dict_ht_open,
     DICT_TYPE_UNIX, dict_unix_open,
+#ifndef MAX_DYNAMIC_MAPS
     DICT_TYPE_TCP, dict_tcp_open,
+#endif
 #ifdef HAS_SDBM
     DICT_TYPE_SDBM, dict_sdbm_open,
 #endif
@@ -243,9 +276,11 @@ static const DICT_OPEN_INFO dict_open_info[] = {
 #ifdef HAS_NETINFO
     DICT_TYPE_NETINFO, dict_ni_open,
 #endif
+#ifndef MAX_DYNAMIC_MAPS
 #ifdef HAS_PCRE
     DICT_TYPE_PCRE, dict_pcre_open,
 #endif
+#endif /* MAX_DYNAMIC_MAPS */
 #ifdef HAS_POSIX_REGEXP
     DICT_TYPE_REGEXP, dict_regexp_open,
 #endif
@@ -303,13 +338,66 @@ DICT   *dict_open3(const char *dict_type, const char *dict_name,
 		  dict_type, dict_name);
     if (dict_open_hash == 0)
 	dict_open_init();
-    if ((dp = (DICT_OPEN_INFO *) htable_find(dict_open_hash, dict_type)) == 0)
-	msg_fatal("unsupported dictionary type: %s", dict_type);
+    if ((dp = (DICT_OPEN_INFO *) htable_find(dict_open_hash, dict_type)) == 0) {
+#ifdef NO_DYNAMIC_MAPS
+	msg_fatal("%s: unsupported dictionary type: %s", myname, dict_type);
+#else
+	struct stat st;
+	LIB_FN fn[2];
+	DICT *(*open) (const char *, int, int);
+	DLINFO *dl=dict_open_dlfind(dict_type);
+	if (!dl)
+	    msg_fatal("%s: unsupported dictionary type: %s:  Is the postfix-%s package installed?", myname, dict_type, dict_type);
+	if (stat(dl->soname,&st) < 0) {
+	    msg_fatal("%s: unsupported dictionary type: %s (%s not found.  Is the postfix-%s package installed?)",
+		myname, dict_type, dl->soname, dict_type);
+	}
+	fn[0].name = dl->openfunc;
+	fn[0].ptr  = (void**)&open;
+	fn[1].name = NULL;
+	load_library_symbols(dl->soname, fn, NULL);
+	dict_open_register(dict_type, open);
+	dp = (DICT_OPEN_INFO *) htable_find(dict_open_hash, dict_type);
+#endif
+    }
+    if (msg_verbose>1) {
+	msg_info("%s: calling %s open routine",myname,dict_type);
+    }
     if ((dict = dp->open(dict_name, open_flags, dict_flags)) == 0)
 	msg_fatal("opening %s:%s %m", dict_type, dict_name);
     if (msg_verbose)
 	msg_info("%s: %s:%s", myname, dict_type, dict_name);
     return (dict);
+}
+
+dict_mkmap_func_t dict_mkmap_func(const char *dict_type)
+{
+    char   *myname="dict_mkmap_func";
+    struct stat st;
+    LIB_FN fn[2];
+    dict_mkmap_func_t mkmap;
+    DLINFO *dl;
+#ifndef NO_DYNAMIC_MAPS
+    if (!dict_dlinfo)
+	msg_fatal("dlinfo==NULL");
+    dl=dict_open_dlfind(dict_type);
+    if (!dl)
+	msg_fatal("%s: unsupported dictionary type: %s:  Is the postfix-%s package installed?", myname, dict_type, dict_type);
+    if (stat(dl->soname,&st) < 0) {
+	msg_fatal("%s: unsupported dictionary type: %s (%s not found.  Is the postfix-%s package installed?)",
+	    myname, dict_type, dl->soname, dict_type);
+    }
+    if (!dl->mkmapfunc)
+	msg_fatal("%s: unsupported dictionary type: %s does not allow map creation.", myname, dict_type);
+
+    fn[0].name = dl->mkmapfunc;
+    fn[0].ptr  = (void**)&mkmap;
+    fn[1].name = NULL;
+    load_library_symbols(dl->soname, fn, NULL);
+    return mkmap;
+#else
+    return (void(*)())NULL;
+#endif
 }
 
 /* dict_open_register - register dictionary type */
@@ -345,6 +433,9 @@ ARGV   *dict_mapnames()
     HTABLE_INFO **ht;
     DICT_OPEN_INFO *dp;
     ARGV   *mapnames;
+#ifndef NO_DYNAMIC_MAPS
+    DLINFO *dlp;
+#endif
 
     if (dict_open_hash == 0)
 	dict_open_init();
@@ -353,12 +444,100 @@ ARGV   *dict_mapnames()
 	dp = (DICT_OPEN_INFO *) ht[0]->value;
 	argv_add(mapnames, dp->type, ARGV_END);
     }
+#ifndef NO_DYNAMIC_MAPS
+    if (!dict_dlinfo)
+	msg_fatal("dlinfo==NULL");
+    for (dlp=dict_dlinfo; dlp->pattern; dlp++) {
+	argv_add(mapnames, dlp->pattern, ARGV_END);
+    }
+#endif
     qsort((void *) mapnames->argv, mapnames->argc, sizeof(mapnames->argv[0]),
 	  dict_sort_alpha_cpp);
     myfree((char *) ht_info);
     argv_terminate(mapnames);
     return mapnames;
 }
+
+#ifndef NO_DYNAMIC_MAPS
+#define	STREQ(x,y) (x == y || (x[0] == y[0] && strcmp(x,y) == 0))
+
+void dict_open_dlinfo(const char *path)
+{
+    char    *myname="dict_open_dlinfo";
+    VSTREAM *conf_fp=vstream_fopen(path,O_RDONLY,0);
+    VSTRING *buf = vstring_alloc(100);
+    char    *cp;
+    ARGV    *argv;
+    MVECT    vector;
+    int      nelm=0;
+    int      linenum=0;
+
+    dict_dlinfo=(DLINFO*)mvect_alloc(&vector,sizeof(DLINFO),3,NULL,NULL);
+
+    if (!conf_fp) {
+	msg_warn("%s: cannot open %s.  No dynamic maps will be allowed.",
+		myname, path);
+    } else {
+	while (vstring_get_nonl(buf,conf_fp) != VSTREAM_EOF) {
+	    cp = vstring_str(buf);
+	    linenum++;
+	    if (*cp == '#' || *cp == '\0')
+		continue;
+	    argv = argv_split(cp, " \t");
+	    if (argv->argc != 3 && argv->argc != 4) {
+		msg_fatal("%s: Expected \"pattern .so-name open-function [mkmap-function]\" at line %d",
+			  myname, linenum);
+	    }
+	    if (STREQ(argv->argv[0],"*")) {
+		msg_warn("%s: wildcard dynamic map entry no longer supported.",
+			  myname);
+		continue;
+	    }
+	    if (argv->argv[1][0] != '/') {
+		msg_fatal("%s: .so name must begin with a \"/\" at line %d",
+			  myname, linenum);
+	    }
+	    if (nelm >= vector.nelm) {
+		dict_dlinfo=(DLINFO*)mvect_realloc(&vector,vector.nelm+3);
+	    }
+	    dict_dlinfo[nelm].pattern  = mystrdup(argv->argv[0]);
+	    dict_dlinfo[nelm].soname   = mystrdup(argv->argv[1]);
+	    dict_dlinfo[nelm].openfunc = mystrdup(argv->argv[2]);
+	    if (argv->argc==4)
+		dict_dlinfo[nelm].mkmapfunc = mystrdup(argv->argv[3]);
+	    else
+		dict_dlinfo[nelm].mkmapfunc = NULL;
+	    nelm++;
+	    argv_free(argv);
+	}
+    }
+    if (nelm >= vector.nelm) {
+	dict_dlinfo=(DLINFO*)mvect_realloc(&vector,vector.nelm+1);
+    }
+    dict_dlinfo[nelm].pattern  = NULL;
+    dict_dlinfo[nelm].soname   = NULL;
+    dict_dlinfo[nelm].openfunc = NULL;
+    dict_dlinfo[nelm].mkmapfunc = NULL;
+    if (conf_fp)
+	vstream_fclose(conf_fp);
+    vstring_free(buf);
+}
+
+static DLINFO *dict_open_dlfind(const char *type)
+{
+    DLINFO *dp;
+
+    if (!dict_dlinfo)
+	return NULL;
+
+    for (dp=dict_dlinfo; dp->pattern; dp++) {
+	if (STREQ(dp->pattern,type))
+	    return dp;
+    }
+    return NULL;
+}
+
+#endif /* !NO_DYNAMIC_MAPS */
 
 #ifdef TEST
 

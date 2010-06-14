@@ -66,6 +66,7 @@ extern DICT *dict_debug(DICT *);
 #define DICT_FLAG_NO_UNAUTH	(1<<13)	/* disallow unauthenticated data */
 #define DICT_FLAG_FOLD_FIX	(1<<14)	/* case-fold key with fixed-case map */
 #define DICT_FLAG_FOLD_MUL	(1<<15)	/* case-fold key with multi-case map */
+#define DICT_FLAG_UPGRADE	(1<<30) /* Upgrade the db */
 #define DICT_FLAG_FOLD_ANY	(DICT_FLAG_FOLD_FIX | DICT_FLAG_FOLD_MUL)
 
  /* IMPORTANT: Update the dict_mask[] table when the above changes */
@@ -138,6 +139,11 @@ extern const char *dict_eval(const char *, const char *, int);
 extern DICT *dict_open(const char *, int, int);
 extern DICT *dict_open3(const char *, const char *, int, int);
 extern void dict_open_register(const char *, DICT *(*) (const char *, int, int));
+#ifndef NO_DYNAMIC_MAPS
+extern void dict_open_dlinfo(const char *path);
+typedef void* (*dict_mkmap_func_t)(const char *);
+dict_mkmap_func_t dict_mkmap_func(const char *dict_type);
+#endif
 
 #define dict_get(dp, key)	((const char *) (dp)->lookup((dp), (key)))
 #define dict_put(dp, key, val)	(dp)->update((dp), (key), (val))

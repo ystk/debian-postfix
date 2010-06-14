@@ -675,6 +675,12 @@ static DICT *dict_db_open(const char *class, const char *path, int open_flags,
 	msg_fatal("set DB cache size %d: %m", dict_db_cache_size);
     if (type == DB_HASH && db->set_h_nelem(db, DICT_DB_NELM) != 0)
 	msg_fatal("set DB hash element count %d: %m", DICT_DB_NELM);
+    if (dict_flags & DICT_FLAG_UPGRADE) {
+	if (msg_verbose)
+	    msg_info("upgrading database %s",db_path);
+	if ((errno = db->upgrade(db,db_path,0)) != 0)
+	    msg_fatal("upgrade of database %s: %m",db_path);
+    }
 #if DB_VERSION_MAJOR == 5 || (DB_VERSION_MAJOR == 4 && DB_VERSION_MINOR > 0)
     if ((errno = db->open(db, 0, db_path, 0, type, db_flags, 0644)) != 0)
 	msg_fatal("open database %s: %m", db_path);

@@ -3480,8 +3480,10 @@ mydomain = domain.tld
 .ft R
 .SH myhostname (default: see "postconf -d" output)
 The internet hostname of this mail system. The default is to use
-the fully-qualified domain name from gethostname(). $myhostname is
-used as a default value for many other configuration parameters.
+the name from gethostname(), which is expected to be a fully-qualified
+domain name.  If it is only one component, then $mydomain is appended
+to it. $myhostname is used as a default value for many other configuration
+parameters.
 .PP
 Example:
 .PP

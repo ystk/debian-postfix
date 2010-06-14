@@ -182,6 +182,13 @@ void    mail_conf_suck(void)
     path = concatenate(var_config_dir, "/", "main.cf", (char *) 0);
     dict_load_file(CONFIG_DICT, path);
     myfree(path);
+
+#ifndef NO_DYNAMIC_MAPS
+    path = concatenate(var_config_dir, "/", "dynamicmaps.cf", (char *) 0);
+    dict_open_dlinfo(path);
+    myfree(path);
+#endif
+
 }
 
 /* mail_conf_flush - discard configuration dictionary */

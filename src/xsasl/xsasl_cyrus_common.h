@@ -16,12 +16,18 @@
   */
 #if defined(USE_SASL_AUTH) && defined(USE_CYRUS_SASL)
 
+#include <sasl.h>
+
 #define NO_SASL_LANGLIST	((const char *) 0)
 #define NO_SASL_OUTLANG		((const char **) 0)
 #define xsasl_cyrus_strerror(status) \
 	sasl_errstring((status), NO_SASL_LANGLIST, NO_SASL_OUTLANG)
 extern int xsasl_cyrus_log(void *, int, const char *);
 extern int xsasl_cyrus_security_parse_opts(const char *);
+extern int xsasl_getpath(void * context, char ** path);
+#ifdef SASL_CB_GETCONFPATH
+extern int xsasl_getconfpath(void * context, char ** path);
+#endif
 
 #endif
 

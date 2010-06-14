@@ -965,6 +965,16 @@ static void show_maps(void)
 {
     ARGV   *maps_argv;
     int     i;
+#ifndef NO_DYNAMIC_MAPS
+    char   *path;
+    char   *config_dir;
+
+    var_config_dir = mystrdup((config_dir = safe_getenv(CONF_ENV_PATH)) != 0 ?
+			      config_dir : DEF_CONFIG_DIR);	/* XXX */
+    path = concatenate(var_config_dir, "/", "dynamicmaps.cf", (char *) 0);
+    dict_open_dlinfo(path);
+    myfree(path);
+#endif
 
     maps_argv = dict_mapnames();
     for (i = 0; i < maps_argv->argc; i++)

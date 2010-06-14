@@ -8,6 +8,7 @@ DIRS	= src/util src/global src/dns src/tls src/xsasl src/milter src/master \
 	src/pipe src/showq src/postalias src/postcat src/postconf src/postdrop \
 	src/postkick src/postlock src/postlog src/postmap src/postqueue \
 	src/postsuper src/qmqpd src/spawn src/flush src/verify \
+	rmail \
 	src/virtual src/proxymap src/anvil src/scache src/discard src/tlsmgr \
 	src/postmulti
 MANDIRS	= proto man html

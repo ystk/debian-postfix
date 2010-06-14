@@ -1,0 +1,143 @@
+#!/opt/gnu/bin/gmake -f
+# -*- makefile -*- 
+# Debianrules for building a Debian package
+# Version 1.5
+#
+# These rules have been specifically designed NOT to require root to
+# run them. At any time root privileges are required, the command to be
+# executed will be made obvious and root's password will be prompted for.
+# Of course, root may still run this and no password will be required.
+#
+# Robert Leslie <rob@mars.org>
+# modified for Postfix by LaMont Jones <lamont@debian.org>
+
+export DH_COMPAT=2
+
+package=postfix
+docdir=hpux/POSTFIX-MAN/opt/$(package)/share/doc
+mandir=hpux/POSTFIX-MAN/opt/$(package)/share/man
+sharedir=hpux/POSTFIX-RUN/opt/$(package)/share
+libdir=hpux/POSTFIX-RUN/opt/$(package)/lib
+plibdir=$(libdir)
+lbindir=hpux/POSTFIX-RUN/opt/$(package)/lbin
+sbindir=hpux/POSTFIX-RUN/opt/$(package)/sbin
+bindir=hpux/POSTFIX-RUN/opt/$(package)/bin
+confdir=hpux/POSTFIX-RUN/opt/$(package)/newconfig/etc/postfix
+
+#AUXLIBS = -L/opt/pcre/lib -L/opt/ldap/lib -lldap -llber
+#MAKE=gmake
+
+#OFLAGS = +O4 +ESlit +Olibcalls +Ofastaccess
+OFLAGS = +O1 +ESlit -g
+SHELL=/usr/bin/bash
+
+ifneq (,$(findstring debug,$(DEB_BUILD_OPTIONS)))
+DEBUG = -g
+endif
+
+ifneq (,$(findstring nostrip,$(DEB_BUILD_OPTIONS)))
+STRIP=y
+endif
+CCARGS="-DMAX_DYNAMIC_MAPS -DHAS_PCRE -DHAS_LDAP -DHAS_PGSQL -I/opt/pcre/include -I/opt/ldap/include -I/opt/postgres/include -I/opt/db4.1/include -DHAS_DB -L/opt/db4.1/lib -ldb"
+
+.PHONY: install install-doc binary binary-arch binary-indep clean
+.PHONY: checkroot build
+
+build:
+	$(checkdir)
+	${MAKE} -f Makefile.in makefiles CC="cc +DA1.1 -Ae" CCARGS=${CCARGS} \
+		AUXLIBS="${AUXLIBS}" OPT="${OFLAGS}" DEBUG="${DEBUG}"
+	for i in hpux/patches/[0-9]*; do echo Applying $$i; patch -p0<$$i; done
+	cd lib && for i in dns global master util; do \
+		ln -fs lib$${i}.a lib$${i}.1; \
+	done
+	#${MAKE} DIRS="src/util src/global src/dns src/master" update
+	${MAKE}
+	touch build
+
+install-doc:
+	mkdir -p ${lbindir} ${bindir} ${libdir} hpux/POSTFIX-RUN/sbin/init.d
+	mkdir -p hpux/POSTFIX-RUN/sbin/rc1.d hpux/POSTFIX-RUN/sbin/rc2.d
+	mkdir -p $(docdir)/html $(docdir)/conf-parts $(docdir)/examples
+	install -m 0444 html/[a-z]* $(docdir)/html
+	install -m 0444 conf/{aliases,sample*} $(docdir)/examples
+	install -m 0444 RELEASE_NOTES $(docdir)/RELEASE_NOTES
+	install -m 0444 0README $(docdir)/README
+	install -m 0444 debian/changelog $(docdir)/changelog.Debian
+	install -m 0444 HISTORY $(docdir)/changelog
+	for file in README_FILES/*_README COMPATIBILITY TODO PORTING; do \
+	    install -m 0444 $${file} $(docdir)/$${file##*/};         \
+	done
+	rm -f $(docdir)/ULTRIX_README $(docdir)/MACOSX_README
+	install conf/main.cf.default $(docdir)/examples/main.cf.default
+	x=$$(find hpux/patches -name 'indep.*');  \
+		for i in $$x; do echo Applying $$i; patch -p0<$$i; done
+
+
+install: build
+	mkdir -p ${lbindir} ${bindir} ${libdir} hpux/POSTFIX-RUN/sbin/init.d
+	mkdir -p hpux/POSTFIX-RUN/sbin/rc1.d hpux/POSTFIX-RUN/sbin/rc2.d
+	mkdir -p $(docdir)/html $(docdir)/conf-parts $(docdir)/examples
+	install lib/*.1 $(libdir)
+	install lib/*.so $(libdir)
+	install libexec/[a-z]* $(lbindir)
+	install bin/[a-z]* $(bindir)
+
+	install hpux/init.d hpux/POSTFIX-RUN/sbin/init.d/postfix
+	ln -sf /sbin/init.d/postfix hpux/POSTFIX-RUN/sbin/rc1.d/K459postfix
+	ln -sf /sbin/init.d/postfix hpux/POSTFIX-RUN/sbin/rc2.d/S541postfix
+
+	mkdir -p $(confdir)
+	install conf/[La-z]* $(confdir)
+	mv $(confdir)/sample* $(docdir)/conf-parts
+
+	mkdir -p hpux/POSTFIX-RUN/usr/sbin hpux/POSTFIX-RUN/usr/bin
+	ln -sf /opt/postfix/bin/sendmail hpux/POSTFIX-RUN/usr/sbin/sendmail
+	ln -sf /opt/postfix/bin/sendmail hpux/POSTFIX-RUN/usr/bin/newaliases
+	ln -sf /opt/postfix/bin/sendmail hpux/POSTFIX-RUN/usr/bin/mailq
+
+	rm -f $(confdir)/{aliases,sample*}
+	cp conf/main.cf $(confdir)/main.cf
+	mkdir -p ${mandir} ${mandir}/man1 ${mandir}/man5 ${mandir}/man8
+	install man/man1/*.1 $(mandir)/man1
+	install man/man5/*.5 $(mandir)/man5
+	install man/man8/*.8 $(mandir)/man8
+	install rmail/rmail.8 $(mandir)/man8
+	x=$$(find hpux/patches -name 'arch.*');  \
+		for i in $$x; do echo Applying $$i; patch -p0<$$i; done
+
+binary-indep: install-doc
+	
+binary-arch: install
+
+clean:
+	$(checkdir)
+	rm -f build
+	test ! -d hpux/POSTFIX-RUN || rm -rf hpux/POSTFIX*
+	rm -f hpux/PSF
+	$(MAKE) tidy
+
+
+buildinfo:
+	@echo; dpkg -l gcc "libc6*" binutils ldso make dpkg-dev $(BUILDINFO) \
+		| awk '$$1 == "ii" { printf("%s-%s\n", $$2, $$3) }' \
+		| tee $(docdir)/buildinfo.Debian; echo
+	chmod 644 $(docdir)/buildinfo.Debian		
+
+define checkdir
+	test -f hpux/rules
+endef
+
+# Below here is fairly generic really
+
+binary: binary-arch binary-indep 
+	vers=$$(sed '1,1s/^.*(\(.*\)).*/\1/;q' debian/changelog); \
+	sed -e 's/@@OSREV@@/1?.*/' \
+	    -e "s/@@VERSION@@/$$vers/" \
+	    -e "s:@@SRC@@:$$(pwd):" hpux/PSF.in > hpux/PSF; \
+	swpackage -xtarget_type=tape -s hpux/PSF \
+	    -d ../postfix_$${vers}_hpux.depot
+
+checkroot:
+	$(checkdir)
+	test "`id -u`" -eq 0

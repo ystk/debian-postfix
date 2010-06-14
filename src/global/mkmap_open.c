@@ -81,14 +81,17 @@
   * We use a different table (in dict_open.c) when querying maps.
   */
 typedef struct {
-    char   *type;
+    const char   *type;
     MKMAP  *(*before_open) (const char *);
 } MKMAP_OPEN_INFO;
 
 static const MKMAP_OPEN_INFO mkmap_types[] = {
+#ifndef MAX_DYNAMIC_MAPS
+static const MKMAP_OPEN_INFO mkmap_types[] = {
     DICT_TYPE_PROXY, mkmap_proxy_open,
 #ifdef HAS_CDB
     DICT_TYPE_CDB, mkmap_cdb_open,
+#endif
 #endif
 #ifdef HAS_SDBM
     DICT_TYPE_SDBM, mkmap_sdbm_open,
@@ -156,7 +159,16 @@ MKMAP  *mkmap_open(const char *type, const char *path,
      */
     for (mp = mkmap_types; /* void */ ; mp++) {
 	if (mp->type == 0)
+#ifndef NO_DYNAMIC_MAPS
+	{
+	    static MKMAP_OPEN_INFO oi;
+	    oi.before_open=(MKMAP*(*)(const char*))dict_mkmap_func(type);
+	    oi.type=type;
+	    mp=&oi;
+	}
+#else
 	    msg_fatal("unsupported map type: %s", type);
+#endif
 	if (strcmp(type, mp->type) == 0)
 	    break;
     }

@@ -2414,7 +2414,6 @@ extern int var_in_flow_delay;
 					VAR_MYNETWORKS "," \
 					VAR_PERM_MX_NETWORKS "," \
 					VAR_QMQPD_CLIENTS "," \
-					VAR_RELAY_DOMAINS "," \
 					SMTPD_ACCESS_MAPS
 extern char *var_par_dom_match;
 

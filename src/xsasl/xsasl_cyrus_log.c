@@ -28,10 +28,16 @@
 /* System library. */
 
 #include <sys_defs.h>
+#include <string.h>
 
 /* Utility library. */
 
 #include <msg.h>
+#include <stringops.h>
+
+/* Global library. */
+
+#include <mail_params.h>
 
 /* Application-specific */
 
@@ -100,5 +106,23 @@ int     xsasl_cyrus_log(void *unused_context, int priority,
     }
     return (SASL_OK);
 }
+
+int xsasl_getpath(void * context, char ** path)
+{
+#if SASL_VERSION_MAJOR >= 2
+    *path = concatenate(var_config_dir, "/", "sasl:/usr/lib/sasl2", (char *) 0);
+#else
+    *path = concatenate(var_config_dir, "/", "sasl:/usr/lib/sasl", (char *) 0);
+#endif
+    return SASL_OK;
+}
+
+#ifdef SASL_CB_GETCONFPATH
+int xsasl_getconfpath(void * context, char ** path)
+{
+    *path = concatenate(var_config_dir, "/", "sasl:/usr/lib/sasl", (char *) 0);
+    return SASL_OK;
+}
+#endif
 
 #endif

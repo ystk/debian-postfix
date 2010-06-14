@@ -34,7 +34,7 @@ OBJS	= abounce.o anvil_clnt.o been_here.o bounce.o bounce_log.o \
 	canon_addr.o cfg_parser.o cleanup_strerror.o cleanup_strflags.o \
 	clnt_stream.o conv_time.o db_common.o debug_peer.o debug_process.o \
 	defer.o deliver_completed.o deliver_flock.o deliver_pass.o \
-	deliver_request.o dict_ldap.o dict_mysql.o dict_pgsql.o \
+	deliver_request.o \
 	dict_proxy.o domain_list.o dot_lockfile.o dot_lockfile_as.o \
 	dsb_scan.o dsn.o dsn_buf.o dsn_mask.o dsn_print.o dsn_util.o \
 	ehlo_mask.o ext_prop.o file_id.o flush_clnt.o header_opts.o \
@@ -47,7 +47,7 @@ OBJS	= abounce.o anvil_clnt.o been_here.o bounce.o bounce_log.o \
 	mail_params.o mail_pathname.o mail_queue.o mail_run.o \
 	mail_scan_dir.o mail_stream.o mail_task.o mail_trigger.o maps.o \
 	mark_corrupt.o match_parent_style.o mbox_conf.o mbox_open.o \
-	mime_state.o mkmap_cdb.o mkmap_db.o mkmap_dbm.o mkmap_open.o \
+	mime_state.o mkmap_db.o mkmap_dbm.o mkmap_open.o \
 	mkmap_sdbm.o msg_stats_print.o msg_stats_scan.o mynetworks.o \
 	mypwd.o namadr_list.o off_cvt.o opened.o own_inet_addr.o \
 	pipe_command.o post_mail.o quote_821_local.o quote_822_local.o \
@@ -104,10 +104,14 @@ LIBS	= ../../lib/libutil.a
 LIB_DIR	= ../../lib
 INC_DIR	= ../../include
 MAKES	=
+LDAPSO  = dict_ldap.so
+MYSQLSO = dict_mysql.so
+PGSQLSO = dict_pgsql.so
+CDBSO   = dict_cdb.so
 
-.c.o:;	$(CC) $(CFLAGS) -c $*.c
+.c.o:;	$(CC) -fPIC $(CFLAGS) -c $*.c
 
-all: $(LIB)
+all: $(LIB) $(CDBSO) $(LDAPSO) $(MYSQLSO) $(PGSQLSO) 
 
 $(OBJS): ../../conf/makedefs.out
 
@@ -117,14 +121,39 @@ Makefile: Makefile.in
 test:	$(TESTPROG)
 
 $(LIB):	$(OBJS)
-	$(AR) $(ARFL) $(LIB) $?
-	$(RANLIB) $(LIB)
+	gcc -shared -Wl,-soname,libpostfix-global.so.1 -o $(LIB) $(OBJS) $(LIBS) $(SYSLIBS)
+
+$(CDBSO): dict_cdb.o mkmap_cdb.o
+	gcc -shared -Wl,-soname,dict_cdb.so -o $@ $? -lcdb -L. -lutil
+
+dict_cdb.o: ../util/dict_cdb.c
+	$(CC) -fPIC $(CFLAGS) -c $?
+
+$(LDAPSO): dict_ldap.o
+	gcc -shared -Wl,-soname,dict_ldap.so -o $@ $? -lldap -llber -L../../lib -lutil -L. -lglobal
+
+$(MYSQLSO): dict_mysql.o
+	gcc -shared -Wl,-soname,dict_mysql.so -o $@ $? -lmysqlclient -L. -lutil -lglobal
+
+$(PGSQLSO): dict_pgsql.o
+	gcc -shared -Wl,-soname,dict_pgsql.so -o $@ $? -lpq -L. -lutil -lglobal
 
 $(LIB_DIR)/$(LIB): $(LIB)
 	cp $(LIB) $(LIB_DIR)
-	$(RANLIB) $(LIB_DIR)/$(LIB)
 
-update: $(LIB_DIR)/$(LIB) $(HDRS)
+$(LIB_DIR)/$(CDBSO): $(CDBSO)
+	cp $(CDBSO) $(LIB_DIR)
+
+$(LIB_DIR)/$(LDAPSO): $(LDAPSO)
+	cp $(LDAPSO) $(LIB_DIR)
+
+$(LIB_DIR)/$(MYSQLSO): $(MYSQLSO)
+	cp $(MYSQLSO) $(LIB_DIR)
+
+$(LIB_DIR)/$(PGSQLSO): $(PGSQLSO)
+	cp $(PGSQLSO) $(LIB_DIR)
+
+update: $(LIB_DIR)/$(LIB) $(LIB_DIR)/${CDBSO} $(LIB_DIR)/${LDAPSO} $(LIB_DIR)/${MYSQLSO} $(LIB_DIR)/${PGSQLSO} $(HDRS)
 	-for i in $(HDRS); \
 	do \
 	  cmp -s $$i $(INC_DIR)/$$i 2>/dev/null || cp $$i $(INC_DIR); \
@@ -492,7 +521,7 @@ lint:
 	lint $(DEFS) $(SRCS) $(LINTFIX)
 
 clean:
-	rm -f *.o $(LIB) *core $(TESTPROG) junk
+	rm -f *.o $(LIB) $(CDBSO) $(LDAPSO) $(MYSQLSO) $(PGSQLSO) *core $(TESTPROG) junk
 	rm -rf printfck
 
 tidy:	clean

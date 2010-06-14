@@ -714,6 +714,7 @@ extern int initgroups(const char *, int);
 #define INTERNAL_LOCK	MYFLOCK_STYLE_FLOCK
 #define DEF_MAILBOX_LOCK "fcntl, dotlock"	/* RedHat >= 4.x */
 #define HAS_FSYNC
+#define HAS_SDBM
 #define HAS_DB
 #define DEF_DB_TYPE	"hash"
 #define ALIAS_DB_MAP	"hash:/etc/aliases"
@@ -725,11 +726,25 @@ extern int initgroups(const char *, int);
 #define STATFS_IN_SYS_VFS_H
 #define PREPEND_PLUS_TO_OPTSTRING
 #define HAS_POSIX_REGEXP
+#define HAS_DLOPEN
 #define NATIVE_SENDMAIL_PATH "/usr/sbin/sendmail"
 #define NATIVE_MAILQ_PATH "/usr/bin/mailq"
 #define NATIVE_NEWALIAS_PATH "/usr/bin/newaliases"
 #define NATIVE_COMMAND_DIR "/usr/sbin"
+#ifdef DEBIAN
+#define NATIVE_DAEMON_DIR	"/usr/lib/postfix"
+#ifndef DEF_MANPAGE_DIR
+#define DEF_MANPAGE_DIR		"/usr/share/man"
+#endif
+#ifndef DEF_SAMPLE_DIR
+#define DEF_SAMPLE_DIR		"/usr/share/doc/postfix/examples"
+#endif
+#ifndef DEF_README_DIR
+#define DEF_README_DIR		"/usr/share/doc/postfix"
+#endif
+#else
 #define NATIVE_DAEMON_DIR "/usr/libexec/postfix"
+#endif
 #ifdef __GLIBC_PREREQ
 # define HAVE_GLIBC_API_VERSION_SUPPORT(maj, min) __GLIBC_PREREQ(maj, min)
 #else
@@ -895,6 +910,7 @@ extern int h_errno;			/* <netdb.h> imports too much stuff */
 #define USE_STATFS
 #define STATFS_IN_SYS_VFS_H
 #define HAS_POSIX_REGEXP
+#define HAS_DLOPEN
 #define NATIVE_SENDMAIL_PATH "/usr/sbin/sendmail"
 #define NATIVE_MAILQ_PATH "/usr/bin/mailq"
 #define NATIVE_NEWALIAS_PATH "/usr/bin/newaliases"
@@ -932,6 +948,7 @@ extern int h_errno;			/* <netdb.h> imports too much stuff */
 #define USE_STATFS
 #define STATFS_IN_SYS_VFS_H
 #define HAS_POSIX_REGEXP
+#define HAS_SHL_LOAD
 #define NATIVE_SENDMAIL_PATH "/usr/sbin/sendmail"
 #define NATIVE_MAILQ_PATH "/usr/bin/mailq"
 #define NATIVE_NEWALIAS_PATH "/usr/bin/newaliases"
@@ -971,6 +988,7 @@ extern int h_errno;
 #define USE_STATFS
 #define STATFS_IN_SYS_VFS_H
 #define HAS_POSIX_REGEXP
+#define HAS_SHL_LOAD
 #define NATIVE_SENDMAIL_PATH "/usr/bin/sendmail"
 #define NATIVE_MAILQ_PATH "/usr/bin/mailq"
 #define NATIVE_NEWALIAS_PATH "/usr/bin/newaliases"

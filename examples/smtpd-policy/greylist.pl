@@ -73,7 +73,7 @@ use Sys::Syslog qw(:DEFAULT setlogsock);
 # In case of database corruption, this script saves the database as
 # $database_name.time(), so that the mail system does not get stuck.
 #
-$database_name="/var/mta/greylist.db";
+$database_name="/var/lib/postfix/greylist.db";
 $greylist_delay=60;
 
 #

@@ -224,6 +224,10 @@ XSASL_CLIENT_IMPL *xsasl_cyrus_client_init(const char *unused_client_type,
      */
     static sasl_callback_t callbacks[] = {
 	{SASL_CB_LOG, &xsasl_cyrus_log, 0},
+	{SASL_CB_GETPATH,&xsasl_getpath, 0},
+#ifdef SASL_CB_GETCONFPATH
+	{SASL_CB_GETCONFPATH,&xsasl_getconfpath, 0},
+#endif
 	{SASL_CB_LIST_END, 0, 0}
     };
 

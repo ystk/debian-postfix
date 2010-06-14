@@ -409,6 +409,10 @@ DICT   *dict_dbm_open(const char *path, int open_flags, int dict_flags)
     char   *dbm_path;
     int     lock_fd;
 
+#ifdef HAVE_GDBM
+    msg_fatal("%s: gdbm maps use locking that is incompatible with postfix.  Use a hash map instead.",
+		 path);
+#endif
     /*
      * Note: DICT_FLAG_LOCK is used only by programs that do fine-grained (in
      * the time domain) locking while accessing individual database records.

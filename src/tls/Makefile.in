@@ -22,7 +22,7 @@ LIB_DIR	= ../../lib
 INC_DIR	= ../../include
 MAKES	=
 
-.c.o:;	$(CC) $(CFLAGS) -c $*.c
+.c.o:;	$(CC) -fPIC $(CFLAGS) -c $*.c
 
 all: $(LIB)
 
@@ -38,12 +38,10 @@ tests:
 root_tests:
 
 $(LIB):	$(OBJS)
-	$(AR) $(ARFL) $(LIB) $?
-	$(RANLIB) $(LIB)
+	gcc -shared -Wl,-soname,libpostfix-tls.so.1 -o $(LIB) $(OBJS) $(LIBS) $(SYSLIBS)
 
 $(LIB_DIR)/$(LIB): $(LIB)
 	cp $(LIB) $(LIB_DIR)
-	$(RANLIB) $(LIB_DIR)/$(LIB)
 
 update: $(LIB_DIR)/$(LIB) $(HDRS)
 	-for i in $(HDRS); \

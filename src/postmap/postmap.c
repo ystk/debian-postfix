@@ -5,7 +5,7 @@
 /*	Postfix lookup table management
 /* SYNOPSIS
 /* .fi
-/*	\fBpostmap\fR [\fB-Nbfhimnoprsvw\fR] [\fB-c \fIconfig_dir\fR]
+/*	\fBpostmap\fR [\fB-Nbfhimnoprsuvw\fR] [\fB-c \fIconfig_dir\fR]
 /*	[\fB-d \fIkey\fR] [\fB-q \fIkey\fR]
 /*		[\fIfile_type\fR:]\fIfile_name\fR ...
 /* DESCRIPTION
@@ -151,6 +151,8 @@
 /* .sp
 /*	This feature is available in Postfix version 2.2 and later,
 /*	and is not available for all database types.
+/* .IP \fB-u\fR
+/*	Upgrade the database to the current version.
 /* .IP \fB-v\fR
 /*	Enable verbose logging for debugging purposes. Multiple \fB-v\fR
 /*	options make the software increasingly verbose.
@@ -723,6 +725,18 @@ static void postmap_seq(const char *map_type, const char *map_name,
     dict_close(dict);
 }
 
+/* postmap_upgrade - upgrade a map */
+
+static int postmap_upgrade(const char *map_type, const char *map_name)
+{
+    DICT   *dict;
+
+    dict = dict_open3(map_type, map_name, O_RDWR,
+			DICT_FLAG_LOCK|DICT_FLAG_UPGRADE);
+    dict_close(dict);
+    return (dict != 0);
+}
+
 /* usage - explain */
 
 static NORETURN usage(char *myname)
@@ -743,6 +757,7 @@ int     main(int argc, char **argv)
     int     postmap_flags = POSTMAP_FLAG_AS_OWNER | POSTMAP_FLAG_SAVE_PERM;
     int     open_flags = O_RDWR | O_CREAT | O_TRUNC;
     int     dict_flags = DICT_FLAG_DUP_WARN | DICT_FLAG_FOLD_FIX;
+    int     upgrade = 0;
     char   *query = 0;
     char   *delkey = 0;
     int     sequence = 0;
@@ -787,7 +802,7 @@ int     main(int argc, char **argv)
     /*
      * Parse JCL.
      */
-    while ((ch = GETOPT(argc, argv, "Nbc:d:fhimnopq:rsvw")) > 0) {
+    while ((ch = GETOPT(argc, argv, "Nbc:d:fhimnopq:rsuvw")) > 0) {
 	switch (ch) {
 	default:
 	    usage(argv[0]);
@@ -804,8 +819,8 @@ int     main(int argc, char **argv)
 		msg_fatal("out of memory");
 	    break;
 	case 'd':
-	    if (sequence || query || delkey)
-		msg_fatal("specify only one of -s -q or -d");
+	    if (sequence || query || delkey || upgrade)
+		msg_fatal("specify only one of -s -q -u or -d");
 	    delkey = optarg;
 	    break;
 	case 'f':
@@ -831,8 +846,8 @@ int     main(int argc, char **argv)
 	    postmap_flags &= ~POSTMAP_FLAG_SAVE_PERM;
 	    break;
 	case 'q':
-	    if (sequence || query || delkey)
-		msg_fatal("specify only one of -s -q or -d");
+	    if (sequence || query || delkey || upgrade)
+		msg_fatal("specify only one of -s -q -u or -d");
 	    query = optarg;
 	    break;
 	case 'r':
@@ -840,9 +855,14 @@ int     main(int argc, char **argv)
 	    dict_flags |= DICT_FLAG_DUP_REPLACE;
 	    break;
 	case 's':
-	    if (query || delkey)
-		msg_fatal("specify only one of -s or -q or -d");
+	    if (query || delkey || upgrade)
+		msg_fatal("specify only one of -s or -q -u or -d");
 	    sequence = 1;
+	    break;
+	case 'u':
+	    if (sequence || query || delkey || upgrade)
+		msg_fatal("specify only one of -s -q -u or -d");
+	    upgrade=1;
 	    break;
 	case 'v':
 	    msg_verbose++;
@@ -914,6 +934,21 @@ int     main(int argc, char **argv)
 	    exit(0);
 	}
 	exit(1);
+    } else if (upgrade) {			/* Upgrade the map(s) */
+	int success = 1;
+	if (optind + 1 > argc)
+	    usage(argv[0]);
+	while (optind < argc) {
+	    if ((path_name = split_at(argv[optind], ':')) != 0) {
+		success &= postmap_upgrade(argv[optind], path_name);
+	    } else {
+		success &= postmap_upgrade(var_db_type, path_name);
+	    }
+	    if (!success)
+		exit(1);
+	    optind++;
+	}
+	exit(0);
     } else {					/* create/update map(s) */
 	if (optind + 1 > argc)
 	    usage(argv[0]);

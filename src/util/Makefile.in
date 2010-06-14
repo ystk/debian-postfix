@@ -21,6 +21,7 @@ SRCS	= alldig.c allprint.c argv.c argv_split.c attr_clnt.c attr_print0.c \
 	read_wait.c readable.c readlline.c ring.c safe_getenv.c safe_open.c \
 	sane_accept.c sane_connect.c sane_link.c sane_rename.c \
 	sane_socketpair.c sane_time.c scan_dir.c set_eugid.c set_ugid.c \
+	load_lib.c sdbm.c \
 	sigdelay.c skipblanks.c sock_addr.c spawn_command.c split_at.c \
 	split_nameval.c stat_as.c strcasecmp.c stream_connect.c \
 	stream_listen.c stream_recv_fd.c stream_send_fd.c stream_trigger.c \
@@ -37,16 +38,17 @@ OBJS	= alldig.o allprint.o argv.o argv_split.o attr_clnt.o attr_print0.o \
 	attr_print64.o attr_print_plain.o attr_scan0.o attr_scan64.o \
 	attr_scan_plain.o auto_clnt.o base64_code.o basename.o binhash.o \
 	chroot_uid.o cidr_match.o clean_env.o close_on_exec.o concatenate.o \
-	ctable.o dict.o dict_alloc.o dict_cdb.o dict_cidr.o dict_db.o \
+	ctable.o dict.o dict_alloc.o dict_cidr.o dict_db.o \
 	dict_dbm.o dict_debug.o dict_env.o dict_ht.o dict_ni.o dict_nis.o \
-	dict_nisplus.o dict_open.o dict_pcre.o dict_regexp.o dict_sdbm.o \
-	dict_static.o dict_tcp.o dict_unix.o dir_forest.o doze.o dummy_read.o \
+	dict_nisplus.o dict_open.o dict_regexp.o dict_sdbm.o \
+	dict_static.o dict_unix.o dir_forest.o doze.o dummy_read.o \
 	dummy_write.o duplex_pipe.o environ.o events.o exec_command.o \
 	fifo_listen.o fifo_trigger.o file_limit.o find_inet.o fsspace.o \
 	fullname.o get_domainname.o get_hostname.o hex_code.o hex_quote.o \
 	host_port.o htable.o inet_addr_host.o inet_addr_list.o \
 	inet_addr_local.o inet_connect.o inet_listen.o inet_proto.o \
 	inet_trigger.o line_wrap.o lowercase.o lstat_as.o mac_expand.o \
+	load_lib.o sdbm.o \
 	mac_parse.o make_dirs.o mask_addr.o match_list.o match_ops.o msg.o \
 	msg_output.o msg_syslog.o msg_vstream.o mvect.o myaddrinfo.o myflock.o \
 	mymalloc.o myrand.o mystrtok.o name_code.o name_mask.o netstring.o \
@@ -80,7 +82,7 @@ HDRS	= argv.h attr.h attr_clnt.h auto_clnt.h base64_code.h binhash.h \
 	msg_output.h msg_syslog.h msg_vstream.h mvect.h myaddrinfo.h myflock.h \
 	mymalloc.h myrand.h name_code.h name_mask.h netstring.h nvtable.h \
 	open_as.h open_lock.h percentm.h posix_signals.h readlline.h ring.h \
-	safe.h safe_open.h sane_accept.h sane_connect.h sane_fsops.h \
+	safe.h safe_open.h sane_accept.h sane_connect.h sane_fsops.h sdbm.h load_lib.h \
 	sane_socketpair.h sane_time.h scan_dir.h set_eugid.h set_ugid.h \
 	sigdelay.h sock_addr.h spawn_command.h split_at.h stat_as.h \
 	stringops.h sys_defs.h timed_connect.h timed_wait.h trigger.h \
@@ -93,6 +95,8 @@ DEFS	= -I. -D$(SYSTYPE)
 CFLAGS	= $(DEBUG) $(OPT) $(DEFS)
 FILES	= Makefile $(SRCS) $(HDRS)
 INCL	=
+PCRESO  = dict_pcre.so
+TCPSO   = dict_tcp.so
 LIB	= libutil.a
 TESTPROG= dict_open dup2_pass_on_exec events exec_command fifo_open \
 	fifo_rdonly_bug fifo_rdwr_bug fifo_trigger fsspace fullname \
@@ -108,10 +112,11 @@ TESTPROG= dict_open dup2_pass_on_exec events exec_command fifo_open \
 
 LIB_DIR	= ../../lib
 INC_DIR	= ../../include
+LIBS    = $(LIB_DIR)/$(LIB) $(LIB_DIR)/$(PCRESO) $(LIB_DIR)/$(TCPSO)
 
-.c.o:;	$(CC) $(CFLAGS) -c $*.c
+.c.o:;	$(CC) -fPIC $(CFLAGS) -c $*.c
 
-all: $(LIB)
+all: $(LIB) $(PCRESO) $(TCPSO)
 
 $(OBJS): ../../conf/makedefs.out
 
@@ -120,15 +125,25 @@ Makefile: Makefile.in
 
 test:	$(TESTPROG)
 
+$(PCRESO): dict_pcre.o
+	gcc -shared -Wl,-soname,dict_pcre.so -o $@ $? -lpcre -L. -lutil
+
+$(TCPSO): dict_tcp.o
+	gcc -shared -Wl,-soname,dict_tcp.so -o $@ $? -L. -lutil
+
 $(LIB):	$(OBJS)
-	$(AR) $(ARFL) $(LIB) $?
-	$(RANLIB) $(LIB)
+	gcc -shared -Wl,-soname,libpostfix-util.so.1 -o $(LIB) $(OBJS) -ldl $(SYSLIBS)
 
 $(LIB_DIR)/$(LIB): $(LIB)
 	cp $(LIB) $(LIB_DIR)
-	$(RANLIB) $(LIB_DIR)/$(LIB)
 
-update: $(LIB_DIR)/$(LIB) $(HDRS)
+$(LIB_DIR)/$(PCRESO): $(PCRESO)
+	cp $(PCRESO) $(LIB_DIR)
+
+$(LIB_DIR)/$(TCPSO): $(TCPSO)
+	cp $(TCPSO) $(LIB_DIR)
+
+update: $(LIBS) $(HDRS)
 	-for i in $(HDRS); \
 	do \
 	  cmp -s $$i $(INC_DIR)/$$i 2>/dev/null || cp $$i $(INC_DIR); \
@@ -150,7 +165,8 @@ lint:
 	lint $(SRCS)
 
 clean:
-	rm -f *.o $(LIB) *core $(TESTPROG) junk $(MAKES) *.tmp
+	rm -f *.o $(LIB) $(PCRESO) $(TCPSO) *core $(TESTPROG) \
+		junk $(MAKES) *.tmp
 	rm -rf printfck
 
 tidy:	clean

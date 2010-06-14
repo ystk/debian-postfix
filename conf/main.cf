@@ -28,7 +28,7 @@
 # See the files in examples/chroot-setup for setting up Postfix chroot
 # environments on different UNIX systems.
 #
-queue_directory = /var/spool/postfix
+#queue_directory = /var/spool/postfix
 
 # The command_directory parameter specifies the location of all
 # postXXX commands.
@@ -39,7 +39,7 @@ command_directory = /usr/sbin
 # daemon programs (i.e. programs listed in the master.cf file). This
 # directory must be owned by root.
 #
-daemon_directory = /usr/libexec/postfix
+daemon_directory = /usr/lib/postfix
 
 # The data_directory parameter specifies the location of Postfix-writable
 # data files (caches, random numbers). This directory must be owned
@@ -56,7 +56,7 @@ data_directory = /var/lib/postfix
 # particular, don't specify nobody or daemon. PLEASE USE A DEDICATED
 # USER.
 #
-mail_owner = postfix
+#mail_owner = postfix
 
 # The default_privs parameter specifies the default rights used by
 # the local delivery agent for delivery to external file or command.
@@ -95,6 +95,11 @@ mail_owner = postfix
 # myorigin also specifies the default domain name that is appended
 # to recipient addresses that have no @domain part.
 #
+# Debian GNU/Linux specific:  Specifying a file name will cause the
+# first line of that file to be used as the name.  The Debian default
+# is /etc/mailname.
+#
+#myorigin = /etc/mailname
 #myorigin = $myhostname
 #myorigin = $mydomain
 
@@ -260,6 +265,7 @@ unknown_local_recipient_reject_code = 550
 #mynetworks = 168.100.189.0/28, 127.0.0.0/8
 #mynetworks = $config_directory/mynetworks
 #mynetworks = hash:/etc/postfix/network_table
+mynetworks = 127.0.0.0/8
 
 # The relay_domains parameter restricts what destinations this system will
 # relay mail to.  See the smtpd_recipient_restrictions description in
@@ -440,8 +446,8 @@ unknown_local_recipient_reject_code = 550
 # IF YOU USE THIS TO DELIVER MAIL SYSTEM-WIDE, YOU MUST SET UP AN
 # ALIAS THAT FORWARDS MAIL FOR ROOT TO A REAL USER.
 #
-#mailbox_command = /some/where/procmail
-#mailbox_command = /some/where/procmail -a "$EXTENSION"
+#mailbox_command = /usr/bin/procmail
+#mailbox_command = /usr/bin/procmail -a "$EXTENSION"
 
 # The mailbox_transport specifies the optional transport in master.cf
 # to use after processing aliases and .forward files. This parameter
@@ -543,6 +549,8 @@ unknown_local_recipient_reject_code = 550
 #
 #smtpd_banner = $myhostname ESMTP $mail_name
 #smtpd_banner = $myhostname ESMTP $mail_name ($mail_version)
+smtpd_banner = $myhostname ESMTP $mail_name (@@DISTRO@@)
+
 
 # PARALLEL DELIVERY TO THE SAME DESTINATION
 #
@@ -567,7 +575,7 @@ unknown_local_recipient_reject_code = 550
 # logging level when an SMTP client or server host name or address
 # matches a pattern in the debug_peer_list parameter.
 #
-debug_peer_level = 2
+#debug_peer_level = 2
 
 # The debug_peer_list parameter specifies an optional list of domain
 # or network patterns, /file/name patterns or type:name tables. When

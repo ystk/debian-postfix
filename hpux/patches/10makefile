@@ -1,0 +1,121 @@
+diff -ur ../src.orig/src/dns/Makefile src/dns/Makefile
+--- ../src.orig/src/dns/Makefile	Mon Oct 21 18:54:57 2002
++++ src/dns/Makefile	Mon Oct 21 19:00:43 2002
+@@ -27,7 +27,7 @@
+ LIB_DIR	= ../../lib
+ INC_DIR	= ../../include
+ 
+-.c.o:;	$(CC) -fPIC $(CFLAGS) -c $*.c
++.c.o:;	$(CC) +z $(CFLAGS) -c $*.c
+ 
+ all: $(LIB)
+ 
+@@ -39,7 +39,7 @@
+ test:	$(TESTPROG)
+ 
+ $(LIB):	$(OBJS)
+-	gcc -shared -Wl,-soname,libpostfix-dns.so.1 -o $(LIB) $(OBJS) $(LIBS) $(SYSLIBS)
++	ld -b +h /opt/postfix/lib/libdns.1 -o $(LIB) $(OBJS) $(SYSLIBS)
+ 
+ $(LIB_DIR)/$(LIB): $(LIB)
+ 	cp $(LIB) $(LIB_DIR)
+diff -ur ../src.orig/src/global/Makefile src/global/Makefile
+--- ../src.orig/src/global/Makefile	Mon Oct 21 18:54:55 2002
++++ src/global/Makefile	Mon Oct 21 19:00:43 2002
+@@ -95,7 +95,7 @@
+ MAKES	=
+ LDAPSO  = dict_ldap.so
+ 
+-.c.o:;	$(CC) -fPIC $(CFLAGS) -c $*.c
++.c.o:;	$(CC) +z $(CFLAGS) -c $*.c
+ 
+ all: $(LIB)
+ 
+@@ -105,10 +105,10 @@
+ test:	$(TESTPROG)
+ 
+ $(LIB):	$(OBJS)
+-	gcc -shared -Wl,-soname,libpostfix-global.so.1 -o $(LIB) $(OBJS) $(LIBS) $(SYSLIBS)
++	ld -b +h /opt/postfix/lib/libglobal.1 -o $(LIB) $(OBJS) $(SYSLIBS)
+ 
+ $(LDAPSO): dict_ldap.o
+-	gcc -shared -Wl,-soname,dict_ldap.so -o $@ $? -lldap -llber -L../../lib -lutil -L. -lglobal
++	ld -b +h /opt/postfix/lib/dict_ldap.so -o $@ $? -L/opt/ldap/lib -lldap -llber -L../../lib -lutil -L. -lglobal
+ 
+ dict_ldap.c:	../util/dict_ldap.c
+ 	ln -f $? $@
+diff -ur ../src.orig/src/master/Makefile src/master/Makefile
+--- ../src.orig/src/master/Makefile	Mon Oct 21 18:54:59 2002
++++ src/master/Makefile	Mon Oct 21 19:00:43 2002
+@@ -35,7 +35,7 @@
+ INC_DIR	= ../../include
+ BIN_DIR	= ../../libexec
+ 
+-.c.o:;	$(CC) `for i in $(LIB_OBJ); do [ $$i = $@ ] && echo -fPIC; done` $(CFLAGS) -c $*.c
++.c.o:;	$(CC) `for i in $(LIB_OBJ); do [ $$i = $@ ] && echo +z; done` $(CFLAGS) -c $*.c
+ 
+ all:	$(PROG) $(LIB)
+ 
+@@ -50,7 +50,7 @@
+ test:	$(TESTPROG)
+ 
+ $(LIB):	$(LIB_OBJ)
+-	gcc -shared -Wl,-soname,libpostfix-master.so.1 -o $(LIB) $(LIB_OBJ) $(LIBS) $(SYSLIBS)
++	ld -b +h /opt/postfix/lib/libmaster.1 -o $(LIB) $(LIB_OBJ) $(SYSLIBS)
+ 
+ $(LIB_DIR)/$(LIB): $(LIB)
+ 	cp $(LIB) $(LIB_DIR)/$(LIB)
+diff -ur ../src.orig/src/util/Makefile src/util/Makefile
+--- ../src.orig/src/util/Makefile	Mon Oct 21 18:54:53 2002
++++ src/util/Makefile	Mon Oct 21 19:04:22 2002
+@@ -112,10 +112,10 @@
+ 
+ LIB_DIR	= ../../lib
+ INC_DIR	= ../../include
+-LIBS    = $(LIB_DIR)/$(LIB) $(LIB_DIR)/$(PCRESO) $(LIB_DIR)/$(MYSQLSO) \
++LIBS    = $(LIB_DIR)/$(LIB) $(LIB_DIR)/$(PCRESO) \
+ 	  $(LIB_DIR)/$(PGSQLSO) $(LIB_DIR)/$(TCPSO) $(LIB_DIR)/$(SDBMSO)
+ 
+-.c.o:;	$(CC) -fPIC $(CFLAGS) -c $*.c
++.c.o:;	$(CC) +z $(CFLAGS) -c $*.c
+ 
+ all: $(LIB)
+ 
+@@ -125,22 +125,22 @@
+ test:	$(TESTPROG)
+ 
+ $(PCRESO): dict_pcre.o
+-	gcc -shared -Wl,-soname,dict_pcre.so -o $@ $? -lpcre -L. -lutil
++	ld -b +h /opt/postfix/lib/dict_pcre.so -o $@ $? -L/opt/pcre/lib -lpcre -L. -lutil
+ 
+ $(MYSQLSO): dict_mysql.o
+-	gcc -shared -Wl,-soname,dict_mysql.so -o $@ $? -lmysqlclient -L. -lutil
++	ld -b +h /opt/postfix/lib/dict_mysql.so -o $@ $? -L/opt/mysql/lib -lmysql -L. -lutil
+
+ $(PGSQLSO): dict_pgsql.o
+-	gcc -shared -Wl,-soname,dict_pgsql.so -o $@ $? -lpq -L. -lutil
++	ld -b +h /opt/postfix/lib/dict_pgsql.so -o $@ $? -L/opt/postgres/lib -lpq -L. -lutil
+ 
+ $(TCPSO): dict_tcp.o
+-	gcc -shared -Wl,-soname,dict_tcp.so -o $@ $? -L. -lutil
++	ld -b +h /opt/postfix/lib/dict_tcp.so -o $@ $? -L. -lutil
+ 
+ $(SDBMSO): dict_sdbm.o sdbm.o
+-	gcc -shared -Wl,-soname,dict_sdbm.so -o $@ dict_sdbm.o sdbm.o -L. -lutil
++	ld -b +h /opt/postfix/lib/dict_sdbm.so -o $@ $? -L. -lutil
+ 
+ $(LIB):	$(OBJS)
+-	gcc -shared -Wl,-soname,libpostfix-util.so.1 -o $(LIB) $(OBJS) -ldl $(SYSLIBS)
++	ld -b +h /opt/postfix/lib/libutil.1 -o $(LIB) $(OBJS) $(SYSLIBS)
+ 
+ $(LIB_DIR)/$(LIB): $(LIB)
+ 	cp $(LIB) $(LIB_DIR)
+@@ -149,7 +149,7 @@
+ 	cp $(PCRESO) $(LIB_DIR)
+ 
+ $(LIB_DIR)/$(MYSQLSO): $(MYSQLSO)
+-	cp $(MYSQLSO) $(LIB_DIR)
++	#cp $(MYSQLSO) $(LIB_DIR)
+ 
+ $(LIB_DIR)/$(TCPSO): $(TCPSO)
+ 	cp $(TCPSO) $(LIB_DIR)

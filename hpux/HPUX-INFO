@@ -1,0 +1,16 @@
+The HP-UX build tree is currently in mid-flight.  The build should work,
+but the postinst/configure scripts are still pending.  So far, the result
+is UNTESTED.
+
+The intention here is to provide an build process for hp-ux that is open-
+source, and relieve me from some of my support duties there.  Starting with
+a base HP-UX machine, the following need to be installed to make life happy.
+
+From HP:
+  1) HP's C-ANSI-C product.
+
+From Debian:
+  2) GNU patch
+  3) GNU install (in the fileutils package)
+  4) PCRE3
+  5) OpenLDAP
