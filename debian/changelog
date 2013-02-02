@@ -1,3 +1,11 @@
+postfix (2.7.1-1+squeeze1) stable-security; urgency=high
+
+  * Fix data injection in TLS handshaking (CVE-2011-0411)
+  * Don't reuse the SASL handle after authentication failure
+    (CVE-2011-1720)
+
+ -- Florian Weimer <fw@deneb.enyo.de>  Wed, 04 May 2011 21:09:07 +0200
+
 postfix (2.7.1-1) unstable; urgency=low
 
   [Matt Moen]
