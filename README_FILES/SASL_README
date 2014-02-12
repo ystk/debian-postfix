@@ -14,7 +14,7 @@ HHooww PPoossttffiixx uusseess SSAASSLL aauutthheenntti
 
 SMTP servers need to decide whether an SMTP client is authorized to send mail
 to remote destinations, or only to destinations that the server itself is
-responsible for. Usually, SMTP servers allow mail to remote destinations when
+responsible for. Usually, SMTP servers accept mail to remote destinations when
 the client's IP address is in the "same network" as the server's IP address.
 
 SMTP clients outside the SMTP server's network need a different way to get
@@ -26,10 +26,9 @@ can give it "same network" privileges.
 
 Postfix does not implement SASL itself, but instead uses existing
 implementations as building blocks. This means that some SASL-related
-configuration will involve files that belong to Postfix, while other
-configuration will involve files that belong to the specific SASL
-implementation that Postfix will use. This document covers both the Postfix and
-non-Postfix configuration.
+configuration files will belong to Postfix, while other configuration files
+belong to the specific SASL implementation that Postfix will use. This document
+covers both the Postfix and non-Postfix configuration.
 
 You can read more about the following topics:
 
@@ -87,9 +86,9 @@ implementations.
 
     NNoottee
 
-    Before Postfix version 2.3, Postfix had support only for Cyrus SASL.
     Current Postfix versions have a plug-in architecture that can support
-    multiple SASL implementations.
+    multiple SASL implementations. Before Postfix version 2.3, Postfix had
+    support only for Cyrus SASL.
 
 To find out what SASL implementations are compiled into Postfix, use the
 following commands:
@@ -108,9 +107,14 @@ configure and operate the Dovecot authentication server.
 
 PPoossttffiixx ttoo DDoovveeccoott SSAASSLL ccoommmmuunniiccaattiioonn
 
-Communication between the Postfix SMTP server and Dovecot SASL happens via a
-UNIX-domain socket. The socket pathname and the list of mechanisms offered to
-Postfix need to be specified on the Dovecot server side in dovecot.conf.
+Communication between the Postfix SMTP server and Dovecot SASL happens over a
+UNIX-domain socket or over a TCP socket. Dovecot 1 supports UNIX-domain socket
+communication only.
+
+UUNNIIXX--ddoommaaiinn ssoocckkeett ccoommmmuunniiccaattiioonn
+
+The socket pathname and the list of mechanisms offered to Postfix need to be
+specified on the Dovecot server side in dovecot.conf.
 
 The following example assumes that the Postfix queue is under /var/spool/
 postfix/.
@@ -135,6 +139,34 @@ postfix/.
 Line 3 provides plain and login as mechanisms for the Postfix SMTP server, line
 10 places the Dovecot SASL socket in /var/spool/postfix/private/auth, and lines
 11-13 limit read+write permissions to user and group postfix only.
+
+Proceed with the section "Enabling SASL authentication and authorization in the
+Postfix SMTP server" to turn on and use SASL in the Postfix SMTP server.
+
+TTCCPP ssoocckkeett ccoommmmuunniiccaattiioonn
+
+The TCP port and the list of mechanisms offered to Postfix need to be specified
+on the Dovecot server side in 10-auth.conf and 10-master.conf.
+
+The following examples assume that Postfix should communicate with Dovecot on
+TCP port 12345.
+
+    1 /etc/dovecot/conf.d/10-auth.conf:
+    2     auth_mechanisms = plain login
+
+Line 2 provides plain and login as mechanisms for the Postfix SMTP server.
+
+    1 /etc/dovecot/conf.d/10-master.conf:
+    2     service auth {
+    3       unix_listener auth-userdb {
+    4       }
+    5       inet_listener {
+    6         port = 12345
+    7       }
+    8     }
+
+Line 5 creates a new TCP socket and line 6 specifies port 12345 where Dovecot
+SASL should wait for Postfix authentication requests.
 
 Proceed with the section "Enabling SASL authentication and authorization in the
 Postfix SMTP server" to turn on and use SASL in the Postfix SMTP server.
@@ -647,16 +679,30 @@ dovecot instead of cyrus:
     /etc/postfix/main.cf:
         smtpd_sasl_type = dovecot
 
-Additionally set the path where the Postfix SMTP server can find the Dovecot
-SASL socket:
+Additionally specify how Postfix SMTP server can find the Dovecot
+authentication server. This depends on the settings that you have selected in
+the section "Postfix to Dovecot SASL communication".
+
+  * If you configured Dovecot for UNIX-domain socket communication, configure
+    Postfix as follows:
 
     /etc/postfix/main.cf:
         smtpd_sasl_path = private/auth
 
     NNoottee
-
     This example uses a pathname relative to the Postfix queue directory, so
     that it will work whether or not the Postfix SMTP server runs chrooted.
+
+  * If you configured Dovecot for TCP socket communication, configure Postfix
+    as follows. If Dovecot runs on a different machine, replace 127.0.0.1 by
+    that machine's IP address.
+
+    /etc/postfix/main.cf:
+        smtpd_sasl_path = inet:127.0.0.1:12345
+
+    NNoottee
+    If you specify a remote IP address, information will be sent as plaintext
+    over the network.
 
 EEnnaabblliinngg SSAASSLL aauutthheennttiiccaattiioonn iinn tthhee PPoossttffiixx SSMMTTPP sseerrvveerr
 
@@ -701,6 +747,7 @@ capability twice - once for compliant and once for broken clients:
 
     % tteellnneett sseerrvveerr..eexxaammppllee..ccoomm 2255
     ...
+    220 server.example.com ESMTP Postfix
     EEHHLLOO cclliieenntt..eexxaammppllee..ccoomm
     250-server.example.com
     250-PIPELINING
@@ -885,7 +932,7 @@ TTeessttiinngg SSAASSLL aauutthheennttiiccaattiioonn i
 
 To test the server side, connect (for example, with telnet) to the Postfix SMTP
 server port and you should be able to have a conversation as shown below.
-Information sent by the client (that is, you) is shown in bold font.
+Information sent by the client (that is, you) is shown in bboolldd font.
 
     % tteellnneett sseerrvveerr..eexxaammppllee..ccoomm 2255
     ...
@@ -900,6 +947,15 @@ Information sent by the client (that is, you) is shown in bold font.
     AAUUTTHH PPLLAAIINN AAHHRRllcc33QQAAddGGVVzzddHHBBhhcc33MM==
     235 Authentication successful
 
+To test this over a connection that is encrypted with TLS, use openssl s_client
+instead of telnet:
+
+    % ooppeennssssll ss__cclliieenntt --ccoonnnneecctt sseerrvveerr..eexxaammppllee..ccoomm::2255 --ssttaarrttttllss ssmmttpp
+    ...
+    220 server.example.com ESMTP Postfix
+    EEHHLLOO cclliieenntt..eexxaammppllee..ccoomm
+    ...see above example for more...
+
 Instead of AHRlc3QAdGVzdHBhc3M=, specify the base64-encoded form of
 \0username\0password (the \0 is a null byte). The example above is for a user
 named `test' with password `testpass'.
@@ -913,21 +969,34 @@ named `test' with password `testpass'.
 You can use one of the following commands to generate base64 encoded
 authentication information:
 
-    % ggeenn--aauutthh ppllaaiinn
-    username: uusseerrnnaammee
-    password:
+  * Using a recent version of the bbaasshh shell:
 
-The ggeenn--aauutthh Perl script was written by John Jetmore and can be found at http:/
-/jetmore.org/john/code/gen-auth.
+        % eecchhoo --nnee ''\\000000uusseerrnnaammee\\000000ppaasssswwoorrdd'' || ooppeennssssll bbaassee6644
 
-    % pprriinnttff ''\\00uusseerrnnaammee\\00ppaasssswwoorrdd'' || mmmmeennccooddee
+    Some other shells support similar syntax.
 
-The mmmmeennccooddee command is part of the metamail software.
+  * Using the pprriinnttff command:
 
-    % ppeerrll --MMMMIIMMEE::::BBaassee6644 --ee \\
-        ''pprriinntt eennccooddee__bbaassee6644((""\\00uusseerrnnaammee\\00ppaasssswwoorrdd""));;''
+        % pprriinnttff ''\\00%%ss\\00%%ss'' ''uusseerrnnaammee'' ''ppaasssswwoorrdd'' || ooppeennssssll bbaassee6644
+        % pprriinnttff ''\\00%%ss\\00%%ss'' ''uusseerrnnaammee'' ''ppaasssswwoorrdd'' || mmmmeennccooddee
 
-MIME::Base64 is available from http://www.cpan.org/.
+    The mmmmeennccooddee command is part of the metamail software.
+
+  * Using Perl MMIIMMEE::::BBaassee6644:
+
+        % ppeerrll --MMMMIIMMEE::::BBaassee6644 --ee \\
+            ''pprriinntt eennccooddee__bbaassee6644((""\\00uusseerrnnaammee\\00ppaasssswwoorrdd""));;''
+
+    MIME::Base64 is available from http://www.cpan.org/.
+
+  * Using the ggeenn--aauutthh script:
+
+        % ggeenn--aauutthh ppllaaiinn
+        username: uusseerrnnaammee
+        password:
+
+    The ggeenn--aauutthh Perl script was written by John Jetmore and can be found at
+    http://jetmore.org/john/code/gen-auth.
 
 CCoonnffiigguurriinngg SSAASSLL aauutthheennttiiccaattiioonn iinn tthhee PPoossttffiixx SSMMTTPP//LLMMTTPP cclliieenntt
 
@@ -1119,21 +1188,37 @@ such cases the SMTP client will log the following error message:
     This same error message will also be logged when the libplain.so or
     liblogin.so modules are not installed in the /usr/lib/sasl2 directory.
 
-The less secure approach is to lower the security standards and permit
-plaintext authentication mechanisms:
+The insecure approach is to lower the security standards and permit plaintext
+authentication mechanisms:
 
     /etc/postfix/main.cf:
         smtp_sasl_security_options = noanonymous
 
-If the remote server supports TLS, you can protect the plaintext username and
-password by turning on TLS in the Postfix SMTP client (see: TLS_README), and
-configuring the client as discussed next.
+The more secure approach is to protect the plaintext username and password with
+TLS session encryption. To find out if the remote SMTP server supports TLS,
+connect to the server and see if it announces STARTTLS support as shown in the
+example. Information sent by the client (that is, you) is shown in bboolldd font.
+
+    % tteellnneett sseerrvveerr..eexxaammppllee..ccoomm 2255
+    ...
+    220 server.example.com ESMTP Postfix
+    EEHHLLOO cclliieenntt..eexxaammppllee..ccoomm
+    250-server.example.com
+    250-PIPELINING
+    250-SIZE 10240000
+    250-STARTTLS
+    ...
+
+Instead of port 25 (smtp), specify port 587 (submission) where appriopriate.
 
 EEnnccrryypptteedd SSMMTTPP sseessssiioonn ((TTLLSS))
 
-A separate parameter controls Postfix SASL mechanism policy during a TLS-
-encrypted SMTP session. The default is to copy the settings from the
-unencrypted session:
+To turn on TLS in the Postfix SMTP client, see TLS_README for configuration
+details.
+
+The smtp_sasl_tls_security_options parameter controls Postfix SASL mechanism
+policy during a TLS-encrypted SMTP session. The default is to copy the settings
+from the unencrypted session:
 
     /etc/postfix/main.cf:
         smtp_sasl_tls_security_options = $smtp_sasl_security_options
@@ -1142,15 +1227,15 @@ A more sophisticated policy allows plaintext mechanisms, but only over a TLS-
 encrypted connection:
 
     /etc/postfix/main.cf:
-        smtpd_sasl_security_options = noanonymous, noplaintext
-        smtpd_sasl_tls_security_options = noanonymous
+        smtp_sasl_security_options = noanonymous, noplaintext
+        smtp_sasl_tls_security_options = noanonymous
 
 PPoossttffiixx SSMMTTPP//LLMMTTPP cclliieenntt ppoolliiccyy -- SSAASSLL mmeecchhaanniissmm nnaammeess
 
-Unfortunately, Postfix needs a second client policy for SASL mechanism
-selection. Reason: the Cyrus SASL library will choose the most secure
-authentication mechanism that both the SMTP client and server implement - even
-if one of the parties was not configured for that mechanism.
+Given the SASL security options of the previous section, the Cyrus SASL library
+will choose the most secure authentication mechanism that both the SMTP client
+and server implement. Unfortunately, that authentication mechanism may fail
+because the client or server is not configured to use that mechanism.
 
 To prevent this, the Postfix SMTP client can filter the names of the
 authentication mechanisms from the remote SMTP server. Used correctly, the

@@ -84,6 +84,7 @@ void    smtpd_state_init(SMTPD_STATE *state, VSTREAM *stream,
     state->service = mystrdup(service);
     state->buffer = vstring_alloc(100);
     state->addr_buf = vstring_alloc(100);
+    state->conn_count = state->conn_rate = 0;
     state->error_count = 0;
     state->error_mask = 0;
     state->notify_mask = name_mask(VAR_NOTIFY_CLASSES, mail_error_masks,
@@ -138,16 +139,22 @@ void    smtpd_state_init(SMTPD_STATE *state, VSTREAM *stream,
     state->dsn_buf = vstring_alloc(100);
     state->dsn_orcpt_buf = vstring_alloc(100);
 #ifdef USE_TLS
-    state->tls_use_tls = 0;
-    state->tls_enforce_tls = 0;
-    state->tls_auth_only = 0;
+#ifdef USE_TLSPROXY
+    state->tlsproxy = 0;
+#endif
     state->tls_context = 0;
 #endif
 
+
+    /*
+     * Minimal initialization to support external authentication (e.g.,
+     * XCLIENT) without having to enable SASL in main.cf.
+     */
 #ifdef USE_SASL_AUTH
     if (SMTPD_STAND_ALONE(state))
 	var_smtpd_sasl_enable = 0;
     smtpd_sasl_set_inactive(state);
+    smtpd_sasl_state_init(state);
 #endif
 
     state->milter_argv = 0;
@@ -167,6 +174,9 @@ void    smtpd_state_init(SMTPD_STATE *state, VSTREAM *stream,
      * Initialize the conversation history.
      */
     smtpd_chat_reset(state);
+
+    state->ehlo_argv = 0;
+    state->ehlo_buf = 0;
 }
 
 /* smtpd_state_reset - cleanup after disconnect */
@@ -211,4 +221,8 @@ void    smtpd_state_reset(SMTPD_STATE *state)
 	vstring_free(state->dsn_buf);
     if (state->dsn_orcpt_buf)
 	vstring_free(state->dsn_orcpt_buf);
+#if (defined(USE_TLS) && defined(USE_TLSPROXY))
+    if (state->tlsproxy)			/* still open after longjmp */
+	vstream_fclose(state->tlsproxy);
+#endif
 }

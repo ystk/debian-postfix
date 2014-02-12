@@ -49,7 +49,7 @@
 /*
 /*	In order to fend off denial of service attacks, message headers
 /*	are truncated at or above var_header_limit bytes, message boundary
-/*	strings are truncated at var_boundary_len bytes, and the multipart
+/*	strings are truncated at var_mime_bound_len bytes, and the multipart
 /*	nesting level is limited to var_mime_maxdepth levels.
 /*
 /*	mime_state_alloc() creates a MIME state machine. The machine
@@ -925,7 +925,9 @@ int     mime_state_update(MIME_STATE *state, int rec_type,
 		    if (state->curr_domain != MIME_ENC_7BIT)
 			REPORT_ERROR(state, MIME_ERR_ENCODING_DOMAIN,
 				 mime_state_enc_name(state->curr_encoding));
-		} else {
+		}
+		/* EAI: message/global allows non-identity encoding. */
+		else if (state->curr_stype == MIME_STYPE_RFC822) {
 		    if (state->curr_encoding != state->curr_domain)
 			REPORT_ERROR(state, MIME_ERR_ENCODING_DOMAIN,
 				 mime_state_enc_name(state->curr_encoding));

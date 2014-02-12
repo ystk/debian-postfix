@@ -30,6 +30,9 @@
 /*	const CFG_PARSER *parser;
 /*	const char *name;
 /*	int defval;
+/*
+/*	DICT_OWNER cfg_get_owner(parser)
+/*	const CFG_PARSER *parser;
 /* DESCRIPTION
 /*	This module implements utilities for parsing parameters defined
 /*	either as "\fIname\fR = \fBvalue\fR" in a file pointed to by
@@ -37,7 +40,8 @@
 /*	\fBvalue\fR" in main.cf (the old LDAP style).  It unifies the
 /*	two styles and provides support for range checking.
 /*
-/*	\fIcfg_parser_alloc\fR initializes the parser.
+/*	\fIcfg_parser_alloc\fR initializes the parser. The result
+/*	is NULL if a configuration file could not be opened.
 /*
 /*	\fIcfg_parser_free\fR releases the parser.
 /*
@@ -55,6 +59,8 @@
 /*	Conveniently, \fIcfg_get_str\fR returns \fBNULL\fR if
 /*	\fIdefval\fR is \fBNULL\fR and no value was found.  The returned
 /*	string has to be freed by the caller if not \fBNULL\fR.
+/*
+/*	cfg_get_owner() looks up the configuration file owner.
 /* DIAGNOSTICS
 /*	Fatal errors: bad string length, malformed numerical value, malformed
 /*	boolean value.
@@ -82,7 +88,8 @@
 
 #include "sys_defs.h"
 
-#include <stdio.h>
+#include <stdlib.h>
+#include <errno.h>
 #include <string.h>
 
 #ifdef STRCASECMP_IN_STRINGS_H
@@ -146,11 +153,14 @@ static int get_dict_int(const struct CFG_PARSER *parser,
 		             const char *name, int defval, int min, int max)
 {
     const char *strval;
+    char   *end;
     int     intval;
-    char    junk;
+    long    longval;
 
     if ((strval = (char *) dict_lookup(parser->name, name)) != 0) {
-	if (sscanf(strval, "%d%c", &intval, &junk) != 1)
+	errno = 0;
+	intval = longval = strtol(strval, &end, 10);
+	if (*strval == 0 || *end != 0 || errno == ERANGE || longval != intval)
 	    msg_fatal("%s: bad numerical configuration: %s = %s",
 		      parser->name, name, strval);
     } else
@@ -218,21 +228,31 @@ CFG_PARSER *cfg_parser_alloc(const char *pname)
 {
     const char *myname = "cfg_parser_alloc";
     CFG_PARSER *parser;
+    DICT   *dict;
 
     if (pname == 0 || *pname == 0)
 	msg_fatal("%s: null parser name", myname);
     parser = (CFG_PARSER *) mymalloc(sizeof(*parser));
     parser->name = mystrdup(pname);
     if (*parser->name == '/' || *parser->name == '.') {
-	dict_load_file(parser->name, parser->name);
+	if (dict_load_file_xt(parser->name, parser->name) == 0) {
+	    myfree(parser->name);
+	    myfree((char *) parser);
+	    return (0);
+	}
 	parser->get_str = get_dict_str;
 	parser->get_int = get_dict_int;
 	parser->get_bool = get_dict_bool;
+	dict = dict_handle(parser->name);
     } else {
 	parser->get_str = get_main_str;
 	parser->get_int = get_main_int;
 	parser->get_bool = get_main_bool;
+	dict = dict_handle(CONFIG_DICT);	/* XXX Use proper API */
     }
+    if (dict == 0)
+	msg_panic("%s: dict_handle failed", myname);
+    parser->owner = dict->owner;
     return (parser);
 }
 

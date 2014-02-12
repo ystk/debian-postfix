@@ -113,6 +113,7 @@
 #include <myaddrinfo.h>
 #include <sock_addr.h>
 #include <inet_proto.h>
+#include <split_at.h>
 
 /* Global library. */
 
@@ -225,6 +226,14 @@ void    smtpd_peer_init(SMTPD_STATE *state)
 	state->port = mystrdup(client_port.buf);
 
 	/*
+	 * XXX Strip off the IPv6 datalink suffix to avoid false alarms with
+	 * strict address syntax checks.
+	 */
+#ifdef HAS_IPV6
+	(void) split_at(client_addr.buf, '%');
+#endif
+
+	/*
 	 * We convert IPv4-in-IPv6 address to 'true' IPv4 address early on,
 	 * but only if IPv4 support is enabled (why would anyone want to turn
 	 * it off)? With IPv4 support enabled we have no need for the IPv6
@@ -328,17 +337,18 @@ void    smtpd_peer_init(SMTPD_STATE *state)
 	     * must not be allowed to enter the audit trail, as people would
 	     * draw false conclusions.
 	     */
-	    aierr = hostname_to_sockaddr(state->name, (char *) 0, 0, &res0);
+	    aierr = hostname_to_sockaddr_pf(state->name, state->addr_family,
+					    (char *) 0, 0, &res0);
 	    if (aierr) {
-		msg_warn("%s: hostname %s verification failed: %s",
-			 state->addr, state->name, MAI_STRERROR(aierr));
+		msg_warn("hostname %s does not resolve to address %s: %s",
+			 state->name, state->addr, MAI_STRERROR(aierr));
 		REJECT_PEER_NAME(state, (TEMP_AI_ERROR(aierr) ?
 			    SMTPD_PEER_CODE_TEMP : SMTPD_PEER_CODE_FORGED));
 	    } else {
 		for (res = res0; /* void */ ; res = res->ai_next) {
 		    if (res == 0) {
-			msg_warn("%s: address not listed for hostname %s",
-				 state->addr, state->name);
+			msg_warn("hostname %s does not resolve to address %s",
+				 state->name, state->addr);
 			REJECT_PEER_NAME(state, SMTPD_PEER_CODE_FORGED);
 			break;
 		    }
@@ -362,8 +372,13 @@ void    smtpd_peer_init(SMTPD_STATE *state)
     else {
 	state->name = mystrdup("localhost");
 	state->reverse_name = mystrdup("localhost");
-	state->addr = mystrdup("127.0.0.1");	/* XXX bogus. */
-	state->rfc_addr = mystrdup("127.0.0.1");/* XXX bogus. */
+	if (proto_info->sa_family_list[0] == PF_INET6) {
+	    state->addr = mystrdup("::1");	/* XXX bogus. */
+	    state->rfc_addr = mystrdup(IPV6_COL "::1");	/* XXX bogus. */
+	} else {
+	    state->addr = mystrdup("127.0.0.1");/* XXX bogus. */
+	    state->rfc_addr = mystrdup("127.0.0.1");	/* XXX bogus. */
+	}
 	state->addr_family = AF_UNSPEC;
 	state->name_status = SMTPD_PEER_CODE_OK;
 	state->reverse_name_status = SMTPD_PEER_CODE_OK;
