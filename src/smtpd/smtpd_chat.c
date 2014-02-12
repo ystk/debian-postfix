@@ -83,10 +83,12 @@
 #include <mail_addr.h>
 #include <post_mail.h>
 #include <mail_error.h>
+#include <smtp_reply_footer.h>
 
 /* Application-specific. */
 
 #include "smtpd.h"
+#include "smtpd_expand.h"
 #include "smtpd_chat.h"
 
 #define STR	vstring_str
@@ -125,7 +127,12 @@ void    smtpd_chat_query(SMTPD_STATE *state)
 {
     int     last_char;
 
-    last_char = smtp_get(state->buffer, state->client, var_line_limit);
+    /*
+     * We can't parse or store input that exceeds var_line_limit, so we skip
+     * over it to avoid loss of synchronization.
+     */
+    last_char = smtp_get(state->buffer, state->client, var_line_limit,
+			 SMTP_GET_FLAG_SKIP);
     smtp_chat_append(state, "In:  ", STR(state->buffer));
     if (last_char != '\n')
 	msg_warn("%s: request longer than %d: %.30s...",
@@ -156,6 +163,13 @@ void    smtpd_chat_reply(SMTPD_STATE *state, const char *format,...)
     va_start(ap, format);
     vstring_vsprintf(state->buffer, format, ap);
     va_end(ap);
+
+    if (*var_smtpd_rej_footer
+	&& (*(cp = STR(state->buffer)) == '4' || *cp == '5'))
+	smtp_reply_footer(state->buffer, 0, var_smtpd_rej_footer,
+			  STR(smtpd_expand_filter), smtpd_expand_lookup,
+			  (char *) state);
+
     /* All 5xx replies must have a 5.xx.xx detail code. */
     for (cp = STR(state->buffer), end = cp + strlen(STR(state->buffer));;) {
 	if (var_soft_bounce) {
@@ -168,6 +182,10 @@ void    smtpd_chat_reply(SMTPD_STATE *state, const char *format,...)
 	/* This is why we use strlen() above instead of VSTRING_LEN(). */
 	if ((next = strstr(cp, "\r\n")) != 0) {
 	    *next = 0;
+	    if (next[2] != 0)
+		cp[3] = '-';			/* contact footer kludge */
+	    else
+		next = end;			/* strip trailing \r\n */
 	} else {
 	    next = end;
 	}

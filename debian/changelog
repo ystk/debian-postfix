@@ -1,8 +1,514 @@
+postfix (2.9.6-2) wheezy; urgency=low
+
+  * Fix fumbled merge to actually have the right maintainer address. 
+    See also bug 702412.  Closes: #699877
+
+ -- LaMont Jones <lamont@debian.org>  Wed, 06 Mar 2013 07:28:23 -0700
+
+postfix (2.9.6-1) unstable; urgency=low
+
+  [Wietse Venema]
+
+  * New upstream version
+
+  [Scott Kitterman]
+
+  * reacquire NIS authentication, include libresolv in chroot.  Closes: #683687
+
+  [LaMont Jones]
+
+  * Drop bashism in init.d script.  Closes: #690936
+
+ -- LaMont Jones <lamont@debian.org>  Tue, 05 Feb 2013 17:11:41 -0700
+
+postfix (2.9.5-1ubuntu1) raring; urgency=low
+
+  * Merge from Debian unstable.  Remaining changes:
+    - Re-enabled NIS authentication which was inadvertently dropped
+
+ -- Scott Kitterman <scott@kitterman.com>  Mon, 31 Dec 2012 17:13:13 -0500
+
+postfix (2.9.5-1) unstable; urgency=low
+
+  [Wietse Venema]
+
+  * New upstream version
+
+  [LaMont Jones]
+
+  * memcache support was dropped in error as part of Debian packaging. 
+    Reported by: Ács Gábor <acs.gabor@linuxprog.hu>
+  * Merge remote-tracking branch 'origin/stable/v2.9' into stable/v2.9
+  * Acknowledege 2.9.3-2.1 NMU, add Indonesian
+
+  [localization folks]
+
+  * l10n: Russian translation updates.  Closes: #677135 (Sergey Alyoshin)
+  * l10n: Japanese translation updates.  Closes: #675738 (Kenshi Muto)
+  * l10n: Catalan translation updates.  Closes: #675758 (Jordà Polo)
+  * l10n: German translation updates.  Closes: #675999 (Helge Kreutzmann)
+  * l10n: Dutch translation updates.  Closes: #675953 (Jeroen Schot)
+  * l10n: Finnish translation updates.  Closes: #676178 (Tommi Vainikainen)
+  * l10n: Indonesian translations.  Closes: #695644 (Mahyuddin Susanto)
+  * l10n: Swedish translation updates.  Closes: #675994 (Martin Bagge)
+  * l10n: Danish translation updates.  Closes: #675609 (Joe Dalton)
+  * l10n: Czech translation updates.  Closes: #675574 (Miroslav Kure)
+  * l10n: Add Polish debconf translation.  Closes: #676835 (Michał Kułach)
+  * l10n: Portuguese translation updates.  Closes: #676260 (Miguel Figueiredo)
+  * l10n: French translation updates.  Closes: #675904 (Christian Perrier)
+  * l10n: Turkish translation updates.  Closes: #677056 (Atila KOÇ)
+  * l10n: Italian translation updates.  Closes: #677349 (Cristian Rigamonti)
+
+ -- LaMont Jones <lamont@debian.org>  Sun, 16 Dec 2012 21:40:56 -0700
+
+postfix (2.9.3-2.1) unstable; urgency=low
+
+  * Non-maintainer upload.
+  * Fix pending l10n issues. Debconf translations:
+    - Czech (Miroslav Kure).  Closes: #675574
+    - Danish (Joe Hansen).  Closes: #675609
+    - Japanese (Kenshi Muto).  Closes: #675738
+    - Catalan; (Jord� Polo).  Closes: #675758
+    - French (Christian Perrier).  Closes: #675904
+    - Dutch; (Jeroen Schot).  Closes: #675953
+    - Swedish (Martin Bagge / brother).  Closes: #675994
+    - German (Helge Kreutzmann).  Closes: #675999
+    - Finnish (Tommi Vainikainen).  Closes: #676178
+    - Portuguese (Miguel Figueiredo).  Closes: #676260
+    - Polish (Michał Kułach).  Closes: #676835
+    - Turkish (Atila KOÇ).  Closes: #677056
+    - Russian (Sergey Alyoshin).  Closes: #677135
+    - Italian (Cristian Rigamonti).  Closes: #677349
+    - Spanish; (Matías A. Bellone).  Closes: #679290
+    - Slovak (Ivan Masár).  Closes: #681529
+
+ -- Christian Perrier <bubulle@debian.org>  Tue, 17 Jul 2012 20:33:40 -0600
+
+postfix (2.9.3-2ubuntu2.1) quantal-proposed; urgency=low
+
+  * Re-enabled NIS authentication which was inadvertently dropped
+    (LP: #1068036)
+
+ -- Scott Kitterman <scott@kitterman.com>  Thu, 18 Oct 2012 23:50:55 -0400
+
+postfix (2.9.3-2ubuntu2) quantal; urgency=low
+
+  * d/rules: Fix apport hook installation (LP: #1038527)
+
+ -- Clint Byrum <clint@ubuntu.com>  Sat, 18 Aug 2012 15:45:12 -0700
+
+postfix (2.9.3-2ubuntu1) quantal; urgency=low
+
+  * Add libresolv to libs copied to chroot so postfix can resolve hostnames in
+    remote maps (LP: #1023550)
+
+ -- Scott Kitterman <scott@kitterman.com>  Fri, 27 Jul 2012 09:56:33 -0400
+
+postfix (2.9.3-2) unstable; urgency=low
+
+  [LaMont Jones]
+
+  * add sqlite entry to dynamicmaps.cf on upgrade.  Closes: #675247
+
+  [localization folks]
+
+  * l10n: update spanish translations.  Closes: #674938 (Francisco Javier
+    Cuadrado)
+
+ -- LaMont Jones <lamont@debian.org>  Wed, 30 May 2012 22:40:11 -0600
+
+postfix (2.9.3-1) unstable; urgency=low
+
+  * New upstream
+
+ -- LaMont Jones <lamont@debian.org>  Tue, 29 May 2012 20:15:26 -0600
+
+postfix (2.9.2-1) unstable; urgency=low
+
+  [Wietse Venema]
+
+  - Bitrot: shut up useless warnings about Cyrus SASL call-back function
+    pointer type mis-matches.
+  - Bitrot: OpenSSL 1.0.1 introduces new protocols. Update the known TLS
+    protocol list so that protocols can be turned off selectively to
+    work around implementation bugs.  Based on a patch by Victor Duchovni.
+
+  [LaMont Jones]
+
+  * Suggest: postfix-doc, for completeness.  Closes: #670376
+
+ -- LaMont Jones <lamont@debian.org>  Mon, 30 Apr 2012 18:58:47 -0600
+
+postfix (2.9.1-5) unstable; urgency=low
+
+  [LaMont Jones]
+
+  * do not try to copy /etc/resolv.conf onto itself.  LP: #980682
+
+  [localization folks]
+
+  * l10n: updated Turkish debconf.  Closes: #669095 (Atila KOÇ)
+
+ -- LaMont Jones <lamont@debian.org>  Mon, 23 Apr 2012 05:33:41 -0600
+
+postfix (2.9.1-4) unstable; urgency=low
+
+  [LaMont Jones]
+
+  * postfix Depends: cpio.  Closes: #617703
+  * create /dev/{,u}random for SSL.  Closes: #572841
+  * cleanup cert copying code to handle trailing / on CApath
+
+  [Sven Joachim]
+
+  * add --quiet to cpio invocation.  Closes: #614675
+
+  [localization folks]
+
+  * l10n: Updated dutch debconf.  Closes: #668531 (Jeroen Schot)
+
+ -- LaMont Jones <lamont@debian.org>  Fri, 13 Apr 2012 12:10:32 -0600
+
+postfix (2.9.1-3) unstable; urgency=low
+
+  [LaMont Jones]
+
+  * Link with and use sqlite when building dict_sqlite.  add sqlite
+    dictionary to dynamicmaps.cf. Closes: #666950
+  * whitespace cleanup
+  * Default to version3 of ldap, instead of version2.  Closes: #668095
+  * address init script silent failure when cert copy fails.  Closes: #667055
+  * copy libgcc_s.so into the postfix chroot so that pthread_cancel stays
+    happy.  May address launchpad bug 970921.
+
+  [David Olrik]
+
+  * also need to link dict_sqlite.so against -lpthread. [Based on the patch
+    from David.] Closes: #666693 LP: #978698
+
+  [localization folks]
+
+  * l10n: updated Russian debconf.  Closes: #666785 (Sergey Alyoshin)
+  * l10n: updated Japanese debconf.  Closes: #666897 (Kenshi Muto)
+  * l10n: Updated German debconf.  Closes: #666412 (Helge Kreutzmann)
+  * l10n: updated Swedish debconf.  Closes: #668184 (Martin Bagge)
+  * l10n: updated Danish debconf.  Closes: #668033 (Joe Dalton)
+  * l10n: updated Czech debconf.  Closes: #668046 (Miroslav Kure)
+  * l10n: updated Portuguese debconf.  Closes: #668210 (Miguel Figueiredo)
+  * l10n: updated French debconf.  Closes: #666784 (Christian Perrier)
+  * l10n: Turkish debconf.  Closes: #666533 (Atila KOÇ)
+  * l10n: updated Italian debconf.  Closes: #667532 (Cristian Rigamonti)
+
+ -- LaMont Jones <lamont@debian.org>  Thu, 12 Apr 2012 06:55:26 -0600
+
+postfix (2.9.1-2) unstable; urgency=low
+
+  * Drop unnecessary openssl check, since sonames will save us.
+
+ -- LaMont Jones <lamont@debian.org>  Tue, 20 Mar 2012 13:47:16 -0600
+
+postfix (2.9.1-1) unstable; urgency=low
+
+  [Wietse Venema]
+
+  * 2.9.1
+
+  [Steve Langasek]
+
+  * debian/update-libc.d: before we try to copy the resolv.conf over, just
+    check if the service is running by calling /etc/init.d/postfix status.  If
+    it's not running, there's never a need to copy, and if it's running we
+    know the package is installed - making other checks superfluous and
+    ensuring our hook doesn't exit non-zero if called before /var is mounted
+    read-write.  LP: #927803.
+  * debian/init.d: if postmulti fails (which for some reason it does when
+    the rootfs is read-only in early boot!), the init script 'status' command
+    returns zero because "all" of 0 configured instances are running.  Fix the
+    script to return non-zero in this case.  LP: #927803.
+
+  [LaMont Jones]
+
+  * Cleanup root_address template, to reduce ambiguous meaning.  LP: #877150
+  * revert debian/control maintainer changes from Ubuntu
+
+ -- LaMont Jones <lamont@debian.org>  Sun, 11 Mar 2012 21:11:43 -0600
+
+postfix (2.8.7-1ubuntu2) precise; urgency=low
+
+  * debian/init.d: if postmulti fails (which for some reason it does when
+    the rootfs is read-only in early boot!), the init script 'status'
+    command returns zero because "all" of 0 configured instances are
+    running.  Fix the script to return non-zero in this case.  LP: #927803.
+
+ -- Steve Langasek <steve.langasek@ubuntu.com>  Fri, 17 Feb 2012 11:07:48 -0800
+
+postfix (2.8.7-1ubuntu1) precise; urgency=low
+
+  * debian/update-libc.d: before we try to copy the resolv.conf over, just
+    check if the service is running by calling /etc/init.d/postfix status.
+    If it's not running, there's never a need to copy, and if it's running
+    we know the package is installed - making other checks superfluous and
+    ensuring our hook doesn't exit non-zero if called before /var is mounted
+    read-write.  LP: #927803.
+
+ -- Steve Langasek <steve.langasek@ubuntu.com>  Thu, 16 Feb 2012 17:53:51 -0800
+
+postfix (2.8.7-1) unstable; urgency=low
+
+  [Wietse Venema]
+
+  * New Upstream Version
+
+  [LaMont Jones]
+
+  * ack NMU
+  * add debian/copyright file for lintian
+  * Add SMTPS entry to ufw profile.  LP: #859658
+  * Add sqlite map support.  LP: #774500  Closes: #651208
+  * Fix linux 3.0 + multiarch FTBFS, based on patch from Loïc Minier.
+    Closes: #643020
+
+ -- LaMont Jones <lamont@debian.org>  Tue, 17 Jan 2012 19:48:32 -0700
+
+postfix (2.8.5-1.1) unstable; urgency=high
+
+  * Non-maintainer upload.
+  * Fix FTBFS on kfreebsd with patch from Christoph Egger (closes: #640012).
+
+ -- Julien Cristau <jcristau@debian.org>  Wed, 14 Dec 2011 23:33:12 +0100
+
+postfix (2.8.5-1) unstable; urgency=low
+
+  [Wietse Venema]
+
+  * 2.8.5
+    - Workaround: report a {client_connections} Milter macro value of zero
+      instead of garbage, when the remote SMTP client is not subject to any
+      smtpd_client_* limits. Problem reported by Christian Roessner.
+    - Bugfix: allow for Milters that send an SMTP server reply without RFC 3463
+      enhanced status code. Reported by Vladimir Vassiliev.
+
+  [LaMont Jones]
+
+  * remerge ubuntu fork: do not use dh_apport
+
+ -- LaMont Jones <lamont@debian.org>  Wed, 05 Oct 2011 14:11:54 -0600
+
+postfix (2.8.4-1ubuntu2) oneiric; urgency=low
+
+  * makedefs: fix FTBFS for Linux 3.x + multiarch with same approach as in
+    2.8.1-1ubuntu1 for the backported chunk added in 2.8.3-1ubuntu1.
+
+ -- Loïc Minier <loic.minier@ubuntu.com>  Mon, 26 Sep 2011 01:47:30 +0200
+
+postfix (2.8.4-1ubuntu1) oneiric; urgency=low
+
+  * Add back in apport.  Debian lacks it, so the package is now
+    forked. :(
+
+ -- LaMont Jones <lamont@ubuntu.com>  Sat, 20 Aug 2011 14:39:33 -0600
+
+postfix (2.8.4-1) unstable; urgency=low
+
+  [Scott Kitterman]
+
+  * Switch to debhelper 7, use dh_prep instead of dh_clean -k
+
+  [Friedemann Stoyan]
+
+  * create chroots with the right ca_path.  Closes: #627266
+
+  [Wietse Venema]
+
+  * Upstream fix release
+    - Performance: a high load of DSN success notification requests
+      could slow down the queue manager.
+    - Bugfix (introduced Postfix 2.3 and Postfix 2.7): the Milter
+      client reported some "file too large" errors as temporary
+      errors.
+    - Bugfix (introduced in Postfix 1.1, duplicated in Postfix
+      2.3, unrelated mistake in Postfix 2.7): the local(8) delivery
+      agent ignored table lookup errors in mailbox_command_maps,
+      mailbox_transport_maps, fallback_transport_maps and (while
+      bouncing mail to alias) alias owner lookup.
+    - Bugfix (introduced Postfix 2.6 with master_service_disable)
+      loop control error when parsing a malformed master.cf file.
+    - Bugfix (introduced: Postfix 2.7): "sendmail -t" reported
+      "protocol error" after queue file write error.
+    - Linux kernel version 3 support.
+    - Workaround: some Spamhaus RHSBL rejects lookups with "No
+      IP queries" even if the name has an alphanumerical prefix.
+      We play safe, and skip both RHSBL and RHSWL queries for
+      names ending in a numerical suffix.
+
+  [LaMont Jones]
+
+  * apport, fix FTBFS on linux 3.0 - From ubuntu.
+  * SASL vs multiarch.  Closes: #638443, #638045
+  * Update init.d script to handle multi_instance setups.  Closes: #560682
+  * Do not try to update resolv.conf when main.cf does not exist.  LP: #530323
+  * Better handle bad map names in postmap -u.  LP: #647647
+  * Drop apport usage, since debian lacks it and failing to build is bad.
+
+ -- LaMont Jones <lamont@debian.org>  Sat, 20 Aug 2011 13:48:59 -0600
+
+postfix (2.8.3-1ubuntu3) oneiric; urgency=low
+
+  * src/xsasl/xsasl_cyrus_{client,server}.c: don't set a sasl callback for
+    the path, only do so for the config path; we shouldn't override the
+    already-correct module path built into cyrus-sasl2 itself,
+    especially now that said path may change due to multiarch.
+
+ -- Steve Langasek <steve.langasek@ubuntu.com>  Mon, 15 Aug 2011 20:10:53 -0700
+
+postfix (2.8.3-1ubuntu2) oneiric; urgency=low
+
+  * debian/rules: pass postfix to dh_apport so packages don't all get
+    apport hook. (LP: #822566)
+
+ -- Clint Byrum <clint@ubuntu.com>  Mon, 08 Aug 2011 10:46:18 -0500
+
+postfix (2.8.3-1ubuntu1) oneiric; urgency=low
+
+  * debian/source.apport: Adding postfix hook to help discover what
+    invalid hostnames cause bug reports and stop obviously invalid
+    names. (LP: #782204)
+  * makedefs, sys/utils/sys_defs.h: Apply upstream patch to fix FTBFS
+    with 3.0 kernel. (LP: #821609)
+
+ -- Clint Byrum <clint@ubuntu.com>  Sat, 06 Aug 2011 08:20:40 -0700
+
+postfix (2.8.3-1) unstable; urgency=low
+
+  [Wietse Venema]
+
+  * 2.8.3
+    - Cleanup: postscreen(8) and verify(8) daemons now lock their respective
+      cache file exclusively upon open, to avoid massive cache corruption
+      by unsupported sharing.
+    - Bugfix (introduced with Postfix SASL patch 20000314): don't reuse a
+      server SASL handle after authentication failure.  CVE-2011-1720
+
+  [LaMont Jones]
+  * Ack ubuntu fixes for multiarch.  Closes: #620326, #625674
+
+ -- LaMont Jones <lamont@debian.org>  Tue, 10 May 2011 08:40:13 -0600
+
+postfix (2.8.2-1ubuntu2) natty-proposed; urgency=low
+
+  * debian/init.d: copy both /lib/libnss_*.so and /lib/*/libnss_*.so to the
+    chroot; this is overbroad since it will pick up NSS modules for
+    architectures other than our own, but avoids a runtime dep on dpkg-dev
+    or build-time munging of the init script.  Thanks to Kevin Sumner for
+    the patch.  LP: #764096.
+
+ -- Steve Langasek <steve.langasek@ubuntu.com>  Wed, 04 May 2011 14:48:07 -0700
+
+postfix (2.8.2-1ubuntu1) natty; urgency=low
+
+  * Merge from debian unstable.  Remaining changes:
+    - makedefs: search all directories known by the compiler for our
+      libraries, not just /lib and /lib64; fixing the build failure with
+      multiarch.
+
+ -- Scott Kitterman <scott@kitterman.com>  Mon, 04 Apr 2011 23:43:56 -0400
+
+postfix (2.8.2-1) unstable; urgency=low
+
+  [Wietse Venema]
+
+  * new upstream, various bug fixes
+
+ -- LaMont Jones <lamont@debian.org>  Tue, 22 Mar 2011 10:37:24 -0600
+
+postfix (2.8.1-1ubuntu1) natty; urgency=low
+
+  * makedefs: search all directories known by the compiler for our libraries,
+    not just /lib and /lib64; fixing the build failure with multiarch.
+
+ -- Steve Langasek <steve.langasek@ubuntu.com>  Fri, 01 Apr 2011 04:06:29 +0000
+
+postfix (2.8.1-1) unstable; urgency=low
+
+  [Wietse Venema]
+
+  * new upstream version
+
+  [Kees Cook]
+
+  * debian/init.d: fix relative path problem in CA bundle chroot copying.
+    Closes: #614748, #614750  LP: #723312
+
+ -- LaMont Jones <lamont@debian.org>  Wed, 23 Feb 2011 02:04:21 -0700
+
+postfix (2.8.0-2) unstable; urgency=low
+
+  * a little more lintian cleanup
+  * Fix missing format strings in smtp-sink.c
+
+ -- LaMont Jones <lamont@debian.org>  Tue, 22 Feb 2011 11:20:43 -0700
+
+postfix (2.8.0-1) unstable; urgency=low
+
+  [Wietse Venema]
+  * New Upstream
+
+  [martin f krafft]
+  * copy ssl certs to the chroot at startup more completely.  Closes: #287795
+
+  [ Scott Kitterman ]
+  * Update to compat 5 and bump required debhelper version to 5
+  * Add Homepage: to debian/control
+  * Switch x-vcs* fields to vcs* in debian/control
+  * Bump standards version to 3.9.1.0
+  * Expunge archaic references to the postfix-tls package from debian/control
+  * Add dovecot-common to suggests as an alternate smtp-auth provider
+  * Add smtp-auth providers to Should-Start and Should-Stop in init.d to
+    finish dependency based boot support (Closes: #543472)
+  * Update README.Debian to remove the obsolete reference to deviating from
+    upstream on smtp_line_length_limit settings (Closes: #561426)
+  * Include status declarartion in init script (Closes: #509922)
+    - Thanks to Fladischer Michael for the patch
+
+  [ LaMont Jones ]
+  * A little bit more lintian cleanup.
+
+ -- LaMont Jones <lamont@debian.org>  Mon, 21 Feb 2011 14:38:01 -0700
+
+postfix (2.7.1-2) unstable; urgency=low
+
+  [LaMont Jones]
+
+  * dpkg-dev changed how it handled ${newline} in vars.in.  remove the space
+    following.  Needs 1.15.5.  Closes: #579668
+
+  [Gabriele 'LightKnight' Stilli]
+
+  * Deliver insserv.conf.d/postfix for ordering.  Closes: #592920
+
+  [Hideki Yamane]
+
+  * Updates to Japanase debconf templates.  Closes: #591991
+
+  [Thijs Kinkhorst]
+
+  * Spelling error in Dutch templates translation.  Closes: #589538
+
+  [Joe Dalton]
+
+  * Danish translation of the debconf templates postfix.  Closes: #601128
+
+  [Emanuele Aina]
+
+  * Merge correction
+
+ -- LaMont Jones <lamont@debian.org>  Wed, 27 Oct 2010 11:58:50 -0600
+
 postfix (2.7.1-1) unstable; urgency=low
 
   [Matt Moen]
 
-  * Create ca-certificates.crt for smtp{,d}_enforce_tls case, too. 
+  * Create ca-certificates.crt for smtp{,d}_enforce_tls case, too.
     Closes: #575464
 
   [Wietse Venema]
@@ -76,7 +582,7 @@ postfix (2.6.5-2) unstable; urgency=low
 postfix (2.6.5-1ubuntu1) karmic; urgency=low
 
   * Merge from Debian unstable (no previous delta)
-  * Add python recommends to postfix for postfix-add-* scripts 
+  * Add python recommends to postfix for postfix-add-* scripts
 
  -- Scott Kitterman <scott@kitterman.com>  Tue, 01 Sep 2009 09:06:43 -0400
 
@@ -263,7 +769,7 @@ postfix (2.5.2-0) unstable; urgency=low
   [Wietse Venema]
 
   * New upstream release
-  
+
   [Sergey Alyoshin]
 
   * l10n: Po debconf Russian translation.  Closes: #479776
@@ -700,7 +1206,7 @@ postfix (2.4.5-4) unstable; urgency=low
   [ Wietse Venema ]
   * smtpd: unparsable canonical name led to an assertion failure
 
-  [ LaMont Jones ] 
+  [ LaMont Jones ]
   * examples: add mailqfmt.pl in -doc. Closes: #440814
   * l10n: updated French translations.  Closes: #440525
   * control: switch to db 4.6
@@ -2472,7 +2978,7 @@ postfix (0.0.20010502.SNAPSHOT-4) unstable; urgency=high
     global, dns, and master libraries.
   * Support 'debug' and 'nostrip' options in DEB_BUILD_OPTIONS
   * dpkg-statoverride exits (correctly) with non-zero status in places
-    where it didn't before.  
+    where it didn't before.
 
  -- LaMont Jones <lamont@debian.org>  Wed, 23 May 2001 22:13:25 -0600
 
@@ -2909,14 +3415,14 @@ postfix (0.0.19990317pl01-1) unstable; urgency=low
   * Add rmail: actually, copy the source over from sendmail 8.9.3-2, and
     wrap a Postfix-style makefile around it. (Bug #31814)
   * Actually list the dependency on adduser. (Bug #34979)
-  
+
  -- LaMont Jones <lamont@debian.org>  Wed, 24 Mar 1999 01:00:15 -0700
 
 postfix (0.0.19990122pl01-1) unstable; urgency=low
   * Upstream patch release, see /usr/doc/postfix/changelog.
   * Fix upload to include orig and .diff.  Sigh.
   * Add /usr/lib/sendmail symlink (bug 30940)
-  
+
  -- LaMont Jones <lamont@debian.org>  Mon,  1 Feb 1999 20:10:59 -0600
 
 postfix (0.0.19990122-1) unstable; urgency=low
@@ -2975,3 +3481,4 @@ postfix (0.0.19981211-0) unstable; urgency=low
     Claims to be Beta-19981211 internally...
 
  -- LaMont Jones <lamont@debian.org>  Fri, 11 Dec 1998 22:31:37 -0600
+

@@ -214,6 +214,8 @@
 
 /*#define msg_verbose	2*/
 
+static void cleanup_milter_set_error(CLEANUP_STATE *, int);
+
 #define STR(x)		vstring_str(x)
 #define LEN(x)		VSTRING_LEN(x)
 
@@ -370,8 +372,7 @@ static char *cleanup_milter_hbc_extend(void *context, const char *command,
 	}
 	return ((char *) buf);
     }
-    msg_warn("unknown command in %s map: %s", map_class, command);
-    return ((char *) buf);
+    return ((char *) HBC_CHECKS_STAT_UNKNOWN);
 }
 
 /* cleanup_milter_header_checks - inspect Milter-generated header */
@@ -389,6 +390,11 @@ static int cleanup_milter_header_checks(CLEANUP_STATE *state, VSTRING *buf)
 			    MIME_HDR_PRIMARY, (HEADER_OPTS *) 0,
 			    buf, (off_t) 0);
     if (ret == 0) {
+	return (0);
+    } else if (ret == HBC_CHECKS_STAT_ERROR) {
+	msg_warn("%s: %s lookup error -- deferring delivery",
+		 state->queue_id, VAR_MILT_HEAD_CHECKS);
+	state->errs |= CLEANUP_STAT_WRITE;
 	return (0);
     } else {
 	if (ret != STR(buf)) {
@@ -432,8 +438,7 @@ static void cleanup_milter_hbc_add_meta_records(CLEANUP_STATE *state)
      * later.
      */
     if ((new_meta_offset = vstream_fseek(state->dst, (off_t) 0, SEEK_END)) < 0) {
-	msg_warn("%s: seek file %s: %m", myname, cleanup_path);
-	state->errs |= CLEANUP_STAT_WRITE;
+	cleanup_milter_set_error(state, errno);
 	return;
     }
     if (state->filter != 0)
@@ -453,8 +458,7 @@ static void cleanup_milter_hbc_add_meta_records(CLEANUP_STATE *state)
      * value with the location of the new meta record.
      */
     if (vstream_fseek(state->dst, state->append_meta_pt_offset, SEEK_SET) < 0) {
-	msg_warn("%s: seek file %s: %m", myname, cleanup_path);
-	state->errs |= CLEANUP_STAT_WRITE;
+	cleanup_milter_set_error(state, errno);
 	return;
     }
     cleanup_out_format(state, REC_TYPE_PTR, REC_TYPE_PTR_FORMAT,
@@ -841,8 +845,7 @@ static off_t cleanup_find_header_start(CLEANUP_STATE *state, ssize_t index,
 	     /* Reset the saved PTR record and update last_type. */ ;
 	else if ((header_label == 0
 		  || (strncasecmp(header_label, STR(buf), len) == 0
-		      && (IS_SPACE_TAB(STR(buf)[len])
-			  || STR(buf)[len] == ':')))
+		      && (strlen(header_label) == len)))
 		 && --index == 0) {
 	    /* If we have a saved PTR record, it points to start of header. */
 	    break;
@@ -1450,7 +1453,7 @@ static const char *cleanup_add_rcpt(void *context, const char *ext_rcpt)
 	}
     }
     tok822_free_tree(tree);
-    cleanup_addr_bcc(state, STR(int_rcpt_buf));
+    cleanup_addr_bcc_dsn(state, STR(int_rcpt_buf), NO_DSN_ORCPT, DEF_DSN_NOTIFY);
     vstring_free(int_rcpt_buf);
     if (addr_count == 0) {
 	msg_warn("%s: ignoring attempt from Milter to add null recipient",
@@ -2151,7 +2154,7 @@ char   *var_milt_head_checks = "";
 
 /* Dummies to satisfy unused external references. */
 
-int     cleanup_masquerade_internal(VSTRING *addr, ARGV *masq_domains)
+int     cleanup_masquerade_internal(CLEANUP_STATE *state, VSTRING *addr, ARGV *masq_domains)
 {
     msg_panic("cleanup_masquerade_internal dummy");
 }

@@ -1,7 +1,7 @@
 #! /usr/bin/perl
 
 # Gateway script for postfix to send to LDAP mail-enabled groups.
-# $Id: postfix_groups.pl,v 1.6 2007/01/29 16:11:07 subbarao Exp $ 
+# $Id: postfix_groups.pl,v 1.6 2007/01/29 16:11:07 subbarao Exp $
 
 #++
 # NAME
@@ -12,7 +12,7 @@
 #   postfix_groups.pl <sender> <nexthop> <recipient>
 # DESCRIPTION
 #   postfix_groups.pl delivers mail to LDAP mail-enabled groups. It is
-#   intended to be invoked by \fBpipe\fR(8). Here is an example of a 
+#   intended to be invoked by \fBpipe\fR(8). Here is an example of a
 #   simple mail-enabled LDAP group:
 #
 #   dn: cn=postfix-hackers, ou=Groups, o=hp.com
@@ -41,12 +41,12 @@
 #   .br
 #   mailRoutingAddress: subbarao@quest.lf.hp.com
 #
-#   postfix_groups.pl expands the incoming address 
-#   postfix-hackers@groups.hp.com to the destination addresses 
+#   postfix_groups.pl expands the incoming address
+#   postfix-hackers@groups.hp.com to the destination addresses
 #   lamont@cranston.fc.hp.com and subbarao@quest.lf.hp.com.
 #
 # CONFIGURATION
-#   To configure postfix_groups.pl to handle addresses of the form 
+#   To configure postfix_groups.pl to handle addresses of the form
 #   groupaddr@groups.mycompany.com, specify the following in \fBmaster.cf\fR:
 #
 # groups   unix  -   n   n   -   -   pipe
@@ -56,7 +56,7 @@
 #
 # groups.mycompany.com	groups:groups
 #
-#   And the following in \fBmain.cf\fR (assuming an LDAP server 
+#   And the following in \fBmain.cf\fR (assuming an LDAP server
 #   ldap.mycompany.com with the root DN of o=mycompany.com):
 #
 # groups_destination_recipient_limit = 1
@@ -68,8 +68,8 @@
 # groups_domain = groups.mycompany.com
 # groups_bind = no
 #
-#   Note: The groups_* map should not be referenced in virtual_maps or 
-#   elsewhere. Also note that the groups_destination_recipient_limit 
+#   Note: The groups_* map should not be referenced in virtual_maps or
+#   elsewhere. Also note that the groups_destination_recipient_limit
 #   should be set to 1.
 #
 ## [Describe main.cf parameters]
@@ -77,7 +77,7 @@
 #
 ## [Describe LDAP attributes that govern mail-enabled groups]
 ## TBD
-# 
+#
 # AUTHOR
 #   Kartik Subbarao <subbarao@computer.org>
 #
@@ -114,8 +114,8 @@ my $map = shift(@ARGV); 		# ${nexthop} == map name
 my $recipient = shift(@ARGV);	# ${recipient}
 my $debug = 0;
 
-if ($debug && ! -t STDIN) { 
-	open(STDOUT, "> /tmp/postfix_groups.stdout"); 
+if ($debug && ! -t STDIN) {
+	open(STDOUT, "> /tmp/postfix_groups.stdout");
 	open(STDERR, "> /tmp/postfix_groups.stderr");
 }
 
@@ -131,7 +131,7 @@ my $ldap_host = $postconf{"${map}_server_host"} || 'localhost';
 my $ldap_port = $postconf{"${map}_server_port"} || 389;
 my $ldap_timeout = $postconf{"${map}_timeout"} || 120;
 my $basedn = $postconf{"${map}_search_base"};
-my @excluded_resolved_domains = 
+my @excluded_resolved_domains =
 	split(" ", $postconf{"${map}_excluded_resolved_domains"});
 
 my $mail_attr = 'mail';
@@ -146,7 +146,7 @@ my $addheader_attr = 'mgrpAddHeader';
 my $removeheader_attr = 'mgrpRemoveHeader';
 
 my $smtp_host = 'localhost'; # Use smtpd running on localhost
-my $smtpd_recipient_limit = $postconf{smtpd_recipient_limit} 
+my $smtpd_recipient_limit = $postconf{smtpd_recipient_limit}
 							|| `postconf -h smtpd_recipient_limit`
 							|| 1000;
 chomp $smtpd_recipient_limit;
@@ -155,12 +155,12 @@ chomp $smtpd_recipient_limit;
 # Read message from STDIN
 my $message = Mail::Internet->new(\*STDIN, Modify => 0);
 
-my $ldap = Net::LDAP->new($ldap_host, 
-						  port => $ldap_port, 
+my $ldap = Net::LDAP->new($ldap_host,
+						  port => $ldap_port,
 						  timeout => $ldap_timeout)
 	or warn("$ldap_host: $@\n"), exit $TEMPFAIL;
 
-## TODO: Explicitly specify the attributes retrieved by the first search, so 
+## TODO: Explicitly specify the attributes retrieved by the first search, so
 ## that it can match the specific names as defined (e.g. member, etc)
 my $ldapmesg = $ldap->search(base => $basedn,
 							 filter => "(mail=$recipient)");
@@ -192,7 +192,7 @@ foreach my $allowed_broadcaster (@allowed_broadcasters) {
 		my @attrs = $uri->attributes;
 		if (@attrs) {
 			# If attributes are specified in the LDAP URL,
-			# their values are expanded as DNs, instead of expanding 
+			# their values are expanded as DNs, instead of expanding
 			# the LDAP entry itself.
 			my $mesg = $ldap->search(base => $uri->dn,
 						  scope => 'base',
@@ -210,23 +210,23 @@ foreach my $allowed_broadcaster (@allowed_broadcasters) {
 			my $entry = $mesg->entry(0) or next;
 
 			foreach my $dnval (map { $entry->get_value($_) } @attrs) {
-				push(@allowed_fromaddrs, 
-					expand_entry(dn => $dnval, 
+				push(@allowed_fromaddrs,
+					expand_entry(dn => $dnval,
 						resultattrs => \@allowed_broadcaster_result_attrs));
 			}
 		}
 		else {
-			# Expand the entry, and append to the list of allowed 
+			# Expand the entry, and append to the list of allowed
 			# broadcaster addresses.
-			push(@allowed_fromaddrs, 
-				expand_entry(dn => $uri->dn, 
+			push(@allowed_fromaddrs,
+				expand_entry(dn => $uri->dn,
 					resultattrs => \@allowed_broadcaster_result_attrs));
 		}
 	}
 	elsif ($uri->scheme eq 'mailto') {
 		push(@allowed_fromaddrs, $uri->to);
 	}
-	else { 
+	else {
 		# Unknown scheme, treat it as an RFC 822 mail address
 		push(@allowed_fromaddrs, $allowed_broadcaster);
 	}
@@ -240,7 +240,7 @@ if (@allowed_fromaddrs) {
 }
 
 # Populate Errors-To: header if requested. Also adjust envelope sender.
-if ($errorsto) { 
+if ($errorsto) {
 	# Only supports RFC 822 mail address specification for now
 	$errorsto =~ s/^mailto://;
 	$header->add(undef, "Errors-To: $errorsto");
@@ -295,7 +295,7 @@ while (@addrs) {
 	@rcpt_to = splice(@addrs, 0, $smtpd_recipient_limit);
 	@goodaddrs = $smtp->to(@rcpt_to, { SkipBad => 1 });
 	@seen{@goodaddrs} = ();
-	foreach my $addr (@rcpt_to) { 
+	foreach my $addr (@rcpt_to) {
 		push(@badaddrs, $addr) unless exists $seen{$addr};
 	}
 	unless ($smtp->data(split(/^/m, $message->as_string))) {
@@ -316,7 +316,7 @@ sub get_postfix_params
 	local $/ = undef;
 
 	open(MAINCF, $maincf_file) or warn("$maincf_file: $!\n"), exit $OSFILE;
-	my $maincfstr = <MAINCF>; close MAINCF; 
+	my $maincfstr = <MAINCF>; close MAINCF;
 	$maincfstr =~ s/^#.*?\n//mg;  # Get rid of comments
 	$maincfstr =~ s/\n[ \t]+/ /mg; # Collapse line continuation
 	foreach (split(/\n/, $maincfstr)) {
@@ -334,7 +334,7 @@ sub expand_entry
 	my (%results, @result_attrs);
 	my ($dn, $mesg, $entry, @entries, %seen);
 
-	@result_attrs = $arg{resultattrs} 
+	@result_attrs = $arg{resultattrs}
 					? @{$arg{resultattrs}} : @default_result_attrs;
 
 	push(@entries, $arg{entry}) if $arg{entry};	# Passed as entry
@@ -342,12 +342,12 @@ sub expand_entry
 
 	while (my $entry = shift(@entries)) {
 		unless (ref $entry) { # Actually a DN, get corresponding entry
-			my $dn = $entry; 
+			my $dn = $entry;
 			$mesg = $ldap->search(base => $dn,
 						  		  scope => 'base',
 							  	  filter => "(objectclass=*)",
-							  	  attrs => [ $mail_attr, 
-								  			 $member_attr, 
+							  	  attrs => [ $mail_attr,
+								  			 $member_attr,
 											 @ldapurl_attrs,
 											 @result_attrs ]);
 			if ($mesg->code) {
@@ -392,7 +392,7 @@ sub expand_entry
 
 			# Add the result attributes of each group member to the results hash
 			foreach my $memberentry ($mesg->entries) {
-				foreach my $value (map { $memberentry->get_value($_) } 
+				foreach my $value (map { $memberentry->get_value($_) }
 										@result_attrs) {
 					$results{$value} = 1;
 				}

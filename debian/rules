@@ -1,5 +1,5 @@
 #!/usr/bin/make -f
-# -*- makefile -*- 
+# -*- makefile -*-
 # Debianrules for building a Debian package
 # Version 1.5
 #
@@ -45,18 +45,19 @@ ifneq (,$(findstring nostrip,$(DEB_BUILD_OPTIONS)))
 STRIP=y
 endif
 
-CCARGS=-DDEBIAN -DMAX_DYNAMIC_MAPS -DHAS_PCRE -DHAS_LDAP \
+CCARGS=-DDEBIAN -DMAX_DYNAMIC_MAPS -DHAS_PCRE -DHAS_LDAP -DHAS_SQLITE \
 	-DMYORIGIN_FROM_FILE \
 	$(shell getconf LFS_CFLAGS) \
 	-DHAS_CDB \
 	-DHAS_MYSQL -I/usr/include/mysql \
 	-DHAS_PGSQL -I`pg_config --includedir` \
+	-DHAS_SQLITE -I/usr/include \
 	-DHAS_SSL -I/usr/include/openssl \
 	-DUSE_SASL_AUTH -I/usr/include/sasl \
 	-DUSE_CYRUS_SASL \
 	-DUSE_TLS
 
-AUXLIBS =-lssl -lcrypto -lsasl2
+AUXLIBS =-lssl -lcrypto -lsasl2 -lpthread
 
 DOCFILES=README_FILES/*_README COMPATIBILITY TODO PORTING
 TLSDOCFILES=${TLSSRC}/TLS_TODO ${TLSSRC}/TLS_ACKNOWLEDGEMENTS
@@ -64,7 +65,7 @@ TLSDOCFILES=${TLSSRC}/TLS_TODO ${TLSSRC}/TLS_ACKNOWLEDGEMENTS
 .PHONY: install install-doc binary binary-arch binary-indep clean
 .PHONY: checkroot
 
-build: 
+build:
 	$(checkdir)
 	${MAKE} makefiles CCARGS="${CCARGS}" DEBUG=${DEBUG} \
 		AUXLIBS="${AUXLIBS} -L$$(pwd)/debian" OPT="$(OFLAGS)"
@@ -79,7 +80,7 @@ build:
 	touch $@
 
 install-doc: build
-	dh_clean -k
+	dh_prep
 	dh_installdirs -i
 	install -m 0444 html/* $(docdir)/html; rm $(docdir)/html/Makefile.in
 	dh_installexamples -p ${docpkg} examples/{qmail-local,smtpd-policy}
@@ -102,7 +103,7 @@ install-doc: build
 	done
 
 install: build
-	dh_clean -k
+	dh_prep
 	dh_installdirs -a
 	install lib/*.1.0.1 $(libdir)
 	install debian/postfix_groups.pl $(libdir)
@@ -111,6 +112,7 @@ install: build
 	install lib/dict_pcre.so ${base}-pcre/${plibdir}
 	install lib/dict_mysql.so ${base}-mysql/${plibdir}
 	install lib/dict_pgsql.so ${base}-pgsql/${plibdir}
+	install lib/dict_sqlite.so ${base}/${plibdir}
 	install lib/dict_tcp.so ${base}/${plibdir}
 	install lib/dict_cdb.so ${base}-cdb/${plibdir}
 	install libexec/[a-z]* ${base}/${plibdir}
@@ -133,6 +135,7 @@ install: build
 	install -m 0644 conf/main.cf.tls $(sharedir)/main.cf.tls
 	install -m644 debian/postfix.ufw.profile debian/postfix/etc/ufw/applications.d/postfix
 	install -m644 debian/rsyslog.conf debian/postfix/etc/rsyslog.d/postfix.conf
+	install -m644 debian/postfix.insserv.conf debian/postfix/etc/insserv.conf.d/postfix
 
 	install man/man1/*.1 ${base}/usr/share/man/man1
 	install man/man5/*.5 ${base}/usr/share/man/man5
@@ -153,6 +156,10 @@ install: build
 	install debian/ip-down.d ${base}/etc/network/if-down.d/postfix
 	install debian/update-libc.d ${base}/etc/resolvconf/update-libc.d/postfix
 	install -m 0444 debian/lintian-override ${base}/usr/share/lintian/overrides/${package}
+
+	if dpkg-vendor --is ubuntu; then \
+	    install -m 644 -D debian/postfix.apport ${base}/usr/share/apport/package-hooks/postfix.py; \
+	fi
 
 debian/vars:
 	cp debian/vars.in $@
@@ -205,7 +212,7 @@ clean-preunpatch:
 	test ! -d ${base} || rm -rf ${base}
 	$(MAKE) tidy
 
-clean: clean-preunpatch 
+clean: clean-preunpatch
 	rm -rf debian/{files*,vars,*substvars,*.debhelper}
 	find .. -maxdepth 1 -name $(package)*.asc -size 0 -exec rm {} ";"
 	rm -f debian/stamp-* conf/main.cf.debian conf/main.cf.dist
@@ -214,7 +221,7 @@ buildinfo:
 	@echo; dpkg -l gcc "libc6*" binutils ldso make dpkg-dev $(BUILDINFO) \
 		| awk '$$1 == "ii" { printf("%s-%s\n", $$2, $$3) }' \
 		| tee $(docdir)/buildinfo.Debian; echo
-	chmod 644 $(docdir)/buildinfo.Debian		
+	chmod 644 $(docdir)/buildinfo.Debian
 
 define checkdir
 	test -f debian/rules

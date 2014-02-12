@@ -59,9 +59,9 @@
 /* DESCRIPTION
 /*	This module implements header_checks and body_checks.
 /*	Actions are executed while mail is being delivered. The
-/*	following actions are recognized: WARN, REPLACE, PREPEND,
-/*	IGNORE, DUNNO, and OK. These actions are safe for use in
-/*	delivery agents.
+/*	following actions are recognized: INFO, WARN, REPLACE,
+/*	PREPEND, IGNORE, DUNNO, and OK. These actions are safe for
+/*	use in delivery agents.
 /*
 /*	Other actions may be supplied via the extension mechanism
 /*	described below.  For example, actions that change the
@@ -77,13 +77,14 @@
 /*	not be called.
 /*
 /*	hbc_header_checks() inspects the specified logical header.
-/*	The result is either the original header, HBC_CHECK_STAT_IGNORE
-/*	(meaning: discard the header) or a new header (meaning:
-/*	replace the header and destroy the new header with myfree()).
+/*	The result is either the original header, HBC_CHECKS_STAT_IGNORE
+/*	(meaning: discard the header), HBC_CHECKS_STAT_ERROR, or a
+/*	new header (meaning: replace the header and destroy the new
+/*	header with myfree()).
 /*
 /*	hbc_header_checks_free() returns memory to the pool.
 /*
-/*	hbc_body_checks_create(), dbhc_body_checks(), dbhc_body_free()
+/*	hbc_body_checks_create(), hbc_body_checks(), hbc_body_free()
 /*	perform similar functions for body lines.
 /*
 /*	Arguments:
@@ -115,7 +116,7 @@
 /*	and the input byte offset within the current header or body
 /*	segment.  The result value is either the original line
 /*	argument, HBC_CHECKS_STAT_IGNORE (delete the line from the
-/*	input stream) or HBC_CHECK_STAT_UNKNOWN (the command was
+/*	input stream) or HBC_CHECKS_STAT_UNKNOWN (the command was
 /*	not recognized).  Specify a null pointer to disable this
 /*	feature.
 /* .RE
@@ -184,6 +185,7 @@
   * Something that is guaranteed to be different from a real string result
   * from header/body_checks.
   */
+char hbc_checks_error;
 const char hbc_checks_unknown;
 
  /*
@@ -246,6 +248,10 @@ static char *hbc_action(void *context, HBC_CALL_BACKS *cb,
 
     if (STREQUAL(cmd, "WARN", cmd_len)) {
 	cb->logger(context, "warning", where, line, cmd_args);
+	return ((char *) line);
+    }
+    if (STREQUAL(cmd, "INFO", cmd_len)) {
+	cb->logger(context, "info", where, line, cmd_args);
 	return ((char *) line);
     }
     if (STREQUAL(cmd, "REPLACE", cmd_len)) {
@@ -314,6 +320,8 @@ char   *hbc_header_checks(void *context, HBC_CHECKS *hbc, int header_class,
 	return (hbc_action(context, hbc->call_backs,
 			   mp->map_class, HBC_CTXT_HEADER, action,
 			   STR(header), LEN(header), offset));
+    } else if (mp->maps && mp->maps->error) {
+	return (HBC_CHECKS_STAT_ERROR);
     } else {
 	return (STR(header));
     }
@@ -337,6 +345,8 @@ char   *hbc_body_checks(void *context, HBC_CHECKS *hbc, const char *line,
 	return (hbc_action(context, hbc->call_backs,
 			   mp->map_class, HBC_CTXT_BODY, action,
 			   line, len, offset));
+    } else if (mp->maps->error) {
+	return (HBC_CHECKS_STAT_ERROR);
     } else {
 	return ((char *) line);
     }

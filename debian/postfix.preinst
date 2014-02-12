@@ -17,6 +17,28 @@ CONFIG=/etc/postfix/main.cf
 MASTER=/etc/postfix/master.cf
 POSTDROP=/usr/sbin/postdrop
 
+sqlite_warning() {
+    if [ -n "$DEBCONF" ]; then
+	db_input medium postfix/sqlite_warning || true
+	db_go || true
+	db_get postfix/sqlite_warning
+	if [ "$RET" != "false" ]; then
+	    touch /var/spool/postfix/sqlite_addition
+	fi
+    else
+    	cat << EOF
+Postfix version 2.9 adds sqlite support to maps, but your dynamicmaps.cf does
+not reflect that.  Accept this option to add support for sqlite maps.
+EOF
+	echo -n "Shall I make the change? "
+	read line
+	case ${line} in
+	    [nN]*)	;;
+	    *)		touch /var/spool/postfix/sqlite_addition;;
+	esac
+    fi
+}
+
 mydomain_warning() {
     if [ -n "$DEBCONF" ]; then
 	db_fset postfix/mydomain_warning seen false
@@ -157,6 +179,14 @@ case "$1" in
 	      touch /var/spool/postfix/mydomain-upgrade
 	    fi
 	  fi
+	fi
+
+	if dpkg --compare-versions $version lt 2.9.3-2; then
+	    # if sqlite is already in dynamicmaps.cf, then don't bother to ask
+	    DM=/etc/postfix/dynamicmaps.cf
+	    if [ ! -f ${DM} ] || ! grep -q "^sqlite[[:space:]]" ${DM}; then
+		sqlite_warning
+	    fi
 	fi
 
 	if ! grep -q '^retry[[:space:]]' $MASTER; then

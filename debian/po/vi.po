@@ -5,11 +5,12 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: postfix 2.5.2-1\n"
-"Report-Msgid-Bugs-To: Source: postfix@packages.debian.org\n"
-"POT-Creation-Date: 2008-05-29 19:58-0600\n"
+"Report-Msgid-Bugs-To: postfix@packages.debian.org\n"
+"POT-Creation-Date: 2012-05-30 22:56-0600\n"
 "PO-Revision-Date: 2008-05-30 18:56+0930\n"
 "Last-Translator: Clytie Siddall <clytie@riverland.net.au>\n"
 "Language-Team: Vietnamese <vi-VN@googlegroups.com>\n"
+"Language: vi\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -50,12 +51,26 @@ msgstr ""
 #. Type: boolean
 #. Description
 #: ../templates:2001
+msgid "add 'sqlite' entry to dynamicmaps.cf?"
+msgstr ""
+
+#. Type: boolean
+#. Description
+#: ../templates:2001
+msgid ""
+"Postfix version 2.9 adds sqlite support to maps, but your dynamicmaps.cf "
+"does not reflect that.  Accept this option to add support for sqlite maps."
+msgstr ""
+
+#. Type: boolean
+#. Description
+#: ../templates:3001
 msgid "Install postfix despite an unsupported kernel?"
 msgstr "Cài đặt postfix bất chấp hạt nhân không được hỗ trợ không?"
 
 #. Type: boolean
 #. Description
-#: ../templates:2001
+#: ../templates:3001
 msgid ""
 "Postfix uses features that are not found in kernels prior to 2.6. If you "
 "proceed with the installation, Postfix will not run."
@@ -65,13 +80,13 @@ msgstr ""
 
 #. Type: boolean
 #. Description
-#: ../templates:3001
+#: ../templates:4001
 msgid "Correct retry entry in master.cf for upgrade?"
 msgstr "Sửa chữa mục nhập « retry » trong « master.cf » để nâng cấp không?"
 
 #. Type: boolean
 #. Description
-#: ../templates:3001
+#: ../templates:4001
 msgid ""
 "Postfix version 2.4 requires that the retry service be added to master.cf."
 msgstr ""
@@ -84,7 +99,7 @@ msgstr ""
 # cf compatible with Postfix 2.2 in this respect.
 #. Type: boolean
 #. Description
-#: ../templates:3001
+#: ../templates:4001
 msgid ""
 "Failure to fix this will result in a broken mailer. Decline this option to "
 "abort the upgrade, giving you the opportunity to add this configuration "
@@ -97,13 +112,13 @@ msgstr ""
 
 #. Type: boolean
 #. Description
-#: ../templates:4001
+#: ../templates:5001
 msgid "Correct tlsmgr entry in master.cf for upgrade?"
 msgstr "Sửa chữa mục nhập « tlsmgr » trong « master.cf » để nâng cấp không?"
 
 #. Type: boolean
 #. Description
-#: ../templates:4001
+#: ../templates:5001
 msgid "Postfix version 2.2 has changed the invocation of tlsmgr."
 msgstr "Postfix phiên bản 2.2 đã thay đổi cách gọi « tismgr »."
 
@@ -113,7 +128,7 @@ msgstr "Postfix phiên bản 2.2 đã thay đổi cách gọi « tismgr »."
 # cf compatible with Postfix 2.2 in this respect.
 #. Type: boolean
 #. Description
-#: ../templates:4001
+#: ../templates:5001
 msgid ""
 "Failure to fix this will result in a broken mailer. Decline this option to "
 "abort the upgrade, giving you the opportunity to add this configuration "
@@ -126,14 +141,14 @@ msgstr ""
 
 #. Type: boolean
 #. Description
-#: ../templates:5001
+#: ../templates:6001
 msgid "Ignore incorrect hostname entry?"
 msgstr "Bỏ qua mục nhập tên máy không đúng không?"
 
 # does not follow RFC 1035 and does not appear to be a valid IP address.
 #. Type: boolean
 #. Description
-#: ../templates:5001
+#: ../templates:6001
 msgid ""
 "The string '${enteredstring}' does not follow RFC 1035 and does not appear "
 "to be a valid IP address."
@@ -146,7 +161,7 @@ msgstr ""
 # be separated by full stops.\"
 #. Type: boolean
 #. Description
-#: ../templates:5001
+#: ../templates:6001
 msgid ""
 "RFC 1035 states that 'each component must start with an alphanum, end with "
 "an alphanum and contain only alphanums and hyphens. Components must be "
@@ -158,7 +173,7 @@ msgstr ""
 
 #. Type: boolean
 #. Description
-#: ../templates:5001
+#: ../templates:6001
 msgid "Please choose whether you want to keep that choice anyway."
 msgstr "Hãy chọn nếu bạn muốn tiếp tục bất chấp hay không."
 
@@ -170,7 +185,7 @@ msgstr "Hãy chọn nếu bạn muốn tiếp tục bất chấp hay không."
 #. try to keep below ~71 characters.
 #. DO NOT USE commas (,) in Choices translations otherwise
 #. this will break the choices shown to users
-#: ../templates:6001
+#: ../templates:7001
 msgid "No configuration"
 msgstr "Không cấu hình"
 
@@ -182,7 +197,7 @@ msgstr "Không cấu hình"
 #. try to keep below ~71 characters.
 #. DO NOT USE commas (,) in Choices translations otherwise
 #. this will break the choices shown to users
-#: ../templates:6001
+#: ../templates:7001
 msgid "Internet Site"
 msgstr "Nơi Mạng"
 
@@ -194,7 +209,7 @@ msgstr "Nơi Mạng"
 #. try to keep below ~71 characters.
 #. DO NOT USE commas (,) in Choices translations otherwise
 #. this will break the choices shown to users
-#: ../templates:6001
+#: ../templates:7001
 msgid "Internet with smarthost"
 msgstr "Mạng có máy khéo"
 
@@ -206,7 +221,7 @@ msgstr "Mạng có máy khéo"
 #. try to keep below ~71 characters.
 #. DO NOT USE commas (,) in Choices translations otherwise
 #. this will break the choices shown to users
-#: ../templates:6001
+#: ../templates:7001
 msgid "Satellite system"
 msgstr "Hệ thống vệ tinh"
 
@@ -218,19 +233,19 @@ msgstr "Hệ thống vệ tinh"
 #. try to keep below ~71 characters.
 #. DO NOT USE commas (,) in Choices translations otherwise
 #. this will break the choices shown to users
-#: ../templates:6001
+#: ../templates:7001
 msgid "Local only"
 msgstr "Chỉ cục bộ"
 
 #. Type: select
 #. Description
-#: ../templates:6002
+#: ../templates:7002
 msgid "General type of mail configuration:"
 msgstr "Kiểu cấu hình thư chung:"
 
 #. Type: select
 #. Description
-#: ../templates:6002
+#: ../templates:7002
 msgid ""
 "Please select the mail server configuration type that best meets your needs."
 msgstr ""
@@ -238,7 +253,7 @@ msgstr ""
 
 #. Type: select
 #. Description
-#: ../templates:6002
+#: ../templates:7002
 msgid ""
 " No configuration:\n"
 "  Should be chosen to leave the current configuration unchanged.\n"
@@ -267,7 +282,7 @@ msgstr ""
 
 #. Type: error
 #. Description
-#: ../templates:7001
+#: ../templates:8001
 msgid "Postfix not configured"
 msgstr "Chưa cấu hình Postfix"
 
@@ -276,7 +291,7 @@ msgstr "Chưa cấu hình Postfix"
 # a later date, or configure it yourself by:
 #. Type: error
 #. Description
-#: ../templates:7001
+#: ../templates:8001
 msgid ""
 "You have chosen 'No Configuration'. Postfix will not be configured and will "
 "not be started by default. Please run 'dpkg-reconfigure postfix' at a later "
@@ -285,38 +300,38 @@ msgid ""
 " - Running '/etc/init.d/postfix start'."
 msgstr ""
 "Bạn đã chọn mục « Không cấu hình ». Vì thế Postfix sẽ không được cấu hình, "
-"cũng sẽ không được khởi chạy theo mặc định. Hãy chạy lệnh cấu hình lại « dpkg-"
-"reconfigure postfix » về sau, hoặc tự cấu hình nó bằng cách:\n"
+"cũng sẽ không được khởi chạy theo mặc định. Hãy chạy lệnh cấu hình lại « "
+"dpkg-reconfigure postfix » về sau, hoặc tự cấu hình nó bằng cách:\n"
 " • sửa tập tin « /etc/postfix/main.cf » để thích hợp với yêu cầu của bạn;\n"
 " • chạy lệnh « /etc/init.d/postfix start »."
 
 # Name: don't translate / Tên: đừng dịch
 #. Type: string
 #. Description
-#: ../templates:8001
+#: ../templates:9001
 msgid "System mail name:"
 msgstr "Tên thư của hệ thống:"
 
 #. Type: string
 #. Description
-#: ../templates:8001
-#| msgid ""
-#| "The \"mail name\" is the domain name used to \"qualify\" mail addresses "
-#| "without a domain name."
+#: ../templates:9001
 msgid ""
 "The \"mail name\" is the domain name used to \"qualify\" _ALL_ mail "
 "addresses without a domain name. This includes mail to and from <root>: "
 "please do not make your machine send out mail from root@example.org unless "
 "root@example.org has told you to."
 msgstr ""
-"« Tên thư » là tên miền được dùng để thêm thông tin nhận diện vào TẤT CẢ các địa chỉ thư không co tên miền. Gồm có thư được gửi đến và từ <root>: đừng làm cho máy tính gửi thư từ địa chỉ « root@miền_đó » nếu địa chỉ đó không yêu cầu."
+"« Tên thư » là tên miền được dùng để thêm thông tin nhận diện vào TẤT CẢ các "
+"địa chỉ thư không co tên miền. Gồm có thư được gửi đến và từ <root>: đừng "
+"làm cho máy tính gửi thư từ địa chỉ « root@miền_đó » nếu địa chỉ đó không "
+"yêu cầu."
 
 # This name will be used by other programs besides Postfix; it should be
 # the single, full domain name (FQDN) from which mail will appear to
 # originate.
 #. Type: string
 #. Description
-#: ../templates:8001
+#: ../templates:9001
 msgid ""
 "This name will also be used by other programs. It should be the single, "
 "fully qualified domain name (FQDN)."
@@ -328,7 +343,7 @@ msgstr ""
 #. Description
 #. Translators, please do NOT translate 'example.org' whch is registered
 #. as a domain name reserved for documentation as per RFC 2606
-#: ../templates:8001
+#: ../templates:9001
 msgid ""
 "Thus, if a mail address on the local host is foo@example.org, the correct "
 "value for this option would be example.org."
@@ -338,7 +353,7 @@ msgstr ""
 
 #. Type: string
 #. Description
-#: ../templates:9001
+#: ../templates:10001
 msgid "Other destinations to accept mail for (blank for none):"
 msgstr "Đích khác cho chúng cần chấp nhận thư (bỏ rỗng nếu không có):"
 
@@ -347,7 +362,7 @@ msgstr "Đích khác cho chúng cần chấp nhận thư (bỏ rỗng nếu khô
 # probably want to include the top-level domain.
 #. Type: string
 #. Description
-#: ../templates:9001
+#: ../templates:10001
 msgid ""
 "Please give a comma-separated list of domains for which this machine should "
 "consider itself the final destination. If this is a mail domain gateway, you "
@@ -359,7 +374,7 @@ msgstr ""
 
 #. Type: string
 #. Description
-#: ../templates:10001
+#: ../templates:11001
 msgid "SMTP relay host (blank for none):"
 msgstr "Máy tiếp SMTP (rỗng nếu không có):"
 
@@ -368,7 +383,7 @@ msgstr "Máy tiếp SMTP (rỗng nếu không có):"
 # host.
 #. Type: string
 #. Description
-#: ../templates:10001
+#: ../templates:11001
 msgid ""
 "Please specify a domain, host, host:port, [address] or [address]:port. Use "
 "the form [destination] to turn off MX lookups. Leave this blank for no relay "
@@ -380,7 +395,7 @@ msgstr ""
 
 #. Type: string
 #. Description
-#: ../templates:10001
+#: ../templates:11001
 msgid "Do not specify more than one host."
 msgstr "Đừng ghi rõ hơn một máy."
 
@@ -389,7 +404,7 @@ msgstr "Đừng ghi rõ hơn một máy."
 # is given, mail is routed directly to the destination.
 #. Type: string
 #. Description
-#: ../templates:10001
+#: ../templates:11001
 msgid ""
 "The relayhost parameter specifies the default host to send mail to when no "
 "entry is matched in the optional transport(5) table. When no relay host is "
@@ -401,20 +416,20 @@ msgstr ""
 
 #. Type: boolean
 #. Description
-#: ../templates:11001
+#: ../templates:12001
 msgid "Use procmail for local delivery?"
 msgstr "Dùng procmail để phát thư cục bộ không?"
 
 #. Type: boolean
 #. Description
-#: ../templates:11001
+#: ../templates:12001
 msgid "Please choose whether you want to use procmail to deliver local mail."
 msgstr ""
 "Hãy chọn nếu bạn muốn sử dụng phần mềm procmail để phát thư cục bộ hay không."
 
 #. Type: boolean
 #. Description
-#: ../templates:11001
+#: ../templates:12001
 msgid ""
 "Note that if you use procmail to deliver mail system-wide, you should set up "
 "an alias that forwards mail for root to a real user."
@@ -425,31 +440,31 @@ msgstr ""
 
 #. Type: select
 #. Choices
-#: ../templates:12001
+#: ../templates:13001
 msgid "all"
 msgstr "tất cả"
 
 #. Type: select
 #. Choices
-#: ../templates:12001
+#: ../templates:13001
 msgid "ipv6"
 msgstr "ipv6"
 
 #. Type: select
 #. Choices
-#: ../templates:12001
+#: ../templates:13001
 msgid "ipv4"
 msgstr "ipv4"
 
 #. Type: select
 #. Description
-#: ../templates:12002
+#: ../templates:13002
 msgid "Internet protocols to use:"
 msgstr "Giao thức Mạng cần dùng:"
 
 #. Type: select
 #. Description
-#: ../templates:12002
+#: ../templates:13002
 msgid ""
 "By default, whichever Internet protocols are enabled on the system at "
 "installation time will be used. You may override this default with any of "
@@ -460,7 +475,7 @@ msgstr ""
 
 #. Type: select
 #. Description
-#: ../templates:12002
+#: ../templates:13002
 msgid ""
 " all : use both IPv4 and IPv6 addresses;\n"
 " ipv6: listen only on IPv6 addresses;\n"
@@ -472,13 +487,13 @@ msgstr ""
 
 #. Type: string
 #. Description
-#: ../templates:13001
+#: ../templates:14001
 msgid "Local address extension character:"
 msgstr "Ký tự mở rộng địa chỉ cục bộ :"
 
 #. Type: string
 #. Description
-#: ../templates:13001
+#: ../templates:14001
 msgid ""
 "Please choose the character that will be used to define a local address "
 "extension."
@@ -486,13 +501,13 @@ msgstr "Hãy chọn ký tự sẽ được dùng để định nghĩa phần m�
 
 #. Type: string
 #. Description
-#: ../templates:13001
+#: ../templates:14001
 msgid "To not use address extensions, leave the string blank."
 msgstr "Để không sử dụng phần mở rộng địa chỉ, bỏ rỗng chuỗi này."
 
 #. Type: error
 #. Description
-#: ../templates:14001
+#: ../templates:15001
 msgid "Bad recipient delimiter"
 msgstr "Dấu sai định giới người nhận"
 
@@ -500,7 +515,7 @@ msgstr "Dấu sai định giới người nhận"
 # characters.  Please try again.
 #. Type: error
 #. Description
-#: ../templates:14001
+#: ../templates:15001
 msgid ""
 "The recipient delimiter must be a single character. '${enteredstring}' is "
 "what you entered."
@@ -510,13 +525,13 @@ msgstr ""
 
 #. Type: boolean
 #. Description
-#: ../templates:15001
+#: ../templates:16001
 msgid "Force synchronous updates on mail queue?"
 msgstr "Ép buộc cập nhật đồng bộ cho hàng đợi thư không?"
 
 #. Type: boolean
 #. Description
-#: ../templates:15001
+#: ../templates:16001
 msgid ""
 "If synchronous updates are forced, then mail is processed more slowly. If "
 "not forced, then there is a remote chance of losing some mail if the system "
@@ -529,7 +544,7 @@ msgstr ""
 
 #. Type: string
 #. Description
-#: ../templates:16001
+#: ../templates:17001
 msgid "Local networks:"
 msgstr "Mạng cục bộ :"
 
@@ -537,24 +552,23 @@ msgstr "Mạng cục bộ :"
 # just the local host, which is needed by some mail user agents.
 #. Type: string
 #. Description
-#: ../templates:16001
-#| msgid ""
-#| "Please specify the network blocks for which this host should relay mail. "
-#| "The default is just the local host, which is needed by some mail user "
-#| "agents."
+#: ../templates:17001
 msgid ""
 "Please specify the network blocks for which this host should relay mail. The "
 "default is just the local host, which is needed by some mail user agents. "
 "The default includes local host for both IPv4 and IPv6. If just connecting "
 "via one IP version, the unused value(s) may be removed."
 msgstr ""
-"Hãy ghi rõ những khối mạng cho chúng máy này nên chuyển tiếp thư. Giá trị mặc định chỉ là máy cục bộ, mà cần thiết cho một số tác nhận người dùng thư (MUA). Giá trị mặc định bao gồm máy cục bộ cho cả hai IPv4 và IPv6. Nếu chỉ kết nối thông qua một phiên bản IP, có thể gỡ bỏ (các) giá trị không dùng."
+"Hãy ghi rõ những khối mạng cho chúng máy này nên chuyển tiếp thư. Giá trị "
+"mặc định chỉ là máy cục bộ, mà cần thiết cho một số tác nhận người dùng thư "
+"(MUA). Giá trị mặc định bao gồm máy cục bộ cho cả hai IPv4 và IPv6. Nếu chỉ "
+"kết nối thông qua một phiên bản IP, có thể gỡ bỏ (các) giá trị không dùng."
 
 # If this is a smarthost for a block of machines, you need to specify the
 # netblocks here, or mail will be rejected rather than relayed.
 #. Type: string
 #. Description
-#: ../templates:16001
+#: ../templates:17001
 msgid ""
 "If this host is a smarthost for a block of machines, you need to specify the "
 "netblocks here, or mail will be rejected rather than relayed."
@@ -567,7 +581,7 @@ msgstr ""
 # an empty string.
 #. Type: string
 #. Description
-#: ../templates:16001
+#: ../templates:17001
 msgid ""
 "To use the postfix default (which is based on the connected subnets), leave "
 "this blank."
@@ -577,7 +591,7 @@ msgstr ""
 
 #. Type: string
 #. Description
-#: ../templates:17001
+#: ../templates:18001
 msgid "Mailbox size limit (bytes):"
 msgstr "Kích cỡ hộp thư tối đa (byte):"
 
@@ -586,7 +600,7 @@ msgstr "Kích cỡ hộp thư tối đa (byte):"
 # default is 51200000.)
 #. Type: string
 #. Description
-#: ../templates:17001
+#: ../templates:18001
 msgid ""
 "Please specify the limit that Postfix should place on mailbox files to "
 "prevent runaway software errors. A value of zero (0) means no limit. The "
@@ -598,13 +612,13 @@ msgstr ""
 
 #. Type: string
 #. Description
-#: ../templates:18001
+#: ../templates:19001
 msgid "Root and postmaster mail recipient:"
 msgstr "Người nhận thư của người chủ và chỉ bưu điện:"
 
 #. Type: string
 #. Description
-#: ../templates:18001
+#: ../templates:19001
 msgid ""
 "Mail for the 'postmaster', 'root', and other system accounts needs to be "
 "redirected to the user account of the actual system administrator."
@@ -615,7 +629,7 @@ msgstr ""
 
 #. Type: string
 #. Description
-#: ../templates:18001
+#: ../templates:19001
 msgid ""
 "If this value is left empty, such mail will be saved in /var/mail/nobody, "
 "which is not recommended."
@@ -625,16 +639,20 @@ msgstr ""
 
 #. Type: string
 #. Description
-#: ../templates:18001
+#: ../templates:19001
 msgid "Mail is not delivered to external delivery agents as root."
 msgstr "Thư không được phát cho tác nhân phát bên ngoài như là người chủ."
 
 #. Type: string
 #. Description
-#: ../templates:18001
+#: ../templates:19001
+#, fuzzy
+#| msgid ""
+#| "If you already have a /etc/aliases file, then you may need to add this "
+#| "entry. Leave this blank to not add one."
 msgid ""
-"If you already have a /etc/aliases file, then you may need to add this "
-"entry. Leave this blank to not add one."
+"If you already have a /etc/aliases file and it does not have an entry for "
+"root, then you should add this entry.  Leave this blank to not add one."
 msgstr ""
 "Nếu bạn đã có tập tin « /etc/aliases », bạn có thể cần phải thêm mục nhập "
 "này. Bỏ rỗng để không thêm."

@@ -325,6 +325,7 @@ static int smtpd_proxy_connect(SMTPD_STATE *state)
 	XFORWARD_PORT, SMTPD_PROXY_XFORWARD_PORT,
 	XFORWARD_PROTO, SMTPD_PROXY_XFORWARD_PROTO,
 	XFORWARD_HELO, SMTPD_PROXY_XFORWARD_HELO,
+	XFORWARD_IDENT, SMTPD_PROXY_XFORWARD_IDENT,
 	XFORWARD_DOMAIN, SMTPD_PROXY_XFORWARD_DOMAIN,
 	0, 0,
     };
@@ -349,12 +350,17 @@ static int smtpd_proxy_connect(SMTPD_STATE *state)
     /*
      * Connect to proxy.
      */
-    if ((fd = connect_fn(endpoint, BLOCKING, proxy->timeout)) < 0)
+    if ((fd = connect_fn(endpoint, BLOCKING, proxy->timeout)) < 0) {
+	msg_warn("connect to proxy filter %s: %m", proxy->service_name);
 	return (smtpd_proxy_rdwr_error(state, 0));
+    }
     proxy->service_stream = vstream_fdopen(fd, O_RDWR);
     /* Needed by our DATA-phase record emulation routines. */
     vstream_control(proxy->service_stream, VSTREAM_CTL_CONTEXT,
 		    (char *) state, VSTREAM_CTL_END);
+    /* Avoid poor performance when TCP MSS > VSTREAM_BUFSIZE. */
+    if (connect_fn == inet_connect)
+	vstream_tweak_tcp(proxy->service_stream);
     smtp_timeout_setup(proxy->service_stream, proxy->timeout);
 
     /*
@@ -426,6 +432,10 @@ static int smtpd_proxy_connect(SMTPD_STATE *state)
 		 && smtpd_proxy_xforward_send(state, buf, XFORWARD_HELO,
 				  IS_AVAIL_CLIENT_HELO(FORWARD_HELO(state)),
 					      FORWARD_HELO(state)))
+	     || ((server_xforward_features & SMTPD_PROXY_XFORWARD_IDENT)
+		 && smtpd_proxy_xforward_send(state, buf, XFORWARD_IDENT,
+				IS_AVAIL_CLIENT_IDENT(FORWARD_IDENT(state)),
+					      FORWARD_IDENT(state)))
 	     || ((server_xforward_features & SMTPD_PROXY_XFORWARD_PROTO)
 		 && smtpd_proxy_xforward_send(state, buf, XFORWARD_PROTO,
 				IS_AVAIL_CLIENT_PROTO(FORWARD_PROTO(state)),
@@ -754,12 +764,16 @@ static int smtpd_proxy_cmd(SMTPD_STATE *state, int expect, const char *fmt,...)
     /*
      * Censor out non-printable characters in server responses and save
      * complete multi-line responses if possible.
+     * 
+     * We can't parse or store input that exceeds var_line_limit, so we just
+     * skip over it to simplify the remainder of the code below.
      */
     VSTRING_RESET(proxy->buffer);
     if (buffer == 0)
 	buffer = vstring_alloc(10);
     for (;;) {
-	last_char = smtp_get(buffer, proxy->service_stream, var_line_limit);
+	last_char = smtp_get(buffer, proxy->service_stream, var_line_limit,
+			     SMTP_GET_FLAG_SKIP);
 	printable(STR(buffer), '?');
 	if (last_char != '\n')
 	    msg_warn("%s: response longer than %d: %.30s...",
@@ -774,7 +788,7 @@ static int smtpd_proxy_cmd(SMTPD_STATE *state, int expect, const char *fmt,...)
 	 */
 	if (LEN(proxy->buffer) < var_line_limit) {
 	    if (VSTRING_LEN(proxy->buffer))
-		VSTRING_ADDCH(proxy->buffer, '\n');
+		vstring_strcat(proxy->buffer, "\r\n");
 	    vstring_strcat(proxy->buffer, STR(buffer));
 	}
 

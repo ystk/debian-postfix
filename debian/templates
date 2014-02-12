@@ -11,6 +11,12 @@ _Description: Add a 'mydomain' entry in main.cf for upgrade?
  yourself. Accept this option to automatically set mydomain based on the
  FQDN of the machine.
 
+Template: postfix/sqlite_warning
+Type: boolean
+_Description: add 'sqlite' entry to dynamicmaps.cf?
+ Postfix version 2.9 adds sqlite support to maps, but your dynamicmaps.cf does
+ not reflect that.  Accept this option to add support for sqlite maps.
+
 Template: postfix/kernel_version_warning
 Type: boolean
 _Description: Install postfix despite an unsupported kernel?
@@ -81,7 +87,7 @@ _Description: Postfix not configured
  You have chosen 'No Configuration'. Postfix will not be configured and
  will not be started by default. Please run 'dpkg-reconfigure postfix' at
  a later date, or configure it yourself by:
-  - Editing /etc/postfix/main.cf to your liking; 
+  - Editing /etc/postfix/main.cf to your liking;
   - Running '/etc/init.d/postfix start'.
 
 Template: postfix/mailname
@@ -192,7 +198,7 @@ _Description: Mailbox size limit (bytes):
 
 Template: postfix/root_address
 Type: string
-Default: 
+Default:
 _Description: Root and postmaster mail recipient:
  Mail for the 'postmaster', 'root', and other system accounts needs to
  be redirected to the user account of the actual system administrator.
@@ -202,5 +208,5 @@ _Description: Root and postmaster mail recipient:
  .
  Mail is not delivered to external delivery agents as root.
  .
- If you already have a /etc/aliases file, then you may need to add this
- entry. Leave this blank to not add one.
+ If you already have a /etc/aliases file and it does not have an entry
+ for root, then you should add this entry.  Leave this blank to not add one.

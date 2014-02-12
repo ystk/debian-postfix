@@ -26,6 +26,7 @@
 	VAR_LMTP_TLS_CIPH, DEF_LMTP_TLS_CIPH, &var_smtp_tls_ciph, 1, 0,
 	VAR_LMTP_TLS_ECCERT_FILE, DEF_LMTP_TLS_ECCERT_FILE, &var_smtp_tls_eccert_file, 0, 0,
 	VAR_LMTP_TLS_ECKEY_FILE, DEF_LMTP_TLS_ECKEY_FILE, &var_smtp_tls_eckey_file, 0, 0,
+	VAR_LMTP_TLS_LOGLEVEL, DEF_LMTP_TLS_LOGLEVEL, &var_smtp_tls_loglevel, 0, 0,
 #endif
 	VAR_LMTP_SASL_MECHS, DEF_LMTP_SASL_MECHS, &var_smtp_sasl_mechs, 0, 0,
 	VAR_LMTP_SASL_TYPE, DEF_LMTP_SASL_TYPE, &var_smtp_sasl_type, 1, 0,
@@ -52,6 +53,8 @@
 	VAR_LMTP_NEST_CHKS, DEF_LMTP_NEST_CHKS, &var_smtp_nest_chks, 0, 0,
 	VAR_LMTP_BODY_CHKS, DEF_LMTP_BODY_CHKS, &var_smtp_body_chks, 0, 0,
 	VAR_LMTP_RESP_FILTER, DEF_LMTP_RESP_FILTER, &var_smtp_resp_filter, 0, 0,
+	VAR_LMTP_ADDR_PREF, DEF_LMTP_ADDR_PREF, &var_smtp_addr_pref, 1, 0,
+	VAR_LMTP_DNS_RES_OPT, DEF_LMTP_DNS_RES_OPT, &var_smtp_dns_res_opt, 0, 0,
 	0,
     };
     static const CONFIG_TIME_TABLE lmtp_time_table[] = {
@@ -82,7 +85,6 @@
 	VAR_LMTP_MXSESS_LIMIT, DEF_LMTP_MXSESS_LIMIT, &var_smtp_mxsess_limit, 0, 0,
 #ifdef USE_TLS
 	VAR_LMTP_TLS_SCERT_VD, DEF_LMTP_TLS_SCERT_VD, &var_smtp_tls_scert_vd, 0, 0,
-	VAR_LMTP_TLS_LOGLEVEL, DEF_LMTP_TLS_LOGLEVEL, &var_smtp_tls_loglevel, 0, 0,
 #endif
 	0,
     };
@@ -106,5 +108,7 @@
 	VAR_LMTP_CNAME_OVERR, DEF_LMTP_CNAME_OVERR, &var_smtp_cname_overr,
 	VAR_LMTP_SASL_AUTH_SOFT_BOUNCE, DEF_LMTP_SASL_AUTH_SOFT_BOUNCE, &var_smtp_sasl_auth_soft_bounce,
 	VAR_LMTP_ASSUME_FINAL, DEF_LMTP_ASSUME_FINAL, &var_lmtp_assume_final,
+	VAR_LMTP_REC_DEADLINE, DEF_LMTP_REC_DEADLINE, &var_smtp_rec_deadline,
+	VAR_LMTP_DUMMY_MAIL_AUTH, DEF_LMTP_DUMMY_MAIL_AUTH, &var_smtp_dummy_mail_auth,
 	0,
     };

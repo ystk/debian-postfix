@@ -10,7 +10,7 @@ DIRS	= src/util src/global src/dns src/tls src/xsasl src/milter src/master \
 	src/postsuper src/qmqpd src/spawn src/flush src/verify \
 	rmail \
 	src/virtual src/proxymap src/anvil src/scache src/discard src/tlsmgr \
-	src/postmulti
+	src/postmulti src/postscreen src/dnsblog src/tlsproxy
 MANDIRS	= proto man html
 LIBEXEC	= libexec/post-install libexec/postfix-files libexec/postfix-script \
 	libexec/postfix-wrapper libexec/main.cf libexec/master.cf \
@@ -36,25 +36,25 @@ update printfck tests root_tests:
 update: $(LIBEXEC)
 
 libexec/post-install: conf/post-install
-	rm -f $@ && ln -sf ../$? $@
+	rm -f $@ && ln -f $? $@
 
 libexec/postfix-files: conf/postfix-files
-	rm -f $@ && ln -sf ../$? $@
+	rm -f $@ && ln -f $? $@
 
 libexec/postfix-script: conf/postfix-script
-	rm -f $@ && ln -sf ../$? $@
+	rm -f $@ && ln -f $? $@
 
 libexec/postfix-wrapper: conf/postfix-wrapper
-	rm -f $@ && ln -sf ../$? $@
+	rm -f $@ && ln -f $? $@
 
 libexec/main.cf: conf/main.cf
-	rm -f $@ && ln -sf ../$? $@
+	rm -f $@ && ln -f $? $@
 
 libexec/master.cf: conf/master.cf
-	rm -f $@ && ln -sf ../$? $@
+	rm -f $@ && ln -f $? $@
 
 libexec/postmulti-script: conf/postmulti-script
-	rm -f $@ && ln -sf ../$? $@
+	rm -f $@ && ln -f $? $@
 
 manpages:
 	set -e; for i in $(MANDIRS); do \

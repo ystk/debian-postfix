@@ -9,7 +9,7 @@ Postfix lookup table management
 .na
 .nf
 .fi
-\fBpostmap\fR [\fB-Nbfhimnoprsvw\fR] [\fB-c \fIconfig_dir\fR]
+\fBpostmap\fR [\fB-Nbfhimnoprsuvw\fR] [\fB-c \fIconfig_dir\fR]
 [\fB-d \fIkey\fR] [\fB-q \fIkey\fR]
         [\fIfile_type\fR:]\fIfile_name\fR ...
 .SH DESCRIPTION
@@ -161,6 +161,8 @@ as the original input order.
 .sp
 This feature is available in Postfix version 2.2 and later,
 and is not available for all database types.
+.IP \fB-u\fR
+Upgrade the database to the current version.
 .IP \fB-v\fR
 Enable verbose logging for debugging purposes. Multiple \fB-v\fR
 options make the software increasingly verbose.
@@ -189,6 +191,10 @@ This is available on systems with support for \fBdbm\fR databases.
 .IP \fBhash\fR
 The output file is a hashed file, named \fIfile_name\fB.db\fR.
 This is available on systems with support for \fBdb\fR databases.
+.IP \fBfail\fR
+A table that reliably fails all requests. The lookup table
+name is used for logging only. This table exists to simplify
+Postfix error tests.
 .IP \fBsdbm\fR
 The output consists of two files, named \fIfile_name\fB.pag\fR and
 \fIfile_name\fB.dir\fR.

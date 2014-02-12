@@ -66,7 +66,7 @@ convert_dbs() {
     for i in $maps; do
       case $i in
 	hash:*|btree:*)
-	    f=${i#*:}.db 
+	    f=${i#*:}.db
 	    if [ -f $f ]; then
 		echo "attempting conversion of $i"
 		echo "  saving old db in ${f}.db3"
@@ -92,7 +92,7 @@ fix_master() {
 	mv ${MASTER}.$$ ${MASTER}
     fi
 
-    while read line; do 
+    while read line; do
 	serv=${line%% *}
 	if ! grep -qE "^${serv}[[:space:]]" ${MASTER}; then
 	    [ -n "$echoed" ] || echo "in master.cf:"; echoed=y
@@ -177,7 +177,7 @@ dpkg-divert --package postfix --remove --rename \
 # handle sasl-smtp[d] -> smtp[d] change.  oops..
 if [ -d /etc/postfix/sasl ]; then
     cd /etc/postfix/sasl
-    for file in smtp smtpd; do 
+    for file in smtp smtpd; do
        if [ -r sasl-${file}.conf ] && [ ! -r ${file}.conf ]; then
 	    ln -s sasl-${file}.conf ${file}.conf
        fi
@@ -203,7 +203,7 @@ chown postfix:root private
 db_fget postfix/chattr changed
 if [ "$RET" = "true" ]; then
     db_get postfix/chattr && chat="$RET"
-    echo "setting synchronous mail queue updates: $chat"    
+    echo "setting synchronous mail queue updates: $chat"
     if [ "$chat" = "true" ]; then
 	chat="+S"
     else
@@ -224,36 +224,23 @@ cd /etc/postfix
 
 if [ ! -f dynamicmaps.cf ]; then
     echo "Creating /etc/postfix/dynamicmaps.cf"
+    # only need tcp and sqlite, since they are provided by the postfix
+    # package.  Everything else gets added by its own package.
     cat << EOF > dynamicmaps.cf
 # Postfix dynamic maps configuration file.
-#
-# The first match found is the one that is used.  Wildcards are not supported
-# as of postfix 2.0.2
 #
 #type	location of .so file			open function	(mkmap func)
 #====	================================	=============	============
 EOF
     addmap tcp
+    addmap sqlite
 else
-    # handle dynamicmaps.cf upgrade - we checked with the user in preinst.
-    if [ -f /var/spool/postfix/dynamicmaps_upgrade ]; then
-      (
-	if ! grep -qi 'wildcards are not supported' dynamicmaps.cf; then
-	    echo '# *** Wildcards are not supported as of postfix 2.0.2 ***'
-	    echo '#'
-	fi
-	sed '/^\*[[:space:]]/d' dynamicmaps.cf
-      ) > dynamicmaps.cf.$$
-      mv dynamicmaps.cf.$$ dynamicmaps.cf
-      # Need to add all of them, since we may need them to configure... sigh.
-      addmap tcp
-      addmap ldap
-      addmap pcre
-      addmap mysql
-      addmap pgsql
+    # add sqlite if we were told we could in preinst.
+    if [ -f /var/spool/postfix/sqlite_addition ]; then
+	addmap sqlite
+	rm -f /var/spool/postfix/sqlite_addition
     fi
 fi
-#addmap sdbm mkmap_sdbm_open	# make sure this entry is there, for tls
 
 db_get postfix/main_mailer_type && mailer="$RET"
 
@@ -379,21 +366,21 @@ EOF
     db_fget postfix/relayhost changed
     if [ "$RET" = "true" ]; then
 	db_get postfix/relayhost && relayhost="$RET"
-	echo "setting relayhost: $relayhost"    
+	echo "setting relayhost: $relayhost"
 	set_postconf "relayhost=$relayhost"
     fi
     db_fget postfix/mynetworks changed
     if [ "$RET" = "true" ]; then
 	db_get postfix/mynetworks && mynetworks="$RET"
 	if [ -z "$RET" ]; then
-	    echo "deleting mynetworks"    
+	    echo "deleting mynetworks"
 	    if grep -q '^mynetworks[[:space:]]*=' main.cf; then
 		# need to remove it, get postconf to do the hard part.
 		postconf -e 'mynetworks=127.0.0.0/8'
 		perl -i -ne 'print unless /^mynetworks\s*=/' main.cf
 	    fi
 	else
-	    echo "setting mynetworks: $mynetworks"    
+	    echo "setting mynetworks: $mynetworks"
 	    set_postconf "mynetworks=$mynetworks"
 	fi
     fi
@@ -401,11 +388,11 @@ EOF
     if [ "$RET" = "true" ]; then
 	db_get postfix/procmail && useprocmail="$RET"
 	if [ "x$useprocmail" = "xtrue" ]; then
-	    echo "setting mailbox_command"        
+	    echo "setting mailbox_command"
 	    set_postconf 'mailbox_command=procmail -a "$EXTENSION"'
 	else
 	    if grep -q ^mailbox_command /etc/postfix/main.cf; then
-		echo "clearing mailbox_command"        
+		echo "clearing mailbox_command"
 		set_postconf "mailbox_command="
 	    fi
 	fi
@@ -413,14 +400,14 @@ EOF
     db_fget postfix/mailbox_limit changed
     if [ "$RET" = "true" ]; then
 	db_get postfix/mailbox_limit && mailbox_limit="$RET"
-	echo "setting mailbox_size_limit: $mailbox_limit"    
+	echo "setting mailbox_size_limit: $mailbox_limit"
 	set_postconf "mailbox_size_limit=$mailbox_limit"
     fi
 
     db_fget postfix/recipient_delim changed
     if [ "$RET" = "true" ]; then
 	db_get postfix/recipient_delim && recip="$RET"
-	echo "setting recipient_delimiter: $recip"    
+	echo "setting recipient_delimiter: $recip"
 	set_postconf "recipient_delimiter=$recip"
     fi
 
@@ -447,7 +434,7 @@ EOF
     db_fget postfix/protocols changed
     if [ "$RET" = "true" ]; then
 	db_get postfix/protocols && protocols="$RET"
-	echo "setting inet_protocols: $protocols"    
+	echo "setting inet_protocols: $protocols"
 	set_postconf "inet_protocols=$protocols"
     fi
 
@@ -463,7 +450,7 @@ else	# ] No configuration [
     if [ -f main.cf ]; then
 	MSG="configuration was untouched"
     else
-	MSG="was not set up.  Start with 
+	MSG="was not set up.  Start with
   cp /usr/share/postfix/main.cf.debian /etc/postfix/main.cf
 "
 	# make sure that we don't try anything stupid below.

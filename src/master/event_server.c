@@ -50,6 +50,11 @@
 /*	global Postfix configuration file. Tables are loaded in the
 /*	order as specified, and multiple instances of the same type
 /*	are allowed.
+/* .IP "MAIL_SERVER_LONG_TABLE (CONFIG_LONG_TABLE *)"
+/*	A table with configurable parameters, to be loaded from the
+/*	global Postfix configuration file. Tables are loaded in the
+/*	order as specified, and multiple instances of the same type
+/*	are allowed.
 /* .IP "MAIL_SERVER_STR_TABLE (CONFIG_STR_TABLE *)"
 /*	A table with configurable parameters, to be loaded from the
 /*	global Postfix configuration file. Tables are loaded in the
@@ -72,6 +77,11 @@
 /*	are allowed. Raw parameters are not subjected to $name
 /*	evaluation.
 /* .IP "MAIL_SERVER_NINT_TABLE (CONFIG_NINT_TABLE *)"
+/*	A table with configurable parameters, to be loaded from the
+/*	global Postfix configuration file. Tables are loaded in the
+/*	order as specified, and multiple instances of the same type
+/*	are allowed.
+/* .IP "MAIL_SERVER_NBOOL_TABLE (CONFIG_NBOOL_TABLE *)"
 /*	A table with configurable parameters, to be loaded from the
 /*	global Postfix configuration file. Tables are loaded in the
 /*	order as specified, and multiple instances of the same type
@@ -122,6 +132,9 @@
 /*	A pointer to a function that is called after "postfix reload"
 /*	or "master exit".  The application can call event_server_drain()
 /*	(see below) to finish ongoing activities in the background.
+/* .IP "MAIL_SERVER_WATCHDOG (int *)"
+/*	Override the default 1000s watchdog timeout. The value is
+/*	used after command-line and main.cf file processing.
 /* .PP
 /*	event_server_disconnect() should be called by the application
 /*	to close a client connection.
@@ -213,6 +226,7 @@
 #include <timed_ipc.h>
 #include <resolve_local.h>
 #include <mail_flow.h>
+#include <mail_version.h>
 
 /* Process manager. */
 
@@ -240,6 +254,7 @@ static int event_server_in_flow_delay;
 static unsigned event_server_generation;
 static void (*event_server_pre_disconn) (VSTREAM *, char *, char **);
 static void (*event_server_slow_exit) (char *, char **);
+static int event_server_watchdog = 1000;
 
 /* event_server_exit - normal termination */
 
@@ -256,6 +271,7 @@ static void event_server_abort(int unused_event, char *unused_context)
 {
     if (msg_verbose)
 	msg_info("master disconnect -- exiting");
+    event_disable_readwrite(MASTER_STATUS_FD);
     if (event_server_slow_exit)
 	event_server_slow_exit(event_server_name, event_server_argv);
     else
@@ -275,6 +291,7 @@ static void event_server_timeout(int unused_event, char *unused_context)
 
 int     event_server_drain(void)
 {
+    const char *myname = "event_server_drain";
     int     fd;
 
     switch (fork()) {
@@ -285,8 +302,13 @@ int     event_server_drain(void)
     case 0:
 	(void) msg_cleanup((MSG_CLEANUP_FN) 0);
 	event_fork();
-	for (fd = MASTER_LISTEN_FD; fd < MASTER_LISTEN_FD + socket_count; fd++)
+	for (fd = MASTER_LISTEN_FD; fd < MASTER_LISTEN_FD + socket_count; fd++) {
 	    event_disable_readwrite(fd);
+	    (void) close(fd);
+	    /* Play safe - don't reuse this file number. */
+	    if (DUP2(STDIN_FILENO, fd) < 0)
+		msg_warn("%s: dup2(%d, %d): %m", myname, STDIN_FILENO, fd);
+	}
 	var_use_limit = 1;
 	return (0);
 	/* Let the master start a new process. */
@@ -557,6 +579,11 @@ NORETURN event_server_main(int argc, char **argv, MULTI_SERVER_FN service,...)
 	msg_info("daemon started");
 
     /*
+     * Check the Postfix library version as soon as we enable logging.
+     */
+    MAIL_VERSION_CHECK;
+
+    /*
      * Initialize from the configuration file. Allow command-line options to
      * override compiled-in defaults or configured parameter values.
      */
@@ -566,6 +593,12 @@ NORETURN event_server_main(int argc, char **argv, MULTI_SERVER_FN service,...)
      * Register dictionaries that use higher-level interfaces and protocols.
      */
     mail_dict_init();
+
+    /*
+     * After database open error, continue execution with reduced
+     * functionality.
+     */
+    dict_allow_surrogate = 1;
 
     /*
      * Pick up policy settings from master process. Shut up error messages to
@@ -657,6 +690,9 @@ NORETURN event_server_main(int argc, char **argv, MULTI_SERVER_FN service,...)
 	case MAIL_SERVER_INT_TABLE:
 	    get_mail_conf_int_table(va_arg(ap, CONFIG_INT_TABLE *));
 	    break;
+	case MAIL_SERVER_LONG_TABLE:
+	    get_mail_conf_long_table(va_arg(ap, CONFIG_LONG_TABLE *));
+	    break;
 	case MAIL_SERVER_STR_TABLE:
 	    get_mail_conf_str_table(va_arg(ap, CONFIG_STR_TABLE *));
 	    break;
@@ -671,6 +707,9 @@ NORETURN event_server_main(int argc, char **argv, MULTI_SERVER_FN service,...)
 	    break;
 	case MAIL_SERVER_NINT_TABLE:
 	    get_mail_conf_nint_table(va_arg(ap, CONFIG_NINT_TABLE *));
+	    break;
+	case MAIL_SERVER_NBOOL_TABLE:
+	    get_mail_conf_nbool_table(va_arg(ap, CONFIG_NBOOL_TABLE *));
 	    break;
 	case MAIL_SERVER_PRE_INIT:
 	    pre_init = va_arg(ap, MAIL_SERVER_INIT_FN);
@@ -707,6 +746,9 @@ NORETURN event_server_main(int argc, char **argv, MULTI_SERVER_FN service,...)
 	    if (user_name)
 		msg_fatal("service %s requires privileged operation",
 			  service_name);
+	    break;
+	case MAIL_SERVER_WATCHDOG:
+	    event_server_watchdog = *va_arg(ap, int *);
 	    break;
 	case MAIL_SERVER_SLOW_EXIT:
 	    event_server_slow_exit = va_arg(ap, MAIL_SERVER_SLOW_EXIT_FN);
@@ -842,7 +884,8 @@ NORETURN event_server_main(int argc, char **argv, MULTI_SERVER_FN service,...)
     close_on_exec(MASTER_STATUS_FD, CLOSE_ON_EXEC);
     close_on_exec(MASTER_FLOW_READ, CLOSE_ON_EXEC);
     close_on_exec(MASTER_FLOW_WRITE, CLOSE_ON_EXEC);
-    watchdog = watchdog_create(var_daemon_timeout, (WATCHDOG_FN) 0, (char *) 0);
+    watchdog = watchdog_create(event_server_watchdog,
+			       (WATCHDOG_FN) 0, (char *) 0);
 
     /*
      * The event loop, at last.

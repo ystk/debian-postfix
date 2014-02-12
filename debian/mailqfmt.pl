@@ -15,7 +15,7 @@ use HTTP::Date;
 my $cmd = '/usr/bin/mailq';
 
 my %q = ( ' ' => 'normal',
-	  '!' => 'hold  ', 
+	  '!' => 'hold  ',
 	  '*' => 'active' );
 
 delete $ENV{'PATH'};
@@ -33,7 +33,7 @@ while(<>) {
 	if (/^--/) { print; next; }	# print trailer
 	if (/^-/) { next; }		# skip header
 	# empty line
-	if (/^$/) { 
+	if (/^$/) {
 		if ($rsn) { $rec .= " reason=$rsn"; }
 		print "$rec\n";
 		$rec = $rsn = '';
@@ -43,7 +43,7 @@ while(<>) {
 	if (/^([0-9A-F]+)\s*([ !*])\s+(\d+)\s+(\S+\s+\S+\s+\d+\s+\d+:\d+:\d+)\s+(.+)$/)
 	{
 		my ($qid, $qfl, $siz, $dat, $from) = ($1, $2, $3, $4, $5);
-		$dat = HTTP::Date::time2isoz(str2time($dat));	
+		$dat = HTTP::Date::time2isoz(str2time($dat));
 		$dat =~ s/ /T/g;
 		$siz = sprintf "%08d", $siz;
 		$rec="$qid queue=$q{$qfl} size=$siz date=$dat from=$from";

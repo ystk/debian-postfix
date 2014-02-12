@@ -22,6 +22,13 @@
 /*	int	socktype;
 /*	struct addrinfo **result;
 /*
+/*	int	hostname_to_sockaddr_pf(hostname, pf, service, socktype, result)
+/*	const char *hostname;
+/*	int	pf;
+/*	const char *service;
+/*	int	socktype;
+/*	struct addrinfo **result;
+/*
 /*	int	hostaddr_to_sockaddr(hostaddr, service, socktype, result)
 /*	const char *hostaddr;
 /*	const char *service;
@@ -59,6 +66,9 @@
 /*	result should be destroyed with freeaddrinfo(). A null host
 /*	pointer converts to the null host address.
 /*
+/*	hostname_to_sockaddr_pf() is an extended interface that
+/*	provides a protocol family override.
+/*
 /*	hostaddr_to_sockaddr() converts a printable network address
 /*	into the corresponding binary form.  The result should be
 /*	destroyed with freeaddrinfo(). A null host pointer converts
@@ -68,6 +78,7 @@
 /*	into printable form. The result buffers should be large
 /*	enough to hold the printable address or port including the
 /*	null terminator.
+/*	This function strips off the IPv6 datalink suffix.
 /*
 /*	sockaddr_to_hostname() converts a binary network address
 /*	into a hostname or service.  The result buffer should be
@@ -100,6 +111,10 @@
 /*	hostname, or a null pointer (meaning the wild-card listen
 /*	address).  On output from sockaddr_to_hostname(), storage
 /*	for the result hostname, or a null pointer.
+/* .IP pf
+/*	Protocol type: PF_UNSPEC (meaning: use any protocol that is
+/*	available), PF_INET, or PF_INET6.  This argument is ignored
+/*	in EMULATE_IPV4_ADDRINFO mode.
 /* .IP hostaddr
 /*	On input to hostaddr_to_sockaddr(), a numeric hostname,
 /*	or a null pointer (meaning the wild-card listen address).
@@ -188,6 +203,7 @@
 #include <msg.h>
 #include <inet_proto.h>
 #include <myaddrinfo.h>
+#include <split_at.h>
 
 /* Application-specific. */
 
@@ -274,10 +290,11 @@ static int find_service(const char *service, int socktype)
 
 #endif
 
-/* hostname_to_sockaddr - hostname to binary address form */
+/* hostname_to_sockaddr_pf - hostname to binary address form */
 
-int     hostname_to_sockaddr(const char *hostname, const char *service,
-			             int socktype, struct addrinfo ** res)
+int     hostname_to_sockaddr_pf(const char *hostname, int pf,
+			             const char *service, int socktype,
+			             struct addrinfo ** res)
 {
 #ifdef EMULATE_IPV4_ADDRINFO
 
@@ -408,7 +425,7 @@ int     hostname_to_sockaddr(const char *hostname, const char *service,
     int     err;
 
     memset((char *) &hints, 0, sizeof(hints));
-    hints.ai_family = inet_proto_info()->ai_family;
+    hints.ai_family = (pf != PF_UNSPEC) ? pf : inet_proto_info()->ai_family;
     hints.ai_socktype = service ? socktype : MAI_SOCKTYPE;
     if (!hostname) {
 	hints.ai_flags = AI_PASSIVE;
@@ -592,16 +609,20 @@ int     sockaddr_to_hostaddr(const struct sockaddr * sa, SOCKADDR_SIZE salen,
     }
     return (0);
 #else
+    int     ret;
 
     /*
      * Native getnameinfo(3) version.
      */
-    return (getnameinfo(sa, salen,
-			hostaddr ? hostaddr->buf : (char *) 0,
-			hostaddr ? sizeof(hostaddr->buf) : 0,
-			portnum ? portnum->buf : (char *) 0,
-			portnum ? sizeof(portnum->buf) : 0,
-			NI_NUMERICHOST | NI_NUMERICSERV));
+    ret = getnameinfo(sa, salen,
+		      hostaddr ? hostaddr->buf : (char *) 0,
+		      hostaddr ? sizeof(hostaddr->buf) : 0,
+		      portnum ? portnum->buf : (char *) 0,
+		      portnum ? sizeof(portnum->buf) : 0,
+		      NI_NUMERICHOST | NI_NUMERICSERV);
+    if (hostaddr != 0 && ret == 0 && sa->sa_family == AF_INET6)
+	(void) split_at(hostaddr->buf, '%');
+    return (ret);
 #endif
 }
 

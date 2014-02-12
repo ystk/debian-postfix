@@ -2,19 +2,20 @@ Source: postfix
 Section: mail
 Priority: extra
 Maintainer: LaMont Jones <lamont@debian.org>
-Standards-Version: 3.7.2.0
-Build-Depends: debhelper (>= 4.1.16), po-debconf (>= 0.5.0), groff-base, patch, lsb-release, libdb-dev (>=4.6.19), libldap2-dev (>=2.1), libpcre3-dev, libmysqlclient-dev|libmysqlclient15-dev|libmysqlclient14-dev, libssl-dev (>=0.9.7), libsasl2-dev, libpq-dev, libcdb-dev, hardening-wrapper
-XS-Vcs-Browser: http://git.debian.org/?p=users/lamont/postfix.git
-XS-Vcs-Git: git://git.debian.org/~lamont/postfix.git
+Standards-Version: 3.9.1.0
+Homepage: http://www.postfix.org
+Build-Depends: debhelper (>= 7), po-debconf (>= 0.5.0), groff-base, patch, lsb-release, libdb-dev (>=4.6.19), libldap2-dev (>=2.1), libpcre3-dev, libmysqlclient-dev|libmysqlclient15-dev|libmysqlclient14-dev, libssl-dev (>=0.9.7), libsasl2-dev, libpq-dev, libcdb-dev, hardening-wrapper, dpkg-dev (>= 1.15.5), libsqlite3-dev
+Vcs-Browser: http://git.debian.org/?p=users/lamont/postfix.git
+Vcs-Git: git://git.debian.org/~lamont/postfix.git
 
 Package: postfix
 Architecture: any
-Depends: ${shlibs:Depends}, ${misc:Depends}, netbase, adduser (>=3.48), dpkg (>= 1.8.3), lsb-base (>=3.0-6), ssl-cert
-Replaces: postfix-tls, mail-transport-agent
+Depends: ${shlibs:Depends}, ${misc:Depends}, netbase, adduser (>=3.48), dpkg (>= 1.8.3), lsb-base (>=3.0-6), ssl-cert, cpio
+Replaces: mail-transport-agent
 Recommends: python
-Suggests: procmail, postfix-mysql, postfix-pgsql, postfix-ldap, postfix-pcre, sasl2-bin, libsasl2-modules, resolvconf, postfix-cdb, mail-reader, ufw
-Conflicts: mail-transport-agent, smail, libnss-db (<< 2.2-3), postfix-tls
-Provides: mail-transport-agent, postfix-tls, ${postfix:Provides}
+Suggests: procmail, postfix-mysql, postfix-pgsql, postfix-ldap, postfix-pcre, sasl2-bin, libsasl2-modules, dovecot-common, resolvconf, postfix-cdb, mail-reader, ufw, postfix-doc
+Conflicts: mail-transport-agent, smail, libnss-db (<< 2.2-3)
+Provides: mail-transport-agent, ${postfix:Provides}
 Description: High-performance mail transport agent
  ${Description}
 
@@ -66,7 +67,7 @@ Description: PostgreSQL map support for Postfix
 Package: postfix-dev
 Architecture: all
 Section: devel
-Depends: postfix (>= ${Upstream}-0), postfix (<< ${Upstream}.0-0)
+Depends: ${misc:Depends}, postfix (>= ${Upstream}-0), postfix (<< ${Upstream}.0-0)
 Description: Loadable modules development environment for Postfix
  ${Description}
  .
@@ -78,7 +79,7 @@ Package: postfix-doc
 Architecture: all
 Section: doc
 Suggests: postfix
-Replaces: postfix-tls
+Depends: ${misc:Depends}
 Description: Documentation for Postfix
  ${Description}
  .

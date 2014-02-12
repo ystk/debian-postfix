@@ -2,22 +2,23 @@
 # Yuriy Talakan' <yt@amur.elektra.ru>, 2005.
 # Yuriy Talakan' <yt@drsk.ru>, 2007.
 # Sergey Alyoshin <alyoshin.s@gmail.com>, 2007, 2008.
-#
+# Vladimir Zhbanov <vzhbanov@gmail.com>, 2012.
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: postfix_2.5.2-1_ru\n"
-"Report-Msgid-Bugs-To: Source: postfix@packages.debian.org\n"
-"POT-Creation-Date: 2008-05-29 19:58-0600\n"
-"PO-Revision-Date: 2008-06-03 10:56+0400\n"
+"Project-Id-Version: postfix_2.9.3-2_ru\n"
+"Report-Msgid-Bugs-To: postfix@packages.debian.org\n"
+"POT-Creation-Date: 2012-05-30 22:56-0600\n"
+"PO-Revision-Date: 2012-06-03 21:12+0400\n"
 "Last-Translator: Sergey Alyoshin <alyoshin.s@gmail.com>\n"
 "Language-Team: Russian <debian-l10n-russian@lists.debian.org>\n"
+"Language: ru\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Generator: KBabel 1.9.1\n"
-"Plural-Forms:  nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%"
-"10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
+"Plural-Forms:  nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n"
+"%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
 
 #. Type: boolean
 #. Description
@@ -33,8 +34,8 @@ msgid ""
 "mydomain must be specified, since hostname(1) is not a fully qualified "
 "domain name (FQDN)."
 msgstr ""
-"Postfix версии 2.3.3-2 и более требует изменений в main.cf. А именно, "
-"необходимо задать mydomain, поскольку hostname(2) не является полностью "
+"Для Postfix версии 2.3.3-2 и выше требуются изменения в main.cf. А именно, "
+"необходимо задать mydomain, поскольку hostname(1) не является полностью "
 "определённым именем домена (FQDN)."
 
 #. Type: boolean
@@ -46,115 +47,131 @@ msgid ""
 "yourself. Accept this option to automatically set mydomain based on the FQDN "
 "of the machine."
 msgstr ""
-"Невозможность исправления приведёт к неработоспособной почтовой программе. "
-"Отказ от этого параметра прервёт обновление, что даст вам возможность "
-"добавить эту настройку самостоятельно. Примените этот параметр, для "
-"автоматической установки mydomain в соответствии с FQDN машины."
+"При невозможности исправления почтовая программа окажется неработоспособной. "
+"В случае отказа обновление будет прервано, что даст вам возможность добавить "
+"эту настройку самостоятельно. В случае согласия mydomain будет определён по "
+"FQDN машины и установлен автоматически."
 
 #. Type: boolean
 #. Description
 #: ../templates:2001
-msgid "Install postfix despite an unsupported kernel?"
-msgstr "Установить postfix несмотря на неподдерживаемое ядро?"
+msgid "add 'sqlite' entry to dynamicmaps.cf?"
+msgstr "Добавить запись 'sqlite' в dynamicmaps.cf?"
 
 #. Type: boolean
 #. Description
 #: ../templates:2001
 msgid ""
-"Postfix uses features that are not found in kernels prior to 2.6. If you "
-"proceed with the installation, Postfix will not run."
+"Postfix version 2.9 adds sqlite support to maps, but your dynamicmaps.cf "
+"does not reflect that.  Accept this option to add support for sqlite maps."
 msgstr ""
-"Postfix использует особенности, которые не заложены в ядра версий до 2.6. "
-"Если вы продолжите установку, postfix не будет работать."
+"Postfix версии 2.9 поддерживает sqlite в картах, но ваш dynamicmaps.cf не "
+"отражает это. В случае согласия будет добавлена поддержка карт sqlite."
 
 #. Type: boolean
 #. Description
 #: ../templates:3001
+msgid "Install postfix despite an unsupported kernel?"
+msgstr "Установить Postfix несмотря на то, что ядро не поддерживается?"
+
+#. Type: boolean
+#. Description
+#: ../templates:3001
+msgid ""
+"Postfix uses features that are not found in kernels prior to 2.6. If you "
+"proceed with the installation, Postfix will not run."
+msgstr ""
+"Postfix использует функциональность, не заложенную в ядра версий до 2.6. "
+"Если продолжить установку, Postfix не будет работать."
+
+#. Type: boolean
+#. Description
+#: ../templates:4001
 msgid "Correct retry entry in master.cf for upgrade?"
 msgstr "Исправить запись сервиса повтора в master.cf для обновления?"
 
 #. Type: boolean
 #. Description
-#: ../templates:3001
+#: ../templates:4001
 msgid ""
 "Postfix version 2.4 requires that the retry service be added to master.cf."
 msgstr "Postfix версии 2.4 требует добавления в master.cf сервиса повтора."
 
 #. Type: boolean
 #. Description
-#: ../templates:3001
+#: ../templates:4001
 msgid ""
 "Failure to fix this will result in a broken mailer. Decline this option to "
 "abort the upgrade, giving you the opportunity to add this configuration "
 "yourself. Accept this option to automatically make master.cf compatible with "
 "Postfix 2.4 in this respect."
 msgstr ""
-"Невозможность исправления приведёт к неработоспособной почтовой программе. "
-"Отказ от этого параметра прервёт обновление, что даст вам возможность "
-"добавить эту настройку самостоятельно. Примените этот параметр для того, "
-"чтобы автоматически сделать master.cf совместимым с Postfix 2.2 в этом "
+"При невозможности исправления почтовая программа окажется неработоспособной. "
+"В случае отказа обновление будет прервано, что даст вам возможность добавить "
+"эту настройку самостоятельно. В случае согласия master.cf будет "
+"автоматически изменён для обеспечения совместимости с Postfix 2.2 в этом "
 "отношении."
 
 #. Type: boolean
 #. Description
-#: ../templates:4001
+#: ../templates:5001
 msgid "Correct tlsmgr entry in master.cf for upgrade?"
 msgstr "Исправить запись 'tlsmgr' в master.cf для обновления?"
 
 #. Type: boolean
 #. Description
-#: ../templates:4001
+#: ../templates:5001
 msgid "Postfix version 2.2 has changed the invocation of tlsmgr."
-msgstr "Postfix версии 2.2 изменил вызов tlsmgr."
+msgstr "В Postfix версии 2.2 изменён вызов tlsmgr."
 
 #. Type: boolean
 #. Description
-#: ../templates:4001
+#: ../templates:5001
 msgid ""
 "Failure to fix this will result in a broken mailer. Decline this option to "
 "abort the upgrade, giving you the opportunity to add this configuration "
 "yourself. Accept this option to automatically make master.cf compatible with "
 "Postfix 2.2 in this respect."
 msgstr ""
-"Невозможность исправления приведёт к неработоспособной почтовой программе. "
-"Отказ от этого параметра прервёт обновление, что даст вам возможность "
-"добавить эту настройку самостоятельно. Примените этот параметр для того, "
-"чтобы автоматически сделать master.cf совместимым с Postfix 2.2 в этом "
+"При невозможности исправления почтовая программа станет неработоспособной. В "
+"случае отказа обновление будет прервано, что даст вам возможность добавить "
+"эту настройку самостоятельно. В случае согласия master.cf будет "
+"автоматически изменён для обеспечения совместимости с Postfix 2.2 в этом "
 "отношении."
 
 #. Type: boolean
 #. Description
-#: ../templates:5001
+#: ../templates:6001
 msgid "Ignore incorrect hostname entry?"
-msgstr "Игнорировать неподходящее значение хост-имени?"
+msgstr "Игнорировать некорректное значение имени узла?"
 
 #. Type: boolean
 #. Description
-#: ../templates:5001
+#: ../templates:6001
 msgid ""
 "The string '${enteredstring}' does not follow RFC 1035 and does not appear "
 "to be a valid IP address."
 msgstr ""
-"Строка '${enteredstring}' не соответствует RFC 1035 и не является правильным "
+"Строка '${enteredstring}' не соответствует RFC 1035 и не является допустимым "
 "IP-адресом."
 
 #. Type: boolean
 #. Description
-#: ../templates:5001
+#: ../templates:6001
 msgid ""
 "RFC 1035 states that 'each component must start with an alphanum, end with "
 "an alphanum and contain only alphanums and hyphens. Components must be "
 "separated by full stops.'"
 msgstr ""
-"RFC 1035 гласит, что 'каждый компонент должен начинаться с буквоцифры, "
-"заканчиваться на буквоцифру и содержать только буквоцифры и дефисы. "
+"RFC 1035 гласит, что 'каждый компонент должен начинаться с буквы или цифры, "
+"заканчиваться на букву или цифру и содержать только буквы, цифры и дефисы. "
 "Компоненты должны разделяться точками'."
 
 #. Type: boolean
 #. Description
-#: ../templates:5001
+#: ../templates:6001
 msgid "Please choose whether you want to keep that choice anyway."
-msgstr "Укажите, желаете ли вы придерживаться этого выбора в любом случае."
+msgstr "Укажите, желаете ли вы сохранить это значение в любом случае."
 
 #. Type: select
 #. Choices
@@ -164,7 +181,7 @@ msgstr "Укажите, желаете ли вы придерживаться э
 #. try to keep below ~71 characters.
 #. DO NOT USE commas (,) in Choices translations otherwise
 #. this will break the choices shown to users
-#: ../templates:6001
+#: ../templates:7001
 msgid "No configuration"
 msgstr "Без настройки"
 
@@ -176,7 +193,7 @@ msgstr "Без настройки"
 #. try to keep below ~71 characters.
 #. DO NOT USE commas (,) in Choices translations otherwise
 #. this will break the choices shown to users
-#: ../templates:6001
+#: ../templates:7001
 msgid "Internet Site"
 msgstr "Интернет-сайт"
 
@@ -188,9 +205,9 @@ msgstr "Интернет-сайт"
 #. try to keep below ~71 characters.
 #. DO NOT USE commas (,) in Choices translations otherwise
 #. this will break the choices shown to users
-#: ../templates:6001
+#: ../templates:7001
 msgid "Internet with smarthost"
-msgstr "Интернет со smart-хостом"
+msgstr "Интернет и smarthost"
 
 #. Type: select
 #. Choices
@@ -200,7 +217,7 @@ msgstr "Интернет со smart-хостом"
 #. try to keep below ~71 characters.
 #. DO NOT USE commas (,) in Choices translations otherwise
 #. this will break the choices shown to users
-#: ../templates:6001
+#: ../templates:7001
 msgid "Satellite system"
 msgstr "Система-спутник"
 
@@ -212,28 +229,28 @@ msgstr "Система-спутник"
 #. try to keep below ~71 characters.
 #. DO NOT USE commas (,) in Choices translations otherwise
 #. this will break the choices shown to users
-#: ../templates:6001
+#: ../templates:7001
 msgid "Local only"
-msgstr "Только локально"
+msgstr "Только локальное использование"
 
 #. Type: select
 #. Description
-#: ../templates:6002
+#: ../templates:7002
 msgid "General type of mail configuration:"
 msgstr "Общий тип почтовой настройки:"
 
 #. Type: select
 #. Description
-#: ../templates:6002
+#: ../templates:7002
 msgid ""
 "Please select the mail server configuration type that best meets your needs."
 msgstr ""
-"Выберите тип настройки почтового сервера, который оптимально удовлетворяет "
-"ваши требования."
+"Выберите тип настройки почтового сервера, наиболее соответствующий вашим "
+"требованиям."
 
 #. Type: select
 #. Description
-#: ../templates:6002
+#: ../templates:7002
 msgid ""
 " No configuration:\n"
 "  Should be chosen to leave the current configuration unchanged.\n"
@@ -248,28 +265,30 @@ msgid ""
 "  The only delivered mail is the mail for local users. There is no network."
 msgstr ""
 " Без настройки:\n"
-"  Должно быть выбрано, чтобы использовать текущую настройку неизменной.\n"
+"  Этот вариант можно выбрать, чтобы оставить текущую настройку без "
+"изменений.\n"
 " Интернет-сайт:\n"
 "  Почта отправляется и принимается напрямую с использованием SMTP.\n"
-" Интернет-сайт использующий smart-хост:\n"
+" Интернет-сайт, использующий smarthost:\n"
 "  Почта отправляется и принимается напрямую с использованием SMTP или\n"
-"  запуском утилиты, такой как fetchmail. Отправляемая почта посылается с\n"
-"  использованием smart-хоста.\n"
+"  с помощью запуска утилиты, такой как fetchmail. Исходящая почта\n"
+"  отправляется через smarthost.\n"
 " Система-спутник:\n"
-"  Вся почта для отправки посылается на другую машину, называемую 'smart-"
-"хост'.\n"
-" Только локально:\n"
-"  Вся доставляемая почта -- это почта локальных пользователей. Сети нет."
+"  Вся доставляемая почта отправляется на другую машину, называемую "
+"'smarthost'.\n"
+" Только локальное использование:\n"
+"  Доставляется только почта, предназначенная для локальных пользователей. "
+"Сети нет."
 
 #. Type: error
 #. Description
-#: ../templates:7001
+#: ../templates:8001
 msgid "Postfix not configured"
 msgstr "Postfix не настроен"
 
 #. Type: error
 #. Description
-#: ../templates:7001
+#: ../templates:8001
 msgid ""
 "You have chosen 'No Configuration'. Postfix will not be configured and will "
 "not be started by default. Please run 'dpkg-reconfigure postfix' at a later "
@@ -281,64 +300,62 @@ msgstr ""
 "будет запускаться. Пожалуйста, выполните позже команду 'dpkg-reconfigure "
 "postfix', или настройте его самостоятельно следующим образом:\n"
 " - Отредактируйте '/etc/postfix/main.cf' по своему желанию;\n"
-" - Запустите '/etc/init.d/postfix' start."
+" - Запустите '/etc/init.d/postfix start'."
 
 #. Type: string
 #. Description
-#: ../templates:8001
+#: ../templates:9001
 msgid "System mail name:"
 msgstr "Системное почтовое имя:"
 
 #. Type: string
 #. Description
-#: ../templates:8001
-#| msgid ""
-#| "The \"mail name\" is the domain name used to \"qualify\" mail addresses "
-#| "without a domain name."
+#: ../templates:9001
 msgid ""
 "The \"mail name\" is the domain name used to \"qualify\" _ALL_ mail "
 "addresses without a domain name. This includes mail to and from <root>: "
 "please do not make your machine send out mail from root@example.org unless "
 "root@example.org has told you to."
 msgstr ""
-"\"Почтовое имя\" -- это имя домена, используемое для \"определения\" "
-"ВСЕХ почтовых адресов без имени домена, включая письма отправленные и "
+"\"Почтовое имя\" -- это имя домена, используемое для \"определения\" ВСЕХ "
+"почтовых адресов без имени домена, включая письма отправленные и "
 "адресованные <root>. Поэтому не делайте так, что ваша машина будет посылать "
-"письма от root@example.org, если <root> example.org не сказал вам сделать "
+"письма от root@example.org, если <root> на example.org не сказал вам сделать "
 "именно так."
 
 #. Type: string
 #. Description
-#: ../templates:8001
+#: ../templates:9001
 msgid ""
 "This name will also be used by other programs. It should be the single, "
 "fully qualified domain name (FQDN)."
 msgstr ""
-"Это имя будет использоваться другими программами. Оно должно быть одним "
-"полностью определённым именем домена (FQDN)."
+"Это имя будет использоваться другими программами. Должно быть указано одно "
+"полностью определённое имя домена (FQDN)."
 
 #. Type: string
 #. Description
 #. Translators, please do NOT translate 'example.org' whch is registered
 #. as a domain name reserved for documentation as per RFC 2606
-#: ../templates:8001
+#: ../templates:9001
 msgid ""
 "Thus, if a mail address on the local host is foo@example.org, the correct "
 "value for this option would be example.org."
 msgstr ""
-"Так, если почтовый адрес на локальном хосте имеет вид foo@example.org, то "
+"Так, если почтовый адрес локального узла имеет вид foo@example.org, то "
 "корректное значение этого параметра будет example.org."
 
 #. Type: string
 #. Description
-#: ../templates:9001
+#: ../templates:10001
 msgid "Other destinations to accept mail for (blank for none):"
 msgstr ""
-"Другие места назначений, для которых принимать почту (пусто, если нет):"
+"Другие адресаты, для которых принимать почту (оставьте поле пустым, если их "
+"нет):"
 
 #. Type: string
 #. Description
-#: ../templates:9001
+#: ../templates:10001
 msgid ""
 "Please give a comma-separated list of domains for which this machine should "
 "consider itself the final destination. If this is a mail domain gateway, you "
@@ -346,147 +363,148 @@ msgid ""
 msgstr ""
 "Задайте разделённый запятыми список доменов, для которых эта машина должна "
 "считать себя конечным пунктом доставки. Если это шлюз почтового домена, то "
-"вы, вероятно, пожелаете включить в этот список домен верхнего уровня."
+"вам, вероятно, нужно включить в этот список домен верхнего уровня."
 
 #. Type: string
 #. Description
-#: ../templates:10001
+#: ../templates:11001
 msgid "SMTP relay host (blank for none):"
-msgstr "Релейный хост SMTP (пусто, если нет):"
+msgstr "Релейный узел SMTP (оставьте поле пустым, если его нет):"
 
 #. Type: string
 #. Description
-#: ../templates:10001
+#: ../templates:11001
 msgid ""
 "Please specify a domain, host, host:port, [address] or [address]:port. Use "
 "the form [destination] to turn off MX lookups. Leave this blank for no relay "
 "host."
 msgstr ""
-"Укажите домен, хост, хост:порт, [адрес] или [адрес:порт]. Чтобы избежать "
-"просмотров МХ-записей, используйте форму [назначение]. Если релейного хоста "
+"Укажите домен, узел, узел:порт, [адрес] или [адрес]:порт. Чтобы избежать "
+"просмотров МХ-записей, используйте форму [назначение]. Если релейного узла "
 "нет, то оставьте это поле пустым."
 
 #. Type: string
 #. Description
-#: ../templates:10001
+#: ../templates:11001
 msgid "Do not specify more than one host."
-msgstr "Не указывайте более одного хоста."
+msgstr "Не указывайте более одного узла."
 
 #. Type: string
 #. Description
-#: ../templates:10001
+#: ../templates:11001
 msgid ""
 "The relayhost parameter specifies the default host to send mail to when no "
 "entry is matched in the optional transport(5) table. When no relay host is "
 "given, mail is routed directly to the destination."
 msgstr ""
-"Параметр relayhost указывает хост по умолчанию, куда должна отправляться "
-"почта при отсутствии подходящей записи в необязательной таблице transport"
-"(5). Если relayhost не задан, то почта пересылается напрямую адресату."
+"Параметр relayhost определяет, на какой узел сети должна отправляться почта "
+"по умолчанию при отсутствии подходящей записи в необязательной таблице "
+"transport(5). Если relayhost не задан, то почта пересылается напрямую "
+"адресату."
 
 #. Type: boolean
 #. Description
-#: ../templates:11001
+#: ../templates:12001
 msgid "Use procmail for local delivery?"
 msgstr "Использовать procmail для локальной доставки?"
 
 #. Type: boolean
 #. Description
-#: ../templates:11001
+#: ../templates:12001
 msgid "Please choose whether you want to use procmail to deliver local mail."
 msgstr "Укажите, хотите ли вы использовать procmail для локальной доставки."
 
 #. Type: boolean
 #. Description
-#: ../templates:11001
+#: ../templates:12001
 msgid ""
 "Note that if you use procmail to deliver mail system-wide, you should set up "
 "an alias that forwards mail for root to a real user."
 msgstr ""
 "Обратите внимание, что если вы используете procmail для доставки почты по "
-"системе, то вам рекомендуется установить псевдоним, который будет пересылать "
-"почту для root реальному пользователю."
+"системе, то вам рекомендуется установить псевдоним для пересылки почты для "
+"root реальному пользователю."
 
 #. Type: select
 #. Choices
-#: ../templates:12001
+#: ../templates:13001
 msgid "all"
 msgstr "все"
 
 #. Type: select
 #. Choices
-#: ../templates:12001
+#: ../templates:13001
 msgid "ipv6"
 msgstr "ipv6"
 
 #. Type: select
 #. Choices
-#: ../templates:12001
+#: ../templates:13001
 msgid "ipv4"
 msgstr "ipv4"
 
 #. Type: select
 #. Description
-#: ../templates:12002
+#: ../templates:13002
 msgid "Internet protocols to use:"
 msgstr "Использовать Интернет-протоколы:"
 
 #. Type: select
 #. Description
-#: ../templates:12002
+#: ../templates:13002
 msgid ""
 "By default, whichever Internet protocols are enabled on the system at "
 "installation time will be used. You may override this default with any of "
 "the following:"
 msgstr ""
-"По умолчанию, будут использованы Интернет-протоколы, которые были разрешены "
-"в системе во время установки. Вы можете переопределить это умолчание любым "
-"следующим:"
+"По умолчанию будут использоваться Интернет-протоколы, которые были разрешены "
+"в системе во время установки. Эту стандартную настройку вы можете заменить "
+"на один из следующих вариантов:"
 
 #. Type: select
 #. Description
-#: ../templates:12002
+#: ../templates:13002
 msgid ""
 " all : use both IPv4 and IPv6 addresses;\n"
 " ipv6: listen only on IPv6 addresses;\n"
 " ipv4: listen only on IPv4 addresses."
 msgstr ""
-" все:  использовать и IPv4, и IPv6 адреса;\n"
-" ipv6: слушать только IPv6 адреса;\n"
-" ipv4: слушать только IPv4 адреса."
+" все:  использовать и адреса IPv4, и IPv6;\n"
+" ipv6: слушать только адреса IPv6;\n"
+" ipv4: слушать только адреса IPv4."
 
 #. Type: string
 #. Description
-#: ../templates:13001
+#: ../templates:14001
 msgid "Local address extension character:"
 msgstr "Символ расширения локальных адресов:"
 
 #. Type: string
 #. Description
-#: ../templates:13001
+#: ../templates:14001
 msgid ""
 "Please choose the character that will be used to define a local address "
 "extension."
 msgstr ""
 "Выберите символ, который будет использоваться для определения расширения "
-"локальных адресов?"
+"локальных адресов."
 
 #. Type: string
 #. Description
-#: ../templates:13001
+#: ../templates:14001
 msgid "To not use address extensions, leave the string blank."
 msgstr ""
-"Чтобы не использовать расширение локальных адресов, оставьте поле пустым."
+"Чтобы не использовать расширение локальных адресов, оставьте это поле пустым."
 
 #. Type: error
 #. Description
-#: ../templates:14001
+#: ../templates:15001
 msgid "Bad recipient delimiter"
 msgstr "Неподходящий разделитель для получателя"
 
 #. Type: error
 #. Description
-#: ../templates:14001
+#: ../templates:15001
 msgid ""
 "The recipient delimiter must be a single character. '${enteredstring}' is "
 "what you entered."
@@ -496,13 +514,13 @@ msgstr ""
 
 #. Type: boolean
 #. Description
-#: ../templates:15001
+#: ../templates:16001
 msgid "Force synchronous updates on mail queue?"
 msgstr "Принудительно задействовать синхронные обновления почтовой очереди?"
 
 #. Type: boolean
 #. Description
-#: ../templates:15001
+#: ../templates:16001
 msgid ""
 "If synchronous updates are forced, then mail is processed more slowly. If "
 "not forced, then there is a remote chance of losing some mail if the system "
@@ -516,73 +534,73 @@ msgstr ""
 
 #. Type: string
 #. Description
-#: ../templates:16001
+#: ../templates:17001
 msgid "Local networks:"
 msgstr "Локальные сети:"
 
 #. Type: string
 #. Description
-#: ../templates:16001
+#: ../templates:17001
 msgid ""
 "Please specify the network blocks for which this host should relay mail. The "
 "default is just the local host, which is needed by some mail user agents. "
 "The default includes local host for both IPv4 and IPv6. If just connecting "
 "via one IP version, the unused value(s) may be removed."
 msgstr ""
-"Укажите блоки сетевых адресов, для которых этот хост должен ретранслировать "
-"(relay) почту. По умолчанию это только локальный хост, что необходимо "
-"некоторым пользовательским почтовым агентам. По умолчанию локальный хост "
-"включён и для IPv4, и для IPv6. Если вы соединяетесь только через одну из "
-"версий IP, то можете отключить неиспользуемую(ые)."
+"Укажите блоки сетевых адресов, для которых этот узел должен ретранслировать "
+"(relay) почту. По умолчанию это только локальный узел, что необходимо "
+"некоторым пользовательским почтовым агентам. По умолчанию локальный узел "
+"сети включён и для IPv4, и для IPv6. Если вы соединяетесь только через одну "
+"из версий IP, то можете отключить неиспользуемую(ые)."
 
 #. Type: string
 #. Description
-#: ../templates:16001
+#: ../templates:17001
 msgid ""
 "If this host is a smarthost for a block of machines, you need to specify the "
 "netblocks here, or mail will be rejected rather than relayed."
 msgstr ""
-"Если этот хост является smart-хостом для блока машин, то вам нужно указать "
-"здесь блоки сетевых адресов или почта будет отвергнута, вместо того чтобы "
-"быть ретранслированной."
+"Если этот узел представляет собой smarthost для блока машин, то вам нужно "
+"указать здесь блоки сетевых адресов, иначе почта будет отвергаться вместо "
+"ретрансляции."
 
 #. Type: string
 #. Description
-#: ../templates:16001
+#: ../templates:17001
 msgid ""
 "To use the postfix default (which is based on the connected subnets), leave "
 "this blank."
 msgstr ""
-"Чтобы использовать значение postfix по умолчанию (которое основано на "
-"присоединённых подсетях), оставьте поле пустым."
+"Чтобы использовать значение Postfix по умолчанию (определяемое на основании "
+"информации о подключенных подсетях), оставьте это поле пустым."
 
 #. Type: string
 #. Description
-#: ../templates:17001
+#: ../templates:18001
 msgid "Mailbox size limit (bytes):"
-msgstr "Ограничение размера почтового ящика, байты:"
+msgstr "Ограничение на размер почтового ящика (в байтах):"
 
 #. Type: string
 #. Description
-#: ../templates:17001
+#: ../templates:18001
 msgid ""
 "Please specify the limit that Postfix should place on mailbox files to "
 "prevent runaway software errors. A value of zero (0) means no limit. The "
 "upstream default is 51200000."
 msgstr ""
-"Укажите ограничение, которое postfix должен применить на файлы почтового "
-"ящика для предотвращения программных ошибок выхода из под контроля. Нуль (0) "
-"означает отсутствие ограничения. По умолчанию 51200000."
+"Укажите ограничение, которое Postfix должен наложить на размер файлов "
+"почтового ящика для предотвращения программных ошибок выхода их из под "
+"контроля. Нуль (0) означает отсутствие ограничения. По умолчанию 51200000."
 
 #. Type: string
 #. Description
-#: ../templates:18001
+#: ../templates:19001
 msgid "Root and postmaster mail recipient:"
-msgstr "Получатель почты root'a и postmaster'а:"
+msgstr "Получатель почты для root и postmaster:"
 
 #. Type: string
 #. Description
-#: ../templates:18001
+#: ../templates:19001
 msgid ""
 "Mail for the 'postmaster', 'root', and other system accounts needs to be "
 "redirected to the user account of the actual system administrator."
@@ -593,7 +611,7 @@ msgstr ""
 
 #. Type: string
 #. Description
-#: ../templates:18001
+#: ../templates:19001
 msgid ""
 "If this value is left empty, such mail will be saved in /var/mail/nobody, "
 "which is not recommended."
@@ -603,246 +621,17 @@ msgstr ""
 
 #. Type: string
 #. Description
-#: ../templates:18001
+#: ../templates:19001
 msgid "Mail is not delivered to external delivery agents as root."
-msgstr "Почта не доставляется внешним агентам доставки как root."
+msgstr "Почта не доставляется внешним агентам доставки от учётной записи root."
 
 #. Type: string
 #. Description
-#: ../templates:18001
+#: ../templates:19001
 msgid ""
-"If you already have a /etc/aliases file, then you may need to add this "
-"entry. Leave this blank to not add one."
+"If you already have a /etc/aliases file and it does not have an entry for "
+"root, then you should add this entry.  Leave this blank to not add one."
 msgstr ""
-"Если у вас уже есть файл /etc/aliases, то, возможно, вам нужно добавить эту "
-"запись. Оставьте пустым, чтобы не добавлять."
-
-#~ msgid "Correct dynamicmaps.cf for upgrade?"
-#~ msgstr "Откорректировать dynamicmaps.cf для обновления?"
-
-#~ msgid ""
-#~ "Postfix version 2.0.2 and later require changes in dynamicmaps.cf. "
-#~ "Specifically, wildcard support is gone, and with it, %s expansion.  Any "
-#~ "changes that you made to dynamicmaps.cf that relied on these features "
-#~ "will need to be fixed by you.  Failure to correct these will result in a "
-#~ "broken mailer."
-#~ msgstr ""
-#~ "Postfix версии 2.0.2 и позже требует изменений в dynamicmaps.cf. Точнее, "
-#~ "исчезла поддержка wildcard и с ней расширение %s. Вы должны поправить все "
-#~ "сделанные вами изменения в dynamicmaps.cf, зависящие от этих "
-#~ "возможностей. Ошибки при исправлении приведут к неработоспособной "
-#~ "почтовой программе."
-
-#~ msgid ""
-#~ "Should dynamicmaps.cf be automatically changed?  Decline this option to "
-#~ "abort the upgrade, giving you the opportunity to eliminate wildcard and %"
-#~ "s-expansion-dependent configuration.  Accept this option if you have no "
-#~ "such configuration, and automatically make dynamicmaps.cf compatible with "
-#~ "Postfix 2.0.2 in this respect."
-#~ msgstr ""
-#~ "Изменить dynamicmaps.cf автоматически?  Откажитесь, чтобы прервать "
-#~ "обновление, и воспользуйтесь моментом для исключения настроек, зависящих "
-#~ "от wildcard  и %s-расширения.  Согласитесь, если у вас нет таких "
-#~ "настроек, и в этом случае dynamicmaps.cf автоматически станет совместимым "
-#~ "с Postfix 2.0.2."
-
-#~ msgid "Correct master.cf for upgrade?"
-#~ msgstr "Исправить master.cf для обновления?"
-
-#~ msgid ""
-#~ "Should this configuration be automatically added to master.cf?  Decline "
-#~ "this option to abort the upgrade, giving you the opportunity to add this "
-#~ "configuration yourself.  Accept this option to automatically make master."
-#~ "cf compatible with Postfix 2.1 in this respect."
-#~ msgstr ""
-#~ "Добавить эту настройку автоматически в master.cf?  Откажитесь, чтобы "
-#~ "прервать обновление, и воспользуйтесь моментом для добавления этой "
-#~ "настройки самостоятельно.  Согласитесь, и в этом случае master.cf "
-#~ "автоматически станет совместимым с Postfix 2.1."
-
-#~ msgid ""
-#~ "Postfix version 2.1 renamed \"nqmgr\" to \"qmgr\", and you are using "
-#~ "\"nqmgr\"."
-#~ msgstr ""
-#~ "Postfix версии 2.1 переименовал \"nqmgr\" в \"qmgr\", а вы используете "
-#~ "\"nqmgr\"."
-
-#~ msgid ""
-#~ "Failure to fix this will result in a broken mailer.  Decline this option "
-#~ "to abort the upgrade, giving you the opportunity to add this "
-#~ "configuration yourself.  Accept this option to automatically make master."
-#~ "cf compatible with Postfix 2.1 in this respect."
-#~ msgstr ""
-#~ "Ошибки при исправлении приведут к неработоспособной почтовой программе.  "
-#~ "Откажитесь, чтобы прервать обновление, и воспользуйтесь моментом для "
-#~ "добавления этой настройки самостоятельно.  Согласитесь, и в этом случае "
-#~ "master.cf автоматически станет совместимым с Postfix 2.1."
-
-#~ msgid "Should Postfix upgrade hash and btree maps?"
-#~ msgstr "Должен ли Postfix обновить карты hash и btree?"
-
-#~ msgid ""
-#~ "Postfix has switched to db4, and this may require maps to be upgraded."
-#~ msgstr ""
-#~ "Postfix теперь использует db4, и это может потребовать обновления карт."
-
-#~ msgid "Do you want to automatically attempt the conversion?"
-#~ msgstr "Вы хотите попытаться запустить автоматическую конвертацию?"
-
-#~ msgid "Transport map incompatibility"
-#~ msgstr "Несовместимая карта transport"
-
-#~ msgid ""
-#~ "You have a transport map defined, and there is an incompatible change in "
-#~ "how transport maps are used.  Postfix will not be restarted automatically."
-#~ msgstr ""
-#~ "У вас определена карта transport, и введено несовместимое изменение при "
-#~ "использовании данного файла. Postfix не перезапустится автоматически."
-
-#~ msgid ""
-#~ "Transport map entries override $mydestination.  If you use transport "
-#~ "maps, it is better to always have explicit entries for all domain names "
-#~ "you have in $mydestination.  See the html/faq.html sections for firewalls "
-#~ "and intranets.  If you have transport entries for parent domains of "
-#~ "anything delivered locally, you will probably need to add specific "
-#~ "entries for the destination domains before you restart Postfix."
-#~ msgstr ""
-#~ "Записи карты transport перекрывают $mydestination. Если вы используете "
-#~ "карты transport, то всегда лучше иметь точные записи для  всех  ваших "
-#~ "доменов в $mydestination. См. разделы  html/faq.html  о  файерволлах  и "
-#~ "интранетах.  Если у вас есть  транспортные  записи  для  родительских "
-#~ "доменов  всего,  что  отправляется  локально,  то  вам  вероятно нужно "
-#~ "добавить   все  указанные   записи   для   доменов   назначения  перед "
-#~ "перезапуском Postfix."
-
-#~ msgid "The string you have entered"
-#~ msgstr "Вы ввели строку"
-
-#~ msgid "\"${enteredstring}\""
-#~ msgstr "\"${enteredstring}\""
-
-#~ msgid ""
-#~ "No configuration, Internet Site, Internet with smarthost, Satellite "
-#~ "system, Local only"
-#~ msgstr ""
-#~ "Без настройки, Интернет-сайт, Интернет-сайт со смартхостом, Система-"
-#~ "спутник, Только локально"
-
-#~ msgid ""
-#~ "You have several choices for general configuration at this point.  If you "
-#~ "have your debconf priority set to 'low' or 'medium', you will be asked "
-#~ "more questions later.  You can always run \"dpkg-reconfigure --"
-#~ "priority=low postfix\" at a later point if you want to see these "
-#~ "questions again."
-#~ msgstr ""
-#~ "Сейчас вы можете выбрать один из нескольких вариантов общей настройки. "
-#~ "Если вы установили приоритет debconf 'низкий' или 'средний', то  далее "
-#~ "вам  будут  заданы  дополнительные  вопросы. Потом  вы  всегда  можете "
-#~ "запустить \"dpkg-reconfigure --priority=low postfix\",  если  вы  хотите "
-#~ "ответить на эти вопросы еще раз."
-
-#~ msgid ""
-#~ "No configuration - IF YOU WANT THE INSTALL TO LEAVE YOUR CONFIG ALONE, "
-#~ "CHOOSE THIS OPTION.  No configuration changes will be done now:  If you "
-#~ "have not already configured Postfix, your mail system will be broken and "
-#~ "should not be used. You must then do the configuration yourself by "
-#~ "editing /usr/share/postfix/main.cf.dist and saving your changes as /etc/"
-#~ "postfix/main.cf, or by running dpkg-reconfigure Postfix.  main.cf will "
-#~ "not be modified by the Postfix install process."
-#~ msgstr ""
-#~ "Без настройки - ЕСЛИ ВЫ ХОТИТЕ ОСТАВИТЬ ВАШИ НАСТРОЙКИ БЕЗ  ИЗМЕНЕНИЙ, ТО "
-#~ "ВЫБЕРИТЕ ЭТУ ОПЦИЮ. Сейчас изменений настроек  не будет: если у вас уже  "
-#~ "не  установлен Postfix, то ваша почтовая система будет нерабочей. "
-#~ "Далее    вы     должны     самостоятельно     отредактировать     файл /"
-#~ "usr/share/postfix/main.cf.dist и сохранить как  /etc/postfix/main.cf, "
-#~ "либо запустить  dpkg-reconfigure Postfix.  main.cf  не  будет изменен в "
-#~ "процессе установки Postfix."
-
-#~ msgid ""
-#~ "Internet site - mail is sent and received directly using SMTP. If your "
-#~ "needs don't fit neatly into any category, you probably want to start with "
-#~ "this one and then edit the config file by hand."
-#~ msgstr ""
-#~ "Интернет-сайт - почта отправляется и  принимается  напрямую  по  SMTP. "
-#~ "Если  вы  не подпадаете точно под эту категорию, то вероятно вам лучше "
-#~ "начать с нее и затем отредактировать файл настроек вручную."
-
-#~ msgid ""
-#~ "Internet site using smarthost - You receive Internet mail on this "
-#~ "machine, either directly by SMTP or by running a utility such as "
-#~ "fetchmail. Outgoing mail is sent using a smarthost. optionally with "
-#~ "addresses rewritten. This is probably what you want for a dialup system."
-#~ msgstr ""
-#~ "Интернет-сайт со смартхостом - Вы принимаете почту из интернет на  эту "
-#~ "машину  либо  напрямую  по  SMTP,  либо  с  помощью  такой утилиты как "
-#~ "fetchmail.  Исходящая  почта  отправляется  на  смартхост.  Возможно с "
-#~ "перезаписью адреса. Очевидно, это  наиболее  подходит  для  системы  с "
-#~ "коммутируемым каналом."
-
-#~ msgid ""
-#~ "Satellite system - All mail is sent to another machine, called a \"smart "
-#~ "host\" for delivery.  No mail is received locally."
-#~ msgstr ""
-#~ "Система-спутник - Вся  подготовленная  для отправки почта отправляется "
-#~ "на  другую машину, называемую \"смартхост\". Локальная доставка "
-#~ "отсутствует."
-
-#~ msgid ""
-#~ "Local delivery only - You are not on a network.  Mail for local users is "
-#~ "delivered."
-#~ msgstr ""
-#~ "Только локально  - Вы не в сети. Почта доставляется  только  локальным "
-#~ "пользователям."
-
-#~ msgid "1) Editing /etc/postfix/main.cf to your liking"
-#~ msgstr "1) Отредактируйте файл /etc/postfix/main.cf как вам нужно"
-
-#~ msgid "2) Running /etc/init.d/postfix start"
-#~ msgstr "2) Выполните команду /etc/init.d/postfix start"
-
-#~ msgid "Mail name?"
-#~ msgstr "Почтовое имя?"
-
-#~ msgid ""
-#~ "Your `mail name' is the hostname portion of the address to be shown on "
-#~ "outgoing news and mail messages (following the username and @ sign)."
-#~ msgstr ""
-#~ "Ваше 'почтовое имя' - это имя хоста в адресе, которое  будет  показано в "
-#~ "исходящих  сообщениях  почты  и  групп  новостей  (вместе  с  именем "
-#~ "пользователя и знаком @)."
-
-#~ msgid "all, ipv6, ipv4"
-#~ msgstr "все, ipv6, ipv4"
-
-#~ msgid "all - use both ipv4 and ipv6 addresses"
-#~ msgstr "все - использовать адреса и ipv4, и ipv6"
-
-#~ msgid "ipv6 - listen only on ipv6 addresses"
-#~ msgstr "ipv6 - слушать только на адресах ipv6"
-
-#~ msgid "ipv4 - listen only on ipv4 addresses"
-#~ msgstr "ipv4 - слушать только на адресах ipv4"
-
-#~ msgid "The default is \"no\"."
-#~ msgstr "По умолчанию \"no\"."
-
-#~ msgid "Where should mail for root go"
-#~ msgstr "Куда должна доставляться почта для root"
-
-#~ msgid ""
-#~ "The user root (and any other users with a uid of 0) must have mail "
-#~ "redirected via an alias, or their mail may be delivered to /var/mail/"
-#~ "nobody.  This is by design:  mail is not delivered to external delivery "
-#~ "agents as root."
-#~ msgstr ""
-#~ "Пользователь root (и любой другой пользователь с uid равным 0) должен "
-#~ "получать почту через почтовый псевдоним или его почта будет доставляться "
-#~ "в /var/mail/nobody.  Так и задумано:  почта не доставляется внешними "
-#~ "агентами доставки как root."
-
-#~ msgid ""
-#~ "What address should be added to /etc/aliases, if the file is created? "
-#~ "(Leave this blank to not add one.)"
-#~ msgstr ""
-#~ "Какой адрес добавить в /etc/aliases, если файл создан?  (Оставьте пустое "
-#~ "поле,чтобы не добавлять никакой.)"
+"Если у вас уже есть файл /etc/aliases, и он не содержит записи для root, то "
+"вам нужно добавить эту запись. Оставьте поле пустым, чтобы ничего не "
+"добавлять."

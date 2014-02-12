@@ -240,11 +240,13 @@
 /*	Table lookup mechanisms:
 /*	cidr_table(5), Associate CIDR pattern with value
 /*	ldap_table(5), Postfix LDAP client
+/*	memcache_table(5), Postfix memcache client
 /*	mysql_table(5), Postfix MYSQL client
 /*	nisplus_table(5), Postfix NIS+ client
 /*	pcre_table(5), Associate PCRE pattern with value
 /*	pgsql_table(5), Postfix PostgreSQL client
 /*	regexp_table(5), Associate POSIX regexp pattern with value
+/*	sqlite_table(5), Postfix SQLite database driver
 /*	tcp_table(5), Postfix client-server table lookup
 /*
 /*	Daemon processes:
@@ -252,6 +254,7 @@
 /*	bounce(8), defer(8), trace(8), Delivery status reports
 /*	cleanup(8), canonicalize and enqueue message
 /*	discard(8), Postfix discard delivery agent
+/*	dnsblog(8), DNS black/whitelist logger
 /*	error(8), Postfix error delivery agent
 /*	flush(8), Postfix fast ETRN service
 /*	local(8), Postfix local delivery agent
@@ -259,6 +262,7 @@
 /*	oqmgr(8), old Postfix queue manager
 /*	pickup(8), Postfix local mail pickup
 /*	pipe(8), deliver mail to non-Postfix command
+/*	postscreen(8), Postfix zombie blocker
 /*	proxymap(8), Postfix lookup table proxy server
 /*	qmgr(8), Postfix queue manager
 /*	qmqpd(8), Postfix QMQP server
@@ -268,6 +272,7 @@
 /*	smtpd(8), Postfix SMTP server
 /*	spawn(8), run non-Postfix server
 /*	tlsmgr(8), Postfix TLS cache and randomness manager
+/*	tlsproxy(8), Postfix TLS proxy server
 /*	trivial-rewrite(8), Postfix address rewriting
 /*	verify(8), Postfix address verification
 /*	virtual(8), Postfix virtual delivery agent
@@ -350,6 +355,7 @@
 #include <clean_env.h>
 #include <argv.h>
 #include <safe.h>
+#include <warn_stat.h>
 
 /* Global library. */
 
@@ -431,6 +437,11 @@ int     main(int argc, char **argv)
     if (isatty(STDERR_FILENO))
 	msg_vstream_init(argv[0], VSTREAM_ERR);
     msg_syslog_init(argv[0], LOG_PID, LOG_FACILITY);
+
+    /*
+     * Check the Postfix library version as soon as we enable logging.
+     */
+    MAIL_VERSION_CHECK;
 
     /*
      * The mail system must be run by the superuser so it can revoke
@@ -520,7 +531,7 @@ int     main(int argc, char **argv)
     /*
      * Run the management script.
      */
-    if (force_single_instance 
+    if (force_single_instance
 	|| argv_split(var_multi_conf_dirs, "\t\r\n, ")->argc == 0) {
 	script = concatenate(var_daemon_dir, "/postfix-script", (char *) 0);
 	if (optind < 1)

@@ -6,15 +6,11 @@ and the source from upstream:
 3.  For policy reasons:
   a. SASL configuration goes in /etc/postfix/sasl
   b. myhostname=/path/to/file is supported (and used) in main.cf
-4.  smtp_line_length_limit defaults to 0, instead of 990, in absolute
-    violation of the RFC.  Note that mailers in the path will still
-    potentially split the line, though.  This will be removed at some
-    point in the future.
-5.  IPV6 support is enabled: postfix listens on ipv6/ipv4 by default,
+4.  IPV6 support is enabled: postfix listens on ipv6/ipv4 by default,
     (see: inet_protocols)
-6.  TLS/SASL support is enabled.
-7.  rmail comes from sendmail, not from postfix.
-8.  The upstream main.cf is delivered as /usr/share/postfix/main.cf.dist,
+5.  TLS/SASL support is enabled.
+6.  rmail comes from sendmail, not from postfix.
+7.  The upstream main.cf is delivered as /usr/share/postfix/main.cf.dist,
     rather than cluttering /etc/postfix/main.cf with comments.
 
 Known caveats:

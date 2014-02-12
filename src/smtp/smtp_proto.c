@@ -270,11 +270,10 @@ int     smtp_helo(SMTP_STATE *state)
 	XFORWARD_PORT, SMTP_FEATURE_XFORWARD_PORT,
 	XFORWARD_PROTO, SMTP_FEATURE_XFORWARD_PROTO,
 	XFORWARD_HELO, SMTP_FEATURE_XFORWARD_HELO,
+	XFORWARD_IDENT, SMTP_FEATURE_XFORWARD_IDENT,
 	XFORWARD_DOMAIN, SMTP_FEATURE_XFORWARD_DOMAIN,
 	0, 0,
     };
-    SOCKOPT_SIZE optlen;
-    int     sndbufsize;
     const char *ehlo_words;
     int     discard_mask;
     static const NAME_MASK pix_bug_table[] = {
@@ -296,7 +295,8 @@ int     smtp_helo(SMTP_STATE *state)
     /*
      * Prepare for disaster.
      */
-    smtp_timeout_setup(state->session->stream, var_smtp_helo_tmout);
+    smtp_stream_setup(state->session->stream, var_smtp_helo_tmout,
+		      var_smtp_rec_deadline);
     if ((except = vstream_setjmp(state->session->stream)) != 0)
 	return (smtp_stream_except(state, except, where));
 
@@ -342,6 +342,7 @@ int     smtp_helo(SMTP_STATE *state)
 	 * is not on by default.
 	 */
 	if (resp->str[strspn(resp->str, "20 *\t\n")] == 0) {
+	    /* Best effort only. Ignore errors. */
 	    if (smtp_pix_bug_maps != 0
 		&& (pix_bug_words =
 		    maps_find(smtp_pix_bug_maps,
@@ -353,7 +354,8 @@ int     smtp_helo(SMTP_STATE *state)
 	    }
 	    if (*pix_bug_words) {
 		pix_bug_mask = name_mask_opt(pix_bug_source, pix_bug_table,
-					 pix_bug_words, NAME_MASK_ANY_CASE);
+					     pix_bug_words,
+				     NAME_MASK_ANY_CASE | NAME_MASK_IGNORE);
 		msg_info("%s: enabling PIX workarounds: %s for %s",
 			 request->queue_id,
 			 str_name_mask("pix workaround bitmask",
@@ -450,6 +452,12 @@ int     smtp_helo(SMTP_STATE *state)
 	    || (ehlo_words = maps_find(smtp_ehlo_dis_maps,
 				       state->session->addr, 0)) == 0)
 	    ehlo_words = var_smtp_ehlo_dis_words;
+	if (smtp_ehlo_dis_maps && smtp_ehlo_dis_maps->error) {
+	    msg_warn("%s: %s map lookup error for %s",
+		     session->state->request->queue_id,
+		     smtp_ehlo_dis_maps->title, state->session->addr);
+	    vstream_longjmp(session->stream, SMTP_ERR_DATA);
+	}
 	discard_mask = ehlo_mask(ehlo_words);
 	if (discard_mask && !(discard_mask & EHLO_MASK_SILENT))
 	    msg_info("discarding EHLO keywords: %s",
@@ -559,27 +567,64 @@ int     smtp_helo(SMTP_STATE *state)
      * XXX No need to do this before and after STARTTLS, but it's not a big deal
      * if we do.
      * 
-     * XXX This critically depends on VSTREAM buffers to never be smaller than
-     * VSTREAM_BUFSIZE.
+     * XXX When TLS is turned on, the SMTP-level writes will be encapsulated as
+     * TLS messages. Thus, the TCP-level payload will be larger than the
+     * SMTP-level payload. This has implications for the PIPELINING engine.
+     * 
+     * To avoid deadlock, the PIPELINING engine needs to request a TCP send
+     * buffer size that can hold the unacknowledged commands plus the TLS
+     * encapsulation overhead.
+     * 
+     * The PIPELINING engine keeps the unacknowledged command size <= the
+     * default VSTREAM buffer size (to avoid small-write performance issues
+     * when the VSTREAM buffer size is at its default size). With a default
+     * VSTREAM buffer size of 4096 there is no reason to increase the
+     * unacknowledged command size as the TCP MSS increases. It's safer to
+     * spread the remote SMTP server's recipient processing load over time,
+     * than dumping a very large recipient list all at once.
+     * 
+     * For TLS encapsulation overhead we make a conservative guess: take the
+     * current protocol overhead of ~40 bytes, double the number for future
+     * proofing (~80 bytes), then round up the result to the nearest power of
+     * 2 (128 bytes). Plus, be prepared for worst-case compression that
+     * expands data by 1 kbyte, so that the worst-case SMTP payload per TLS
+     * message becomes 15 kbytes.
      */
+#define PIPELINING_BUFSIZE	VSTREAM_BUFSIZE
+#ifdef USE_TLS
+#define TLS_WORST_PAYLOAD	16384
+#define TLS_WORST_COMP_OVERHD	1024
+#define TLS_WORST_PROTO_OVERHD	128
+#define TLS_WORST_SMTP_PAYLOAD	(TLS_WORST_PAYLOAD - TLS_WORST_COMP_OVERHD)
+#define TLS_WORST_TOTAL_OVERHD	(TLS_WORST_COMP_OVERHD + TLS_WORST_PROTO_OVERHD)
+#endif
+
     if (session->features & SMTP_FEATURE_PIPELINING) {
-	optlen = sizeof(sndbufsize);
+	SOCKOPT_SIZE optlen;
+	int     tcp_bufsize;
+	int     enc_overhead = 0;
+
+	optlen = sizeof(tcp_bufsize);
 	if (getsockopt(vstream_fileno(session->stream), SOL_SOCKET,
-		       SO_SNDBUF, (char *) &sndbufsize, &optlen) < 0)
+		       SO_SNDBUF, (char *) &tcp_bufsize, &optlen) < 0)
 	    msg_fatal("%s: getsockopt: %m", myname);
-	if (sndbufsize > VSTREAM_BUFSIZE)
-	    sndbufsize = VSTREAM_BUFSIZE;
-	if (sndbufsize < VSTREAM_BUFSIZE) {
-	    sndbufsize = VSTREAM_BUFSIZE;
+#ifdef USE_TLS
+	if (state->misc_flags & SMTP_MISC_FLAG_IN_STARTTLS)
+	    enc_overhead +=
+		(1 + (PIPELINING_BUFSIZE - 1)
+		 / TLS_WORST_SMTP_PAYLOAD) * TLS_WORST_TOTAL_OVERHD;
+#endif
+	if (tcp_bufsize < PIPELINING_BUFSIZE + enc_overhead) {
+	    tcp_bufsize = PIPELINING_BUFSIZE + enc_overhead;
 	    if (setsockopt(vstream_fileno(session->stream), SOL_SOCKET,
-			   SO_SNDBUF, (char *) &sndbufsize, optlen) < 0)
+			   SO_SNDBUF, (char *) &tcp_bufsize, optlen) < 0)
 		msg_fatal("%s: setsockopt: %m", myname);
 	}
 	if (msg_verbose)
-	    msg_info("Using %s PIPELINING, TCP send buffer size is %d",
-		     (state->misc_flags &
-		      SMTP_MISC_FLAG_USE_LMTP) ? "LMTP" : "ESMTP",
-		     sndbufsize);
+	    msg_info("Using %s PIPELINING, TCP send buffer size is %d, "
+		     "PIPELINING buffer size is %d", (state->misc_flags &
+				SMTP_MISC_FLAG_USE_LMTP) ? "LMTP" : "ESMTP",
+		     tcp_bufsize, PIPELINING_BUFSIZE);
     }
 #ifdef USE_TLS
 
@@ -605,7 +650,8 @@ int     smtp_helo(SMTP_STATE *state)
 	    /*
 	     * Prepare for disaster.
 	     */
-	    smtp_timeout_setup(state->session->stream, var_smtp_starttls_tmout);
+	    smtp_stream_setup(state->session->stream, var_smtp_starttls_tmout,
+			      var_smtp_rec_deadline);
 	    if ((except = vstream_setjmp(state->session->stream)) != 0)
 		return (smtp_stream_except(state, except,
 					"receiving the STARTTLS response"));
@@ -746,7 +792,6 @@ static int smtp_start_tls(SMTP_STATE *state)
 	TLS_CLIENT_START(&tls_props,
 			 ctx = smtp_tls_ctx,
 			 stream = session->stream,
-			 log_level = var_smtp_tls_loglevel,
 			 timeout = var_smtp_starttls_tmout,
 			 tls_level = session->tls_level,
 			 nexthop = session->tls_nexthop,
@@ -811,6 +856,10 @@ static int smtp_start_tls(SMTP_STATE *state)
 	    return (smtp_site_fail(state, DSN_BY_LOCAL_MTA,
 				   SMTP_RESP_FAKE(&fake, "4.7.5"),
 				   "Server certificate not verified"));
+
+
+    /* At this point there must not be any pending plaintext. */
+    vstream_fpurge(session->stream, VSTREAM_PURGE_BOTH);
 
     /*
      * At this point we have to re-negotiate the "EHLO" to reget the
@@ -944,6 +993,11 @@ static void smtp_header_rewrite(void *context, int header_class,
 				   header_info, buf, offset);
 	if (result == 0)
 	    return;
+	if (result == HBC_CHECKS_STAT_ERROR) {
+	    msg_warn("%s: smtp header checks lookup error",
+		     state->request->queue_id);
+	    vstream_longjmp(state->session->stream, SMTP_ERR_DATA);
+	}
 	if (result != STR(buf)) {
 	    vstring_strcpy(buf, result);
 	    myfree(result);
@@ -1041,6 +1095,10 @@ static void smtp_body_rewrite(void *context, int type,
 	result = hbc_body_checks(context, smtp_body_checks, buf, len, offset);
 	if (result == buf) {
 	    smtp_text_out(state, type, buf, len, offset);
+	} else if (result == HBC_CHECKS_STAT_ERROR) {
+	    msg_warn("%s: smtp body checks lookup error",
+		     state->request->queue_id);
+	    vstream_longjmp(state->session->stream, SMTP_ERR_DATA);
 	} else if (result != 0) {
 	    smtp_text_out(state, type, result, strlen(result), offset);
 	    myfree(result);
@@ -1175,8 +1233,8 @@ static int smtp_loop(SMTP_STATE *state, NOCLOBBER int send_state,
 	|| send_state > SMTP_STATE_QUIT)
 	msg_panic("%s: bad sender state %d (receiver state %d)",
 		  myname, send_state, recv_state);
-    smtp_timeout_setup(session->stream,
-		       *xfer_timeouts[send_state]);
+    smtp_stream_setup(session->stream, *xfer_timeouts[send_state],
+		      var_smtp_rec_deadline);
     if ((except = vstream_setjmp(session->stream)) != 0) {
 	msg_warn("smtp_proto: spurious flush before read in send state %d",
 		 send_state);
@@ -1220,6 +1278,7 @@ static int smtp_loop(SMTP_STATE *state, NOCLOBBER int send_state,
 #define CAN_FORWARD_CLIENT_PORT	_ATTR_AVAIL_AND_KNOWN_
 #define CAN_FORWARD_PROTO_NAME	_ATTR_AVAIL_AND_KNOWN_
 #define CAN_FORWARD_HELO_NAME	DEL_REQ_ATTR_AVAIL
+#define CAN_FORWARD_IDENT_NAME	DEL_REQ_ATTR_AVAIL
 #define CAN_FORWARD_RWR_CONTEXT	DEL_REQ_ATTR_AVAIL
 #endif
 
@@ -1257,6 +1316,11 @@ static int smtp_loop(SMTP_STATE *state, NOCLOBBER int send_state,
 		&& CAN_FORWARD_HELO_NAME(request->client_helo)) {
 		vstring_strcat(next_command, " " XFORWARD_HELO "=");
 		xtext_quote_append(next_command, request->client_helo, "");
+	    }
+	    if ((session->features & SMTP_FEATURE_XFORWARD_IDENT)
+		&& CAN_FORWARD_IDENT_NAME(request->log_ident)) {
+		vstring_strcat(next_command, " " XFORWARD_IDENT "=");
+		xtext_quote_append(next_command, request->log_ident, "");
 	    }
 	    if ((session->features & SMTP_FEATURE_XFORWARD_DOMAIN)
 		&& CAN_FORWARD_RWR_CONTEXT(request->rewrite_context)) {
@@ -1307,6 +1371,7 @@ static int smtp_loop(SMTP_STATE *state, NOCLOBBER int send_state,
 	     */
 #ifdef USE_SASL_AUTH
 	    if (var_smtp_sasl_enable
+		&& var_smtp_dummy_mail_auth
 		&& (session->features & SMTP_FEATURE_AUTH))
 		vstring_strcat(next_command, " AUTH=<>");
 #endif
@@ -1463,13 +1528,32 @@ static int smtp_loop(SMTP_STATE *state, NOCLOBBER int send_state,
 	 * Flush unsent output if command pipelining is off or if no I/O
 	 * happened for a while. This limits the accumulation of client-side
 	 * delays in pipelined sessions.
+	 * 
+	 * The PIPELINING engine will flush the VSTREAM buffer if the sender
+	 * could otherwise produce more output than fits the PIPELINING
+	 * buffer. This generally works because we know exactly how much
+	 * output we produced since the last time that the sender and
+	 * receiver synchronized the SMTP state. However this logic is not
+	 * applicable after the sender enters the DATA phase, where it does
+	 * not synchronize with the receiver until the <CR><LF>.<CR><LF>.
+	 * Thus, the PIPELINING engine no longer knows how much data is
+	 * pending in the TCP send buffer. For this reason, if PIPELINING is
+	 * enabled, we always pipeline QUIT after <CR><LF>.<CR><LF>. This is
+	 * safe because once the receiver reads <CR><LF>.<CR><LF>, its TCP
+	 * stack either has already received the QUIT<CR><LF>, or else it
+	 * acknowledges all bytes up to and including <CR><LF>.<CR><LF>,
+	 * making room in the sender's TCP stack for QUIT<CR><LF>.
 	 */
+#define CHECK_PIPELINING_BUFSIZE \
+	(recv_state != SMTP_STATE_DOT || send_state != SMTP_STATE_QUIT)
+
 	if (SENDER_IN_WAIT_STATE
 	    || (SENDER_IS_AHEAD
 		&& ((session->features & SMTP_FEATURE_PIPELINING) == 0
-		    || (VSTRING_LEN(next_command) + 2
+		    || (CHECK_PIPELINING_BUFSIZE
+			&& (VSTRING_LEN(next_command) + 2
 		    + vstream_bufstat(session->stream, VSTREAM_BST_OUT_PEND)
-			> VSTREAM_BUFSIZE)
+			    > PIPELINING_BUFSIZE))
 		    || time((time_t *) 0)
 		    - vstream_ftime(session->stream) > 10))) {
 	    while (SENDER_IS_AHEAD) {
@@ -1504,8 +1588,8 @@ static int smtp_loop(SMTP_STATE *state, NOCLOBBER int send_state,
 		 */
 #define LOST_CONNECTION_INSIDE_DATA (except == SMTP_ERR_EOF)
 
-		smtp_timeout_setup(session->stream,
-				   *xfer_timeouts[recv_state]);
+		smtp_stream_setup(session->stream, *xfer_timeouts[recv_state],
+				  var_smtp_rec_deadline);
 		if (LOST_CONNECTION_INSIDE_DATA) {
 		    if (vstream_setjmp(session->stream) != 0)
 			RETURN(smtp_stream_except(state, SMTP_ERR_EOF,
@@ -1813,8 +1897,8 @@ static int smtp_loop(SMTP_STATE *state, NOCLOBBER int send_state,
 	 */
 	if (send_state == SMTP_STATE_DOT && nrcpt > 0) {
 
-	    smtp_timeout_setup(session->stream,
-			       var_smtp_data1_tmout);
+	    smtp_stream_setup(session->stream, var_smtp_data1_tmout,
+			      var_smtp_rec_deadline);
 
 	    if ((except = vstream_setjmp(session->stream)) == 0) {
 
@@ -2008,6 +2092,8 @@ int     smtp_xfer(SMTP_STATE *state)
 	     && CAN_FORWARD_PROTO_NAME(request->client_proto))
 	    || ((session->features & SMTP_FEATURE_XFORWARD_HELO)
 		&& CAN_FORWARD_HELO_NAME(request->client_helo))
+	    || ((session->features & SMTP_FEATURE_XFORWARD_IDENT)
+		&& CAN_FORWARD_IDENT_NAME(request->log_ident))
 	    || ((session->features & SMTP_FEATURE_XFORWARD_DOMAIN)
 		&& CAN_FORWARD_RWR_CONTEXT(request->rewrite_context)));
     if (send_name_addr)

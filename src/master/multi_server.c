@@ -47,6 +47,11 @@
 /*	global Postfix configuration file. Tables are loaded in the
 /*	order as specified, and multiple instances of the same type
 /*	are allowed.
+/* .IP "MAIL_SERVER_LONG_TABLE (CONFIG_LONG_TABLE *)"
+/*	A table with configurable parameters, to be loaded from the
+/*	global Postfix configuration file. Tables are loaded in the
+/*	order as specified, and multiple instances of the same type
+/*	are allowed.
 /* .IP "MAIL_SERVER_STR_TABLE (CONFIG_STR_TABLE *)"
 /*	A table with configurable parameters, to be loaded from the
 /*	global Postfix configuration file. Tables are loaded in the
@@ -69,6 +74,11 @@
 /*	are allowed. Raw parameters are not subjected to $name
 /*	evaluation.
 /* .IP "MAIL_SERVER_NINT_TABLE (CONFIG_NINT_TABLE *)"
+/*	A table with configurable parameters, to be loaded from the
+/*	global Postfix configuration file. Tables are loaded in the
+/*	order as specified, and multiple instances of the same type
+/*	are allowed.
+/* .IP "MAIL_SERVER_NBOOL_TABLE (CONFIG_NBOOL_TABLE *)"
 /*	A table with configurable parameters, to be loaded from the
 /*	global Postfix configuration file. Tables are loaded in the
 /*	order as specified, and multiple instances of the same type
@@ -204,6 +214,7 @@
 #include <timed_ipc.h>
 #include <resolve_local.h>
 #include <mail_flow.h>
+#include <mail_version.h>
 
 /* Process manager. */
 
@@ -262,6 +273,7 @@ static void multi_server_timeout(int unused_event, char *unused_context)
 
 int     multi_server_drain(void)
 {
+    const char *myname = "multi_server_drain";
     int     fd;
 
     switch (fork()) {
@@ -272,8 +284,13 @@ int     multi_server_drain(void)
     case 0:
 	(void) msg_cleanup((MSG_CLEANUP_FN) 0);
 	event_fork();
-	for (fd = MASTER_LISTEN_FD; fd < MASTER_LISTEN_FD + socket_count; fd++)
+	for (fd = MASTER_LISTEN_FD; fd < MASTER_LISTEN_FD + socket_count; fd++) {
 	    event_disable_readwrite(fd);
+	    (void) close(fd);
+	    /* Play safe - don't reuse this file number. */
+	    if (DUP2(STDIN_FILENO, fd) < 0)
+		msg_warn("%s: dup2(%d, %d): %m", myname, STDIN_FILENO, fd);
+	}
 	var_use_limit = 1;
 	return (0);
 	/* Let the master start a new process. */
@@ -558,6 +575,11 @@ NORETURN multi_server_main(int argc, char **argv, MULTI_SERVER_FN service,...)
 	msg_info("daemon started");
 
     /*
+     * Check the Postfix library version as soon as we enable logging.
+     */
+    MAIL_VERSION_CHECK;
+
+    /*
      * Initialize from the configuration file. Allow command-line options to
      * override compiled-in defaults or configured parameter values.
      */
@@ -567,6 +589,12 @@ NORETURN multi_server_main(int argc, char **argv, MULTI_SERVER_FN service,...)
      * Register dictionaries that use higher-level interfaces and protocols.
      */
     mail_dict_init();
+ 
+    /*
+     * After database open error, continue execution with reduced
+     * functionality.
+     */
+    dict_allow_surrogate = 1;
 
     /*
      * Pick up policy settings from master process. Shut up error messages to
@@ -658,6 +686,9 @@ NORETURN multi_server_main(int argc, char **argv, MULTI_SERVER_FN service,...)
 	case MAIL_SERVER_INT_TABLE:
 	    get_mail_conf_int_table(va_arg(ap, CONFIG_INT_TABLE *));
 	    break;
+	case MAIL_SERVER_LONG_TABLE:
+	    get_mail_conf_long_table(va_arg(ap, CONFIG_LONG_TABLE *));
+	    break;
 	case MAIL_SERVER_STR_TABLE:
 	    get_mail_conf_str_table(va_arg(ap, CONFIG_STR_TABLE *));
 	    break;
@@ -672,6 +703,9 @@ NORETURN multi_server_main(int argc, char **argv, MULTI_SERVER_FN service,...)
 	    break;
 	case MAIL_SERVER_NINT_TABLE:
 	    get_mail_conf_nint_table(va_arg(ap, CONFIG_NINT_TABLE *));
+	    break;
+	case MAIL_SERVER_NBOOL_TABLE:
+	    get_mail_conf_nbool_table(va_arg(ap, CONFIG_NBOOL_TABLE *));
 	    break;
 	case MAIL_SERVER_PRE_INIT:
 	    pre_init = va_arg(ap, MAIL_SERVER_INIT_FN);

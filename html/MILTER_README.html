@@ -28,11 +28,13 @@ SMTP commands (HELO, MAIL FROM, etc.) as well as mail content
 <p> The reason for adding Milter support to Postfix is that there
 exists a large collection of applications, not only to block unwanted
 mail, but also to verify authenticity (examples: <a
+href="http://www.opendkim.org/">OpenDKIM</a>, <a
 href="http://sourceforge.net/projects/dkim-milter/">DomainKeys
 Identified Mail (DKIM)</a>, <a
 href="http://sourceforge.net/projects/sid-milter/">SenderID+SPF</a> and
 <a href="http://sourceforge.net/projects/dk-milter/">DomainKeys</a>)
 or to digitally sign mail (examples: <a
+href="http://www.opendkim.org/">OpenDKIM</a>, <a
 href="http://sourceforge.net/projects/dkim-milter/">DomainKeys
 Identified Mail (DKIM)</a>, <a
 href="http://sourceforge.net/projects/dk-milter/">DomainKeys</a>).
@@ -212,9 +214,21 @@ other systems, libmilter may be provided by a package (called
 "sendmail-devel" on some Linux systems).  </p>
 
 <p> Once libmilter is installed, applications such as <a
+href="http://www.opendkim.org/">OpenDKIM</a>, <a
 href="http://sourceforge.net/projects/dkim-milter/">dkim-milter</a> and
 <a href="http://sourceforge.net/projects/sid-milter/">sid-milter</a>
 build out of the box without requiring any tinkering:</p>
+
+<blockquote>
+<pre>
+$ <b>gzcat opendkim-<i>x.y.z</i>.tar.gz | tar xf -</b>
+$ <b>cd opendkim-<i>x.y.z</i></b>
+$ <b>./configure ...<i>options</i>...</b>
+$ <b>make</b>
+[...<i>lots of output omitted</i>...]
+$ <b>make install</b>
+</pre>
+</blockquote>
 
 <blockquote>
 <pre>
@@ -466,7 +480,8 @@ version, the libmilter library will log an error message like this:
 number.  See, however, the <a href="#limitations">limitations</a>
 section below for features that aren't supported by Postfix. </p>
 
-<p> If the Postfix <a href="postconf.5.html#milter_protocol">milter_protocol</a> setting specifies a too high
+<p> With Postfix 2.7 and earlier, if the Postfix <a href="postconf.5.html#milter_protocol">milter_protocol</a>
+setting specifies a too high
 version, the libmilter library simply hangs up without logging a
 warning, and you see a Postfix warning message like one of the
 following: </p>
@@ -480,7 +495,9 @@ warning: milter inet:<i>host</i>:<i>port</i>: can't read SMFIC_DATA reply packet
 </blockquote>
 
 <p> The remedy is to lower the Postfix <a href="postconf.5.html#milter_protocol">milter_protocol</a> version
-number. </p>
+number. Postfix 2.8 and later will automatically turn off protocol
+features that the application's libmilter library does not expect.
+</p>
 
 <h3><a name="timeouts">Milter protocol timeouts</a></h3>
 
@@ -556,7 +573,8 @@ login method </td> </tr>
 address </td> </tr>
 
 <tr> <td> {client_connections} </td> <td> CONNECT </td> <td>
-Connection concurrency for this client </td> </tr>
+Connection concurrency for this client (zero if the client is
+excluded from all smtpd_client_* limits). </td> </tr>
 
 <tr> <td> {client_name} </td> <td> Always </td> <td> Client hostname
 <br> When address &rarr; name lookup or name &rarr; address

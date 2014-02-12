@@ -110,7 +110,7 @@ static void master_unthrottle(MASTER_SERV *serv)
 	event_cancel_timer(master_unthrottle_wrapper, (char *) serv);
 	if (msg_verbose)
 	    msg_info("throttle released for command %s", serv->path);
-	master_avail_listen(serv);		/* XXX interface botch */
+	master_avail_listen(serv);
     }
 }
 
@@ -130,6 +130,7 @@ static void master_throttle(MASTER_SERV *serv)
 			    serv->throttle_delay);
 	if (msg_verbose)
 	    msg_info("throttling command %s", serv->path);
+	master_avail_listen(serv);
     }
 }
 
@@ -275,8 +276,7 @@ static void master_delete_child(MASTER_PROC *proc)
     serv->total_proc--;
     if (proc->avail == MASTER_STAT_AVAIL)
 	master_avail_less(serv, proc);
-    else if (MASTER_LIMIT_OK(serv->max_proc, serv->total_proc)
-	     && serv->avail_proc < 1)
+    else
 	master_avail_listen(serv);
     binhash_delete(master_child_table, (char *) &proc->pid,
 		   sizeof(proc->pid), (void (*) (char *)) 0);
@@ -304,18 +304,25 @@ void    master_reap_child(void)
 					  (char *) &pid, sizeof(pid))) == 0)
 	    msg_panic("master_reap: unknown pid: %d", pid);
 	serv = proc->serv;
+
+#define MASTER_KILL_SIGNAL	SIGTERM
+#define MASTER_SENT_SIGNAL(serv, status) \
+	(MASTER_MARKED_FOR_DELETION(serv) \
+	    && WTERMSIG(status) == MASTER_KILL_SIGNAL)
+
 	if (!NORMAL_EXIT_STATUS(status)) {
 	    if (WIFEXITED(status))
 		msg_warn("process %s pid %d exit status %d",
 			 serv->path, pid, WEXITSTATUS(status));
-	    if (WIFSIGNALED(status))
+	    if (WIFSIGNALED(status) && !MASTER_SENT_SIGNAL(serv, status))
 		msg_warn("process %s pid %d killed by signal %d",
 			 serv->path, pid, WTERMSIG(status));
-	}
-	if (!NORMAL_EXIT_STATUS(status) && proc->use_count == 0
-	    && (serv->flags & MASTER_FLAG_THROTTLE) == 0) {
-	    msg_warn("%s: bad command startup -- throttling", serv->path);
-	    master_throttle(serv);
+	    /* master_delete_children() throttles first, then kills. */
+	    if (proc->use_count == 0
+		&& (serv->flags & MASTER_FLAG_THROTTLE) == 0) {
+		msg_warn("%s: bad command startup -- throttling", serv->path);
+		master_throttle(serv);
+	    }
 	}
 	master_delete_child(proc);
     }
@@ -338,7 +345,7 @@ void    master_delete_children(MASTER_SERV *serv)
     for (info = list = binhash_list(master_child_table); *info; info++) {
 	proc = (MASTER_PROC *) info[0]->value;
 	if (proc->serv == serv)
-	    (void) kill(proc->pid, SIGTERM);
+	    (void) kill(proc->pid, MASTER_KILL_SIGNAL);
     }
     while (serv->total_proc > 0)
 	master_reap_child();

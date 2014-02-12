@@ -186,6 +186,8 @@
 #include <safe.h>
 #include <connect.h>
 #include <valid_hostname.h>
+#include <warn_stat.h>
+#include <events.h>
 
 /* Global library. */
 
@@ -351,6 +353,7 @@ static void flush_queue(void)
     if (mail_flush_maildrop() < 0)
 	msg_fatal_status(EX_UNAVAILABLE,
 			 "Cannot flush mail queue - mail system is down");
+    event_drain(2);
 }
 
 /* flush_site - flush mail for site */
@@ -476,6 +479,11 @@ int     main(int argc, char **argv)
     msg_cleanup(unavailable);
     msg_syslog_init(mail_task("postqueue"), LOG_PID, LOG_FACILITY);
     set_mail_conf_str(VAR_PROCNAME, var_procname = mystrdup(argv[0]));
+
+    /*
+     * Check the Postfix library version as soon as we enable logging.
+     */
+    MAIL_VERSION_CHECK;
 
     /*
      * Parse JCL. This program is set-gid and must sanitize all command-line
