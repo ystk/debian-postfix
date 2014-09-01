@@ -39,6 +39,33 @@ EOF
     fi
 }
 
+relay_restrictions_warning() {
+    if [ -n "$DEBCONF" ]; then
+	db_input medium postfix/relay_restrictions_warning || true
+	db_go || true
+	db_get postfix/relay_restrictions_warning
+	if [ "$RET" != "false" ]; then
+	    touch /var/spool/postfix/set_relay_restrictions
+	fi
+    else
+    	cat << EOF
+Postfix version 2.10 adds smtpd_relay_restrictions, to separate relaying
+restrictions from recipient restrictions, and you have a non-default value
+for smtpd_recipient_restrictions.
+
+Failure to do this may result in deferred or bounced mail after the
+upgrade.  Accept this option to set smtpd_relay_restrictions to
+smtpd_recipient_restrictions.
+EOF
+	echo -n "Shall I make the change? "
+	read line
+	case ${line} in
+	    [nN]*)	;;
+	    *)		touch /var/spool/postfix/set_relay_restrictions;;
+	esac
+    fi
+}
+
 mydomain_warning() {
     if [ -n "$DEBCONF" ]; then
 	db_fset postfix/mydomain_warning seen false
@@ -65,6 +92,7 @@ EOF
 	esac
     fi
 }
+
 retry_warning() {
     if [ -n "$DEBCONF" ]; then
 	db_fset postfix/retry_upgrade_warning seen false
@@ -89,6 +117,7 @@ EOF
 	esac
     fi
 }
+
 tlsmgr_warning() {
     if [ -n "$DEBCONF" ]; then
 	db_fset postfix/tlsmgr_upgrade_warning seen false
@@ -187,6 +216,23 @@ case "$1" in
 	    if [ ! -f ${DM} ] || ! grep -q "^sqlite[[:space:]]" ${DM}; then
 		sqlite_warning
 	    fi
+	fi
+
+	if dpkg --compare-versions $version lt 2.10.0-2; then
+	  RECIP=$(postconf -h smtpd_recipient_restrictions 2>/dev/null || true)
+	  DEFAULT="permit_mynetworks, reject_unauth_destination"
+	  if [ "$RECIP" != "$DEFAULT" ]; then
+	    # 2.10.0-1 is special because it was broken.  If they haven't fixed
+	    # it themselves, deal with it.
+	    if dpkg --compare-versions $version ge 2.10.0-1; then
+	      if [ -n "$RECIP" ] && [ -z "$(postconf -n smtpd_relay_restrictions)" ]; then
+		relay_restrictions_warning
+	      fi
+	    else
+	      # if they have the default recipient_restrictions then no need to ask.
+	      relay_restrictions_warning
+	    fi
+	  fi
 	fi
 
 	if ! grep -q '^retry[[:space:]]' $MASTER; then

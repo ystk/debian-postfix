@@ -1,9 +1,146 @@
-postfix (2.9.6-2) wheezy; urgency=low
+postfix (2.11.1-1) unstable; urgency=medium
+
+  [LaMont Jones]
+
+  * fix usage of LIBLIST in init.d.  Closes: #733123
+
+  [Tanguy Ortolo]
+
+  * copy /etc/host.conf to the chroot
+
+  [Guilhem Moulin]
+
+  * Build dict_ldap.so with SASL binding enabled.  Closes: #730848
+
+  [Joey Hess]
+
+  * Fix short description in init script.  Closes: #738314
+
+  [Jonathan Hall]
+
+  * Better myhostname default handling.  Closes: #214741
+
+  [Wietse Venema]
+
+  * New Upstream release.  Closes: #750485
+
+ -- LaMont Jones <lamont@debian.org>  Sat, 07 Jun 2014 08:48:54 +0100
+
+postfix (2.11.0-1) unstable; urgency=low
+
+  [Wietse Venema]
+
+  * New upstream release: 2.11.0
+
+  [localization folks]
+
+  * l10n: Updated German translations.  Closes: #734893 (Helge Kreutzmann)
+
+ -- LaMont Jones <lamont@debian.org>  Tue, 11 Feb 2014 07:44:30 -0700
+
+postfix (2.10.2-1) unstable; urgency=low
+
+  [Wietse Venema]
+
+  * New upstream release
+
+  [LaMont Jones]
+
+  * drop bad diffs from review
+  * python 2to3 migration for apport.  LP: #1222180
+
+ -- LaMont Jones <lamont@debian.org>  Sun, 08 Sep 2013 19:24:46 -0600
+
+postfix (2.10.1-2) unstable; urgency=low
+
+  * Actually include upstream 2.10.1.  Closes: #721150
+
+ -- LaMont Jones <lamont@debian.org>  Wed, 28 Aug 2013 10:25:36 -0600
+
+postfix (2.10.1-1) unstable; urgency=low
+
+  [LaMont Jones]
+
+  * Merge ubuntu changes
+
+  [Yolanda]
+
+  * d/tests: added dep-8-tests
+  * debian/tests/test-postfix.py: rewrite in pexpect to avoid python error
+
+  [Wietse Venema]
+
+  * 2.10.1
+
+  [localization folks]
+
+  * l10n: Updated German debconf translations.  Closes: #703887 (Chris Leick)
+  * l10n: Updated Polish debconf translations.  Closes: #703929 (Michał
+    Kułach)
+  * l10n: updated Slovak debconf tranlations.  Closes: #709107 (Ivan Masár)
+  * l10n: Updated Portuguese debconf translation.  Closes: #703776 (Miguel
+    Figueiredo)
+  * l10n: Updated Danish debconf tranlations.  Closes: #704016 (Joe Hansen)
+  * l10n: Updated Turkish debconf translations.  Closes: #703871 (Atila KOÇ)
+  * l10n: Updated Italian debconf translations. (Cristian Rigamonti)
+
+ -- LaMont Jones <lamont@debian.org>  Mon, 26 Aug 2013 19:10:31 -0600
+
+postfix (2.10.0-3ubuntu2) saucy; urgency=low
+
+  * debian/tests/test-postfix.py: rewrite in pexpect to avoid python error
+
+ -- Yolanda <yolanda.robla@canonical.com>  Mon, 27 May 2013 11:40:07 +0200
+
+postfix (2.10.0-3ubuntu1) saucy; urgency=low
+
+  * d/tests: added dep-8-tests
+
+ -- Yolanda <yolanda.robla@canonical.com>  Tue, 07 May 2013 23:34:04 +0200
+
+postfix (2.10.0-3) unstable; urgency=low
+
+  [LaMont Jones]
+
+  * Set smtpd_relay_restrictions in the correct place.  LP: #1156223
+
+  [localization folks]
+
+  * l10n: updated Indonesian debconf translations.  Closes: #703225 (T. Surya
+    Fajri)
+  * l10n: Updated Russian debconf translations.  Closes: #703590 (Sergey
+    Alyoshin)
+  * l10n: updated Japanese debconf translations.  Closes: #703168 (Kenshi Muto)
+  * l10n: updated Basque translation.  Closes: #703316 (Dooteo)
+  * l10n: Updated Swedish debconf translations.  Closes: #703397 (Martin Bagge)
+  * l10n: Updated Czech debconf translations.  Closes: #703537 (Miroslav Kure)
+  * l10n: Updated Brazilian Portuguese debconf templates.  Closes: #703471
+    (Marcelo Santana)
+  * l10n: Updated French debconf translations.  Closes: #703449 (Christian
+    Perrier)
+
+ -- LaMont Jones <lamont@debian.org>  Fri, 22 Mar 2013 10:30:29 -0600
+
+postfix (2.10.0-2) unstable; urgency=low
+
+  * Correctly set smtpd_relay_restrictions on upgrade to 2.10.0.
+    Closes: #702374
+
+ -- LaMont Jones <lamont@debian.org>  Thu, 14 Mar 2013 08:15:51 -0600
+
+postfix (2.10.0-1) unstable; urgency=low
+
+  [Wietse Venema]
+
+  * New upstream version
+
+  [LaMont Jones]
 
   * Fix fumbled merge to actually have the right maintainer address. 
-    See also bug 702412.  Closes: #699877
+    Closes: #699877
+  * Fix how we copy $smtp_tls_CApath into the chroot.  LP: #1139159
 
- -- LaMont Jones <lamont@debian.org>  Wed, 06 Mar 2013 07:28:23 -0700
+ -- LaMont Jones <lamont@debian.org>  Mon, 04 Mar 2013 09:03:31 -0700
 
 postfix (2.9.6-1) unstable; urgency=low
 

@@ -254,6 +254,7 @@ if [ "$mailer" != "No configuration" ]; then	# [
 	if [ -f /etc/ssl/private/ssl-cert-snakeoil.key ]; then
 	    cat /usr/share/postfix/main.cf.tls >> main.cf
 	fi
+	postconf -e "smtpd_relay_restrictions=permit_mynetworks permit_sasl_authenticated defer_unauth_destination"
 	NEWCONF=yes
     fi
 
@@ -436,6 +437,25 @@ EOF
 	db_get postfix/protocols && protocols="$RET"
 	echo "setting inet_protocols: $protocols"
 	set_postconf "inet_protocols=$protocols"
+    fi
+
+    # 2.10 upgrade requires us to copy the smtpd_recipient_restrictions
+    # into smtpd_relay_restrictions  Only present for upgrades from before
+    # 2.10.0-2 
+    if [ -f /var/spool/postfix/set_relay_restrictions ]; then
+	# early 2.10.0 was special...  see #702374
+	# if we got here with 2.10.0 in OLDVERSION, then there is no value for
+	# smtpd_relay_restrictions specified in main.cf, and
+	# smtpd_recipient_restrictions is either null (default for 2.10) or
+	# else it is some non-default value that we should copy to relay.
+	VALUE="$(postconf -h smtpd_recipient_restrictions)"
+	if [ -z "$VALUE" ] && dpkg --compare-versions $OLDVERSION ge 2.10.0; then
+	    # null, so use the correct default
+	    VALUE="permit_mynetworks, reject_unauth_destination"
+	fi
+	echo "setting smtpd_relay_restrictions: $VALUE"
+	set_postconf "smtpd_relay_restrictions=$VALUE"
+	rm -f /var/spool/postfix/set_relay_restrictions
     fi
 
     if [ -z "$CHANGES" ]; then

@@ -13,7 +13,7 @@
 # Should-Stop:       postgresql mysql clamav-daemon postgrey spamassassin saslauthd dovecot
 # Default-Start:     2 3 4 5
 # Default-Stop:      0 1 6
-# Short-Description: start and stop the Postfix Mail Transport Agent
+# Short-Description: Postfix Mail Transport Agent
 # Description:       postfix is a Mail Transport agent
 ### END INIT INFO
 
@@ -93,25 +93,28 @@ configure_instance() {
 	ca_path=$($POSTCONF -h smtp_tls_CApath)
 	case "$ca_path" in
 	    '') :;; # no ca_path
-	    $queue_dir/*) :;;  # skip stuff already in chroot
+	    $queue_dir/*) :;;  # skip stuff already in chroot, (and to make vim syntax happy: */)
 	    *)
 		if test -d "$ca_path"; then
 		    dest_dir="$queue_dir/${ca_path#/}"
+		    # strip any/all trailing /
+		    while [ "${dest_dir%/}" != "${dest_dir}" ]; do
+			dest_dir="${dest_dir%/}"
+		    done
 		    new=0
 		    if test -d "$dest_dir"; then
 			# write to a new directory ...
-			dest_dir="${dest_dir%/}.NEW"
+			dest_dir="${dest_dir}.NEW"
 			new=1
-		    else
-			mkdir --parent ${dest_dir%/*}
 		    fi
+		    mkdir --parent ${dest_dir}
 		    # handle files in subdirectories
 		    (cd "$ca_path" && find . -name '*.pem' -print0 | cpio -0pdL --quiet "$dest_dir") 2>/dev/null || 
 		        (log_failure_msg failure copying certificates; exit 1)
 		    c_rehash "$dest_dir" >/dev/null 2>&1
 		    if [ "$new" = 1 ]; then
 			# and replace the old directory
-			rm -r "${dest_dir%.NEW}"
+			rm -rf "${dest_dir%.NEW}"
 			mv "$dest_dir" "${dest_dir%.NEW}"
 		    fi
 		fi
@@ -149,7 +152,7 @@ configure_instance() {
 	fi
 
 	FILES="etc/localtime etc/services etc/resolv.conf etc/hosts \
-	    etc/nsswitch.conf etc/nss_mdns.config"
+	    etc/host.conf etc/nsswitch.conf etc/nss_mdns.config"
 	for file in $FILES; do
 	    [ -d ${file%/*} ] || mkdir -p ${file%/*}
 	    if [ -f /${file} ]; then rm -f ${file} && cp /${file} ${file}; fi
@@ -168,7 +171,7 @@ configure_instance() {
 	done)
 
 	if [ -n "$LIBLIST" ]; then
-	    for f in "$LIBLIST"; do
+	    for f in $LIBLIST; do
 		rm -f "$f"
 	    done
 	    tar cf - -C / $LIBLIST 2>/dev/null |tar xf -

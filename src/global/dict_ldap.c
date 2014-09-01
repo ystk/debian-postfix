@@ -152,7 +152,7 @@
 /*	Wietse Venema
 /*	IBM T.J. Watson Research
 /*	P.O. Box 704
-/*	Yorktown Heights, NY 10532, USA
+/*	Yorktown Heights, NY 10598, USA
 /*
 /*	John Hensley
 /*	john@sunislelodge.com
@@ -1331,21 +1331,11 @@ static const char *dict_ldap_lookup(DICT *dict, const char *name)
     int     rc = 0;
     int     sizelimit;
     int     domain_rc;
-    const char *cp;
 
     dict_ldap->dict.error = 0;
 
     if (msg_verbose)
 	msg_info("%s: In dict_ldap_lookup", myname);
-
-    for (cp = name; *cp; ++cp) {
-    	if (!ISASCII(*cp)) {
-	    if (msg_verbose)
-		msg_info("%s: %s: Skipping lookup of non-ASCII key '%s'",
-			 myname, dict_ldap->parser->name, name);
-	    return (0);
-	}
-    }
 
     /*
      * Don't frustrate future attempts to make Postfix UTF-8 transparent.

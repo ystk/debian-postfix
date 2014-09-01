@@ -1,35 +1,28 @@
-#
-#    Translators, if you are not familiar with the PO format, gettext
-#    documentation is worth reading, especially sections dedicated to
-#    this format, e.g. by running:
-#         info -n '(gettext)PO Files'
-#         info -n '(gettext)Header Entry'
-#
-#    Some information specific to po-debconf are available at
-#            /usr/share/doc/po-debconf/README-trans
-#         or http://www.debian.org/intl/l10n/po-debconf/README-trans
-#
-#    Developers do not need to manually edit POT or PO files.
+# Brazilian Portuguese translation of postfix.
+# Copyright (C) 2013 THE postfix'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the postfix package.
+# Andr√© Lu√≠s Lopes <andrelop@debian.org>, -2004.
+# Marcelo Gomes de Santana <marcgsantana@yahoo.com.br>, 2013.
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: postfix\n"
+"Project-Id-Version: postfix 2.10.0-2\n"
 "Report-Msgid-Bugs-To: postfix@packages.debian.org\n"
-"POT-Creation-Date: 2012-05-30 22:56-0600\n"
-"PO-Revision-Date: 2004-11-18 21:34-0300\n"
-"Last-Translator: AndrÈ LuÌs Lopes <andrelop@debian.org>\n"
-"Language-Team: Debian-BR Project <debian-l10n-portuguese@lists.debian.org>\n"
-"Language: \n"
+"POT-Creation-Date: 2013-03-16 08:39+0100\n"
+"PO-Revision-Date: 2013-03-18 21:25-0300\n"
+"Last-Translator: Marcelo Gomes de Santana <marcgsantana@yahoo.com.br>\n"
+"Language-Team: Brazilian Portuguese <debian-l10n-portuguese@lists.debian."
+"org>\n"
+"Language: pt_BR\n"
 "MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=ISO-8859-1\n"
+"Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
 #. Type: boolean
 #. Description
 #: ../templates:1001
-#, fuzzy
 msgid "Add a 'mydomain' entry in main.cf for upgrade?"
-msgstr "Corrigir master.cf para atualizaÁ„o ?"
+msgstr "Adicionar uma entrada mydomain ao main.cf para atualiza√ß√£o?"
 
 #. Type: boolean
 #. Description
@@ -39,146 +32,178 @@ msgid ""
 "mydomain must be specified, since hostname(1) is not a fully qualified "
 "domain name (FQDN)."
 msgstr ""
+"A vers√£o 2.3.3-2 e posterior do Postfix requer mudan√ßas no main.cf. "
+"Especificamente, o mydomain deve ser definido, uma vez que o hostname(1) n√£o "
+"√© um nome de dom√≠nio completamente qualificado (FQDN)."
 
 #. Type: boolean
 #. Description
 #: ../templates:1001
-#, fuzzy
 msgid ""
 "Failure to fix this will result in a broken mailer. Decline this option to "
 "abort the upgrade, giving you the opportunity to add this configuration "
 "yourself. Accept this option to automatically set mydomain based on the FQDN "
 "of the machine."
 msgstr ""
-"Caso isto n„o seja corrigido, vocÍ ter· um servidor de e-mail quebrado. N„o "
-"aceite esta opÁ„o para abortar a atualizaÁ„o, o que lhe dar· a oportunidade "
-"de adicionar a configuraÁ„o manualmente. Aceite esta opÁ„o para "
-"automaticamente tornar o master.cf compatÌvel com o Postfix 2.1 em relaÁ„o a "
-"esse detalhe."
+"Caso isso n√£o seja corrigido, resultar√° em um servidor de e-mail quebrado. "
+"N√£o aceite esta op√ß√£o para cancelar a atualiza√ß√£o, o que lhe dar√° a "
+"oportunidade de adicionar a configura√ß√£o manualmente. Aceite esta op√ß√£o para "
+"definir automaticamente o mydomain baseado no nome de dom√≠nio completamente "
+"qualificado (FQDN) da m√°quina."
 
 #. Type: boolean
 #. Description
 #: ../templates:2001
-msgid "add 'sqlite' entry to dynamicmaps.cf?"
+msgid "Set smtpd_relay_restrictions in main.cf for upgrade?"
+msgstr "Definir smtpd_relay_restrictions no main.cf para atualiza√ß√£o?"
+
+#. Type: boolean
+#. Description
+#: ../templates:2001
+msgid ""
+"Postfix version 2.10 adds smtpd_relay_restrictions, to separate relaying "
+"restrictions from recipient restrictions, and you have a non-default value "
+"for smtpd_recipient_restrictions."
 msgstr ""
+"A vers√£o 2.10 do Postfix adiciona smtpd_relay_restrictions, para separar as "
+"restri√ß√µes de retransmiss√£o das restri√ß√µes de destinat√°rio, e voc√™ tem um "
+"valor fora do padr√£o para smtpd_recipient_restrictions."
 
 #. Type: boolean
 #. Description
 #: ../templates:2001
+msgid ""
+"Failure to do this may result in deferred or bounced mail after the "
+"upgrade.  Accept this option to set smtpd_relay_restrictions equal to "
+"smtpd_recipient_restrictions."
+msgstr ""
+"Caso isto falhe, pode resultar em mensagem deferida ou devolvida ap√≥s a "
+"atualiza√ß√£o. Aceite esta op√ß√£o para definir smtpd_relay_restrictions igual a "
+"smtpd_recipient_restrictions."
+
+#. Type: boolean
+#. Description
+#: ../templates:3001
+msgid "add 'sqlite' entry to dynamicmaps.cf?"
+msgstr "Adicionar entrada \"sqlite\" ao dynamicmaps.cf?"
+
+#. Type: boolean
+#. Description
+#: ../templates:3001
 msgid ""
 "Postfix version 2.9 adds sqlite support to maps, but your dynamicmaps.cf "
 "does not reflect that.  Accept this option to add support for sqlite maps."
 msgstr ""
+"A vers√£o 2.9 do Postfix adiciona suporte sqlite aos mapas, mas o seu "
+"dynamicmaps.cf n√£o reflete isso. Aceite esta op√ß√£o para adicionar suporte "
+"sqlite aos mapas."
 
 #. Type: boolean
 #. Description
-#: ../templates:3001
+#: ../templates:4001
 msgid "Install postfix despite an unsupported kernel?"
-msgstr ""
+msgstr "Instalar o Postfix apesar de ter um kernel n√£o suportado?"
 
 #. Type: boolean
 #. Description
-#: ../templates:3001
+#: ../templates:4001
 msgid ""
 "Postfix uses features that are not found in kernels prior to 2.6. If you "
 "proceed with the installation, Postfix will not run."
 msgstr ""
+"O Postfix utiliza recursos que n√£o s√£o encontrados em kernels anteriores ao "
+"2.6. Se voc√™ prosseguir com a instala√ß√£o o Postfix n√£o funcionar√°."
 
 #. Type: boolean
 #. Description
-#: ../templates:4001
-#, fuzzy
+#: ../templates:5001
 msgid "Correct retry entry in master.cf for upgrade?"
-msgstr "Corrigir master.cf para atualizaÁ„o ?"
+msgstr "Corrigir entrada retry no master.cf para atualiza√ß√£o?"
 
 #. Type: boolean
 #. Description
-#: ../templates:4001
-#, fuzzy
-#| msgid "Postfix version 2.1 and later require new services in master.cf."
+#: ../templates:5001
 msgid ""
 "Postfix version 2.4 requires that the retry service be added to master.cf."
-msgstr "O Postfix, a partir da vers„o 2.1, requer novos serviÁos no master.cf."
+msgstr ""
+"A vers√£o 2.4 do Postfix requer que o servi√ßo retry seja adicionado ao master."
+"cf."
 
 #. Type: boolean
 #. Description
-#: ../templates:4001
-#, fuzzy
+#: ../templates:5001
 msgid ""
 "Failure to fix this will result in a broken mailer. Decline this option to "
 "abort the upgrade, giving you the opportunity to add this configuration "
 "yourself. Accept this option to automatically make master.cf compatible with "
 "Postfix 2.4 in this respect."
 msgstr ""
-"Caso isto n„o seja corrigido, vocÍ ter· um servidor de e-mail quebrado. N„o "
-"aceite esta opÁ„o para abortar a atualizaÁ„o, o que lhe dar· a oportunidade "
-"de adicionar a configuraÁ„o manualmente. Aceite esta opÁ„o para "
-"automaticamente tornar o master.cf compatÌvel com o Postfix 2.1 em relaÁ„o a "
-"esse detalhe."
+"Caso isto n√£o seja corrigido, resultar√° em um servidor de e-mail quebrado. "
+"N√£o aceite esta op√ß√£o para cancelar a atualiza√ß√£o, o que lhe dar√° a "
+"oportunidade de adicionar a configura√ß√£o manualmente. Aceite esta op√ß√£o para "
+"tornar o master.cf automaticamente compat√≠vel com o Postfix 2.4 com rela√ß√£o "
+"a isso."
 
 #. Type: boolean
 #. Description
-#: ../templates:5001
-#, fuzzy
+#: ../templates:6001
 msgid "Correct tlsmgr entry in master.cf for upgrade?"
-msgstr "Corrigir master.cf para atualizaÁ„o ?"
+msgstr "Corrigir a entrada tlsmgr no master.cf para atualiza√ß√£o?"
 
 #. Type: boolean
 #. Description
-#: ../templates:5001
+#: ../templates:6001
 msgid "Postfix version 2.2 has changed the invocation of tlsmgr."
-msgstr ""
+msgstr "A vers√£o 2.2 do Postfix mudou a invoca√ß√£o do tlsmgr."
 
 #. Type: boolean
 #. Description
-#: ../templates:5001
-#, fuzzy
+#: ../templates:6001
 msgid ""
 "Failure to fix this will result in a broken mailer. Decline this option to "
 "abort the upgrade, giving you the opportunity to add this configuration "
 "yourself. Accept this option to automatically make master.cf compatible with "
 "Postfix 2.2 in this respect."
 msgstr ""
-"Caso isto n„o seja corrigido, vocÍ ter· um servidor de e-mail quebrado. N„o "
-"aceite esta opÁ„o para abortar a atualizaÁ„o, o que lhe dar· a oportunidade "
-"de adicionar a configuraÁ„o manualmente. Aceite esta opÁ„o para "
-"automaticamente tornar o master.cf compatÌvel com o Postfix 2.1 em relaÁ„o a "
-"esse detalhe."
+"Caso isto n√£o seja corrigido, resultar√° em um servidor de e-mail quebrado. "
+"N√£o aceite esta op√ß√£o para cancelar a atualiza√ß√£o, o que lhe dar√° a "
+"oportunidade de adicionar a configura√ß√£o manualmente. Aceite esta op√ß√£o para "
+"tornar o master.cf automaticamente compat√≠vel com o Postfix 2.2 com rela√ß√£o "
+"a isso."
 
 #. Type: boolean
 #. Description
-#: ../templates:6001
+#: ../templates:7001
 msgid "Ignore incorrect hostname entry?"
-msgstr ""
+msgstr "Ignorar entrada incorreta do hostname?"
 
 #. Type: boolean
 #. Description
-#: ../templates:6001
-#, fuzzy
+#: ../templates:7001
 msgid ""
 "The string '${enteredstring}' does not follow RFC 1035 and does not appear "
 "to be a valid IP address."
-msgstr "n„o segue a RFC 1035 e n„o parece ser um endereÁo IP v·lido."
+msgstr ""
+"A string \"${enteredstring}\" n√£o segue a RFC 1035 e n√£o parece ser um "
+"endere√ßo de IP v√°lido."
 
 #. Type: boolean
 #. Description
-#: ../templates:6001
-#, fuzzy
+#: ../templates:7001
 msgid ""
 "RFC 1035 states that 'each component must start with an alphanum, end with "
 "an alphanum and contain only alphanums and hyphens. Components must be "
 "separated by full stops.'"
 msgstr ""
-"A RFC 1035 determina que \"cada componente deve iniciar com um valor "
-"alfanumÈrico, finalizar com um valor alfanumÈrico e conter somente valores "
-"alfanumÈricos e hÌfens. Componentes devem ser separados por pontos.\""
+"A RFC 1035 determina que: \"cada componente deve iniciar com um valor "
+"alfanum√©rico, finalizar com um valor alfanum√©rico e conter somente valores "
+"alfanum√©ricos e h√≠fens. Componentes devem ser separados por pontos.\""
 
 #. Type: boolean
 #. Description
-#: ../templates:6001
-#, fuzzy
+#: ../templates:7001
 msgid "Please choose whether you want to keep that choice anyway."
-msgstr "VocÍ deseja manter essa valor de qualquer forma ?"
+msgstr "Por favor, escolha se voc√™ quer manter este valor de qualquer forma."
 
 #. Type: select
 #. Choices
@@ -188,10 +213,9 @@ msgstr "VocÍ deseja manter essa valor de qualquer forma ?"
 #. try to keep below ~71 characters.
 #. DO NOT USE commas (,) in Choices translations otherwise
 #. this will break the choices shown to users
-#: ../templates:7001
-#, fuzzy
+#: ../templates:8001
 msgid "No configuration"
-msgstr "Tipo geral de configuraÁ„o ?"
+msgstr "Sem configura√ß√£o"
 
 #. Type: select
 #. Choices
@@ -201,9 +225,9 @@ msgstr "Tipo geral de configuraÁ„o ?"
 #. try to keep below ~71 characters.
 #. DO NOT USE commas (,) in Choices translations otherwise
 #. this will break the choices shown to users
-#: ../templates:7001
+#: ../templates:8001
 msgid "Internet Site"
-msgstr ""
+msgstr "Site da Internet"
 
 #. Type: select
 #. Choices
@@ -213,9 +237,9 @@ msgstr ""
 #. try to keep below ~71 characters.
 #. DO NOT USE commas (,) in Choices translations otherwise
 #. this will break the choices shown to users
-#: ../templates:7001
+#: ../templates:8001
 msgid "Internet with smarthost"
-msgstr ""
+msgstr "Internet com smarthost"
 
 #. Type: select
 #. Choices
@@ -225,9 +249,9 @@ msgstr ""
 #. try to keep below ~71 characters.
 #. DO NOT USE commas (,) in Choices translations otherwise
 #. this will break the choices shown to users
-#: ../templates:7001
+#: ../templates:8001
 msgid "Satellite system"
-msgstr ""
+msgstr "Sistema sat√©lite"
 
 #. Type: select
 #. Choices
@@ -237,27 +261,28 @@ msgstr ""
 #. try to keep below ~71 characters.
 #. DO NOT USE commas (,) in Choices translations otherwise
 #. this will break the choices shown to users
-#: ../templates:7001
+#: ../templates:8001
 msgid "Local only"
-msgstr ""
+msgstr "Apenas local"
 
 #. Type: select
 #. Description
-#: ../templates:7002
-#, fuzzy
+#: ../templates:8002
 msgid "General type of mail configuration:"
-msgstr "Tipo geral de configuraÁ„o ?"
+msgstr "Tipo geral de configura√ß√£o de e-mail:"
 
 #. Type: select
 #. Description
-#: ../templates:7002
+#: ../templates:8002
 msgid ""
 "Please select the mail server configuration type that best meets your needs."
 msgstr ""
+"Por favor selecione o tipo de configura√ß√£o do servidor de e-mail que melhor "
+"atende √†s suas necessidades."
 
 #. Type: select
 #. Description
-#: ../templates:7002
+#: ../templates:8002
 msgid ""
 " No configuration:\n"
 "  Should be chosen to leave the current configuration unchanged.\n"
@@ -271,18 +296,30 @@ msgid ""
 " Local only:\n"
 "  The only delivered mail is the mail for local users. There is no network."
 msgstr ""
+" Sem configura√ß√£o:\n"
+"  Deve ser escolhido para deixar a configura√ß√£o atual inalterada.\n"
+" Site da Internet:\n"
+"  A mensagem √© enviada e recebida diretamente usando SMTP.\n"
+" Internet com smarthost:\n"
+"  A mensagem √© recebida diretamente usando SMTP ou executando um utilit√°rio "
+"tal\n"
+"  como o fetchmail. A mensagem de sa√≠da √© enviada usando um smarthost.\n"
+" Sistema sat√©lite:\n"
+"  Toda mensagem √© enviada para uma outra m√°quina, chamada \"smarthost\", "
+"para\n"
+"  entrega.\n"
+" Apenas local:\n"
+"  A mensagem √© entregue apenas para usu√°rios locais. N√£o h√° rede."
 
 #. Type: error
 #. Description
-#: ../templates:8001
-#, fuzzy
+#: ../templates:9001
 msgid "Postfix not configured"
-msgstr "AVISO: Postfix n„o configurado"
+msgstr "Postfix n√£o configurado"
 
 #. Type: error
 #. Description
-#: ../templates:8001
-#, fuzzy
+#: ../templates:9001
 msgid ""
 "You have chosen 'No Configuration'. Postfix will not be configured and will "
 "not be started by default. Please run 'dpkg-reconfigure postfix' at a later "
@@ -290,346 +327,349 @@ msgid ""
 " - Editing /etc/postfix/main.cf to your liking;\n"
 " - Running '/etc/init.d/postfix start'."
 msgstr ""
-"VocË escolheu \"Sem configuraÁ„o\" - o Postfix n„o ser· configurado e n„o "
-"ser· iniciado por padr„o. Por favor, execute o comando 'dpkg-reconfigure "
-"postfix' posteriormente ou configure o Postfix manualmente da seguinte "
-"maneira :"
+"Voc√™ escolheu \"Sem configura√ß√£o\" - o Postfix n√£o ser√° configurado e n√£o "
+"ser√° iniciado por padr√£o. Por favor, execute o comando \"dpkg-reconfigure "
+"postfix\" posteriormente ou configure-o manualmente:\n"
+" - Editando o /etc/postfix/main.cf ao seu gosto;\n"
+" - Executando \"/etc/init.d/postfix start\"."
 
 #. Type: string
 #. Description
-#: ../templates:9001
-#, fuzzy
+#: ../templates:10001
 msgid "System mail name:"
-msgstr "/etc/mailname"
+msgstr "Nome de e-mail do sistema:"
 
 #. Type: string
 #. Description
-#: ../templates:9001
+#: ../templates:10001
 msgid ""
 "The \"mail name\" is the domain name used to \"qualify\" _ALL_ mail "
 "addresses without a domain name. This includes mail to and from <root>: "
 "please do not make your machine send out mail from root@example.org unless "
 "root@example.org has told you to."
 msgstr ""
+"O \"nome de e-mail\" √© o nome de dom√≠nio usado para \"qualificar\" _TODOS_ "
+"os endere√ßos de e-mail sem um nome de dom√≠nio. Isso inclui mensagem de e "
+"para <root>: por favor, n√£o fa√ßa sua m√°quina enviar mensagem a partir de "
+"root@example.org a menos que o root@example.org tenha lhe dito para fazer."
 
 #. Type: string
 #. Description
-#: ../templates:9001
-#, fuzzy
+#: ../templates:10001
 msgid ""
 "This name will also be used by other programs. It should be the single, "
 "fully qualified domain name (FQDN)."
 msgstr ""
-"Esse nome ser· usado por outros programas alÈm do Postfix. Por isso, ele "
-"dever· ser ˙nico. Dever· ser o nome de domÌnio completo (FQDN) a partir do "
-"qual as mensagens parecer„o ter originado."
+"Esse nome ser√° usado por outros programas. Deve ser o √∫nico, nome de dom√≠nio "
+"completamente qualificado (FQDN)."
 
 #. Type: string
 #. Description
 #. Translators, please do NOT translate 'example.org' whch is registered
 #. as a domain name reserved for documentation as per RFC 2606
-#: ../templates:9001
+#: ../templates:10001
 msgid ""
 "Thus, if a mail address on the local host is foo@example.org, the correct "
 "value for this option would be example.org."
 msgstr ""
+"Portanto, se um endere√ßo de e-mail na m√°quina local for foo@example.org, o "
+"valor correto para esta op√ß√£o seria example.org."
 
 #. Type: string
 #. Description
-#: ../templates:10001
-#, fuzzy
+#: ../templates:11001
 msgid "Other destinations to accept mail for (blank for none):"
 msgstr ""
-"Outros destinos para os quais aceitar mensagens ? (em branco para nenhum)"
+"Outros destinos para os quais deve aceitar mensagens (em branco para nenhum):"
 
 #. Type: string
 #. Description
-#: ../templates:10001
-#, fuzzy
+#: ../templates:11001
 msgid ""
 "Please give a comma-separated list of domains for which this machine should "
 "consider itself the final destination. If this is a mail domain gateway, you "
 "probably want to include the top-level domain."
 msgstr ""
-"ForneÁa uma lista de domÌnios separados por vÌrgulas os quais esta m·quina "
-"deve considerar como sendo ela mesma o destino final. Caso este seja um "
-"gateway de mensagens do domÌnio, vocÍ provavelmente desejar· incluir o "
-"domÌnio de nÌvel mais alto (top-level)."
+"Por favor, forne√ßa uma lista de dom√≠nios separados por v√≠rgulas para os "
+"quais esta m√°quina deve considerar-se o destino final. Caso este seja um "
+"gateway de e-mail do dom√≠nio, voc√™ provavelmente desejar√° incluir o dom√≠nio "
+"de n√≠vel mais alto (\"top-level\")."
 
 #. Type: string
 #. Description
-#: ../templates:11001
-#, fuzzy
+#: ../templates:12001
 msgid "SMTP relay host (blank for none):"
-msgstr "SMTP relay host ? (branco para nenhum)"
+msgstr "SMTP relay host (em branco para nenhum):"
 
 #. Type: string
 #. Description
-#: ../templates:11001
-#, fuzzy
+#: ../templates:12001
 msgid ""
 "Please specify a domain, host, host:port, [address] or [address]:port. Use "
 "the form [destination] to turn off MX lookups. Leave this blank for no relay "
 "host."
 msgstr ""
-"Especifique um domÌnio, host, host:porta, [endereÁo] ou [endereÁo:porta]. "
-"Use o formato [destino] para desligar lookups MX. Mantenha em branco para "
-"n„o especificar nenhum host para relay."
+"Especifique um dom√≠nio, host, host:porta, [endere√ßo] ou [endere√ßo:porta]. "
+"Use o formato [destino] para desligar pesquisas de MX. Deixe isso em branco "
+"para nenhum host de relay."
 
 #. Type: string
 #. Description
-#: ../templates:11001
+#: ../templates:12001
 msgid "Do not specify more than one host."
-msgstr ""
+msgstr "N√£o especifique mais de um host."
 
 #. Type: string
 #. Description
-#: ../templates:11001
-#, fuzzy
+#: ../templates:12001
 msgid ""
 "The relayhost parameter specifies the default host to send mail to when no "
 "entry is matched in the optional transport(5) table. When no relay host is "
 "given, mail is routed directly to the destination."
 msgstr ""
-"O par‚metro relayhost especifica o host padr„o para o qual enviar mensagens "
-"quando n„o existe nenhuma entrada correspondente (nenhum match) na tabela "
-"opcional de transporte - transport(5). Quando nenhum relayhost È informado, "
-"as mensagens s„o roteadas diretamente para o destino."
+"O par√¢metro relayhost especifica o host padr√£o para o qual enviar mensagens "
+"quando nenhuma entrada for correspondente na tabela opcional transport(5). "
+"Quando nenhum relayhost √© informado, a mensagem √© roteada diretamente para o "
+"destino."
 
 #. Type: boolean
 #. Description
-#: ../templates:12001
+#: ../templates:13001
 msgid "Use procmail for local delivery?"
-msgstr "Usar procmail para entrega local ?"
+msgstr "Usar procmail para entrega local?"
 
 #. Type: boolean
 #. Description
-#: ../templates:12001
-#, fuzzy
+#: ../templates:13001
 msgid "Please choose whether you want to use procmail to deliver local mail."
-msgstr "VocÍ deseja usar o procmail para entrega local de mensagens ?"
+msgstr ""
+"Por favor, escolha se voc√™ quer usar o procmail para entrega local de "
+"mensagens."
 
 #. Type: boolean
 #. Description
-#: ../templates:12001
+#: ../templates:13001
 msgid ""
 "Note that if you use procmail to deliver mail system-wide, you should set up "
 "an alias that forwards mail for root to a real user."
 msgstr ""
-"Note que, caso vocÍ use o procmail para entregar mensagens para todo o "
-"sistema (system-wide), vocÍ dever· configurar um alias que encaminhar· as "
-"mensages enviadas para o root para um usu·rio real."
+"Note que, caso voc√™ use o procmail para entregar mensagens para todo o "
+"sistema, voc√™ deve configurar um alias que encaminha as mensagens enviadas "
+"ao root para um usu√°rio real."
 
 #. Type: select
 #. Choices
-#: ../templates:13001
+#: ../templates:14001
 msgid "all"
-msgstr ""
+msgstr "todos"
 
 #. Type: select
 #. Choices
-#: ../templates:13001
+#: ../templates:14001
 msgid "ipv6"
-msgstr ""
+msgstr "ipv6"
 
 #. Type: select
 #. Choices
-#: ../templates:13001
+#: ../templates:14001
 msgid "ipv4"
-msgstr ""
+msgstr "ipv4"
 
 #. Type: select
 #. Description
-#: ../templates:13002
+#: ../templates:14002
 msgid "Internet protocols to use:"
-msgstr ""
+msgstr "Protocolos de Internet para usar:"
 
 #. Type: select
 #. Description
-#: ../templates:13002
+#: ../templates:14002
 msgid ""
 "By default, whichever Internet protocols are enabled on the system at "
 "installation time will be used. You may override this default with any of "
 "the following:"
 msgstr ""
+"Por padr√£o, qualquer protocolo de Internet que foi habilitado no momento da "
+"instala√ß√£o ser√° usado. Voc√™ pode substituir esse padr√£o com qualquer um dos "
+"seguintes:"
 
 #. Type: select
 #. Description
-#: ../templates:13002
+#: ../templates:14002
 msgid ""
 " all : use both IPv4 and IPv6 addresses;\n"
 " ipv6: listen only on IPv6 addresses;\n"
 " ipv4: listen only on IPv4 addresses."
 msgstr ""
+" todos: usar tanto endere√ßos IPv4 quanto IPv6;\n"
+" ipv6 : escutar apenas endere√ßos IPv6;\n"
+" ipv4 : escutar apenas endere√ßos IPv4."
 
 #. Type: string
 #. Description
-#: ../templates:14001
-#, fuzzy
+#: ../templates:15001
 msgid "Local address extension character:"
-msgstr "Caracter de extens„o de endereÁo local ?"
+msgstr "Caracter de extens√£o de endere√ßo local:"
 
 #. Type: string
 #. Description
-#: ../templates:14001
-#, fuzzy
+#: ../templates:15001
 msgid ""
 "Please choose the character that will be used to define a local address "
 "extension."
-msgstr "Qual caracter define uma extens„o de endereÁo local ?"
+msgstr ""
+"Por favor, escolha o caracter que ser√° usado para definir uma extens√£o de "
+"endere√ßo local."
 
 #. Type: string
 #. Description
-#: ../templates:14001
+#: ../templates:15001
 msgid "To not use address extensions, leave the string blank."
-msgstr "Para n„o usar extensıes de endereÁos, deixe a string em branco."
+msgstr "Para n√£o usar extens√µes de endere√ßos, deixe a string em branco."
 
 #. Type: error
 #. Description
-#: ../templates:15001
+#: ../templates:16001
 msgid "Bad recipient delimiter"
 msgstr "Delimitador de recipiente ruim"
 
 #. Type: error
 #. Description
-#: ../templates:15001
-#, fuzzy
+#: ../templates:16001
 msgid ""
 "The recipient delimiter must be a single character. '${enteredstring}' is "
 "what you entered."
 msgstr ""
-"O delimitador de recipiente È um caracter ˙nico, vocÍ informou muitos "
-"caracteres. Por favor, tente novamente."
+"O delimitador de recipiente deve ser um caracter √∫nico. \"${enteredstring}\" "
+"√© o que voc√™ digitou."
 
 #. Type: boolean
 #. Description
-#: ../templates:16001
+#: ../templates:17001
 msgid "Force synchronous updates on mail queue?"
-msgstr "ForÁar atualizaÁıes sÌncronas na fila de mensagens ?"
+msgstr "For√ßar atualiza√ß√µes s√≠ncronas na fila de mensagens?"
 
 #. Type: boolean
 #. Description
-#: ../templates:16001
-#, fuzzy
+#: ../templates:17001
 msgid ""
 "If synchronous updates are forced, then mail is processed more slowly. If "
 "not forced, then there is a remote chance of losing some mail if the system "
 "crashes at an inopportune time, and you are not using a journaled filesystem "
 "(such as ext3)."
 msgstr ""
-"Caso atualizaÁıes sÌncronas sejam forÁadas, as mensagens ser„o processadas "
-"mais lentamente. Caso n„o sejam forÁadas, existe a chance de perda de "
-"algumas mensagens caso o sistema trave em um momento inoportuno e vocÍ n„o "
-"esteja utilizando um sitema de arquivo com suporte a journalling (como o "
-"ext3)."
+"Caso atualiza√ß√µes s√≠ncronas sejam for√ßadas, ent√£o as mensagens ser√£o "
+"processadas mais lentamente. Caso n√£o sejam for√ßadas, ent√£o existe a chance "
+"remota de perder algumas mensagens caso o sistema trave em um momento "
+"inoportuno, e voc√™ n√£o esteja utilizando um sistema de arquivo com suporte a "
+"journalling (como o ext3)."
 
 #. Type: string
 #. Description
-#: ../templates:17001
-#, fuzzy
+#: ../templates:18001
 msgid "Local networks:"
-msgstr "Redes locais ?"
+msgstr "Redes locais:"
 
 #. Type: string
 #. Description
-#: ../templates:17001
-#, fuzzy
+#: ../templates:18001
 msgid ""
 "Please specify the network blocks for which this host should relay mail. The "
 "default is just the local host, which is needed by some mail user agents. "
 "The default includes local host for both IPv4 and IPv6. If just connecting "
 "via one IP version, the unused value(s) may be removed."
 msgstr ""
-"Para quais blocos de rede esta m·quina oferecer· 'relay' de mensagens ? O "
-"padr„o È somente oferecer relay para o host local, o que È necess·rio para "
-"alguns clientes de e-mail."
+"Por favor, especifique para quais blocos de rede esta m√°quina deve fazer "
+"relay de mensagens. O padr√£o √© somente para a m√°quina local, o qual √© "
+"necess√°rio para alguns clientes de e-mail. O padr√£o inclui host local tanto "
+"para IPv4 quanto para IPv6. Se conectar apenas atrav√©s de uma vers√£o de IP, o"
+"(s) valor(es) n√£o usado(s) pode(m) ser removido(s)."
 
 #. Type: string
 #. Description
-#: ../templates:17001
-#, fuzzy
+#: ../templates:18001
 msgid ""
 "If this host is a smarthost for a block of machines, you need to specify the "
 "netblocks here, or mail will be rejected rather than relayed."
 msgstr ""
-"Caso esta m·quina seja um smarthost para um bloco de m·quinas, vocÍ "
-"precisar· especificar os blocos de rede aqui ou as mensages ser„o rejeitadas "
-"ao invÈs do relay ocorrer."
+"Caso esta m√°quina seja um smarthost para um bloco de m√°quinas, voc√™ "
+"precisar√° especificar os blocos de rede aqui, ou as mensagens ser√£o "
+"rejeitadas ao inv√©s do relay ocorrer."
 
 #. Type: string
 #. Description
-#: ../templates:17001
-#, fuzzy
+#: ../templates:18001
 msgid ""
 "To use the postfix default (which is based on the connected subnets), leave "
 "this blank."
 msgstr ""
-"Para usar o padr„o do Postfix (o qual È baseado nas redes conectadas), "
-"informe uma string vazia."
+"Para usar o padr√£o do Postfix (o qual √© baseado nas sub-redes conectadas), "
+"deixe isto em branco."
 
 #. Type: string
 #. Description
-#: ../templates:18001
-#, fuzzy
+#: ../templates:19001
 msgid "Mailbox size limit (bytes):"
-msgstr "Tamanho m·ximo das caixas de mensagens"
+msgstr "Limite de tamanho da caixa postal (em bytes):"
 
 #. Type: string
 #. Description
-#: ../templates:18001
-#, fuzzy
+#: ../templates:19001
 msgid ""
 "Please specify the limit that Postfix should place on mailbox files to "
 "prevent runaway software errors. A value of zero (0) means no limit. The "
 "upstream default is 51200000."
 msgstr ""
-"Qual limite dever· ser usado pelo Postfix em arquivos de caixas-postais para "
-"evitar erros de software. Um valor de zero (0) significa que nenhum limite "
-"ser· usado. (O padr„o do Postfix È de 51200000 bytes, o que corresponde a, "
-"aproximadamente, 50 MB.)"
+"Por favor, especifique o limite que o Postfix deve usar em arquivos de "
+"caixas postais para evitar erros de software sem controle. Um valor igual a "
+"zero (0) significa sem limite. O padr√£o do Postfix √© de 51200000."
 
 #. Type: string
 #. Description
-#: ../templates:19001
+#: ../templates:20001
 msgid "Root and postmaster mail recipient:"
-msgstr ""
+msgstr "Destinat√°rio das mensagens para root e postmaster:"
 
 #. Type: string
 #. Description
-#: ../templates:19001
+#: ../templates:20001
 msgid ""
 "Mail for the 'postmaster', 'root', and other system accounts needs to be "
 "redirected to the user account of the actual system administrator."
 msgstr ""
+"Mensagens para o \"postmaster\", \"root\", e outras contas de sistema "
+"precisam ser redirecionadas para a conta de usu√°rio do atual administrador "
+"do sistema."
 
 #. Type: string
 #. Description
-#: ../templates:19001
+#: ../templates:20001
 msgid ""
 "If this value is left empty, such mail will be saved in /var/mail/nobody, "
 "which is not recommended."
 msgstr ""
+"Se este valor for deixado em branco, tais mensagens ser√£o salvas em /var/"
+"mail/nobody, o que n√£o √© recomendado. "
 
 #. Type: string
 #. Description
-#: ../templates:19001
+#: ../templates:20001
 msgid "Mail is not delivered to external delivery agents as root."
-msgstr ""
+msgstr "Mensagens como root n√£o s√£o entregues a agentes externos de entrega."
 
 #. Type: string
 #. Description
-#: ../templates:19001
-#, fuzzy
+#: ../templates:20001
 msgid ""
 "If you already have a /etc/aliases file and it does not have an entry for "
 "root, then you should add this entry.  Leave this blank to not add one."
 msgstr ""
-"Caso vocÍ j· possua um arquivo /etc/aliases, vocÍ possivelmente precisar· "
-"adicionar essa entrada. (Este sistema de configuraÁ„o ir· adicion·-la "
-"somente caso um novo arquivo /etc/aliases esteja sendo criado.)"
+"Caso voc√™ j√° possua um arquivo /etc/aliases e ele n√£o tenha uma entrada para "
+"o root, ent√£o voc√™ deve adicionar essa entrada. Deixe isto em branco para "
+"n√£o adicionar uma."
 
 #~ msgid "Correct dynamicmaps.cf for upgrade?"
-#~ msgstr "Corrigir dynamicmaps.cf para atualizaÁ„o ?"
+#~ msgstr "Corrigir dynamicmaps.cf para atualiza√ß√£o ?"
 
 #~ msgid ""
 #~ "Postfix version 2.0.2 and later require changes in dynamicmaps.cf. "
@@ -638,12 +678,12 @@ msgstr ""
 #~ "will need to be fixed by you.  Failure to correct these will result in a "
 #~ "broken mailer."
 #~ msgstr ""
-#~ "O Postfix vers„o 2.0.2 ou superior requer mudanÁas no arquivo dynamicmaps."
-#~ "cf. Especificamente, o suporte a caracteres curingas n„o existe mais e, "
-#~ "devido a isso, a expans„o %s n„o È mais v·lida. Quaisquer mudanÁas que "
-#~ "vocÍ tenha feito no arquivo dynamicmaps.cf que dependiam destes recursos "
-#~ "precisar„o ser corrigidas manualmente. A n„o correÁ„o das mesmas "
-#~ "resultar· um servidor de mensagens n„o funcional."
+#~ "O Postfix vers√£o 2.0.2 ou superior requer mudan√ßas no arquivo dynamicmaps."
+#~ "cf. Especificamente, o suporte a caracteres curingas n√£o existe mais e, "
+#~ "devido a isso, a expans√£o %s n√£o √© mais v√°lida. Quaisquer mudan√ßas que "
+#~ "voc√™ tenha feito no arquivo dynamicmaps.cf que dependiam destes recursos "
+#~ "precisar√£o ser corrigidas manualmente. A n√£o corre√ß√£o das mesmas "
+#~ "resultar√° um servidor de mensagens n√£o funcional."
 
 #~ msgid ""
 #~ "Should dynamicmaps.cf be automatically changed?  Decline this option to "
@@ -652,16 +692,16 @@ msgstr ""
 #~ "such configuration, and automatically make dynamicmaps.cf compatible with "
 #~ "Postfix 2.0.2 in this respect."
 #~ msgstr ""
-#~ "O arquivo dynamicmaps.cf deve ser modificado automaticamente ? N„o aceite "
-#~ "esta opÁ„o caso queira abortar a atualizaÁ„o, o que lhe dar· a "
-#~ "oportunidade de eliminar a configuraÁ„o dependente de caracteres curingas "
-#~ "e da expans„o %s. Aceite esta opÁ„o caso vocÍ n„o possua nenhuma "
-#~ "configuraÁ„o personalizada e automaticamente permita que o arquivo "
-#~ "dynamicmaps.cf seja compatÌvel com o Postfix 2.0.2 em relaÁ„o a esse "
+#~ "O arquivo dynamicmaps.cf deve ser modificado automaticamente ? N√£o aceite "
+#~ "esta op√ß√£o caso queira abortar a atualiza√ß√£o, o que lhe dar√° a "
+#~ "oportunidade de eliminar a configura√ß√£o dependente de caracteres curingas "
+#~ "e da expans√£o %s. Aceite esta op√ß√£o caso voc√™ n√£o possua nenhuma "
+#~ "configura√ß√£o personalizada e automaticamente permita que o arquivo "
+#~ "dynamicmaps.cf seja compat√≠vel com o Postfix 2.0.2 em rela√ß√£o a esse "
 #~ "detalhe."
 
 #~ msgid "Correct master.cf for upgrade?"
-#~ msgstr "Corrigir master.cf para atualizaÁ„o ?"
+#~ msgstr "Corrigir master.cf para atualiza√ß√£o ?"
 
 #~ msgid ""
 #~ "Should this configuration be automatically added to master.cf?  Decline "
@@ -669,17 +709,17 @@ msgstr ""
 #~ "configuration yourself.  Accept this option to automatically make master."
 #~ "cf compatible with Postfix 2.1 in this respect."
 #~ msgstr ""
-#~ "Essa configuraÁ„o deve ser adicionada automaticamente no master.cf ? N„o "
-#~ "aceite esta opÁ„o caso vocÍ queira abortar a atualizaÁ„o, o que lhe dar· "
-#~ "a oportunidade de adicionar a configuraÁ„o manualmente. Aceite esta opÁ„o "
-#~ "para automaticamente tornar o master.cf compatÌvel com o Postfix 2.1 em "
-#~ "relaÁ„o a esse detalhe."
+#~ "Essa configura√ß√£o deve ser adicionada automaticamente no master.cf ? N√£o "
+#~ "aceite esta op√ß√£o caso voc√™ queira abortar a atualiza√ß√£o, o que lhe dar√° "
+#~ "a oportunidade de adicionar a configura√ß√£o manualmente. Aceite esta op√ß√£o "
+#~ "para automaticamente tornar o master.cf compat√≠vel com o Postfix 2.1 em "
+#~ "rela√ß√£o a esse detalhe."
 
 #~ msgid ""
 #~ "Postfix version 2.1 renamed \"nqmgr\" to \"qmgr\", and you are using "
 #~ "\"nqmgr\"."
 #~ msgstr ""
-#~ "O Postfix vers„o 2.1 renomeou o \"nqmgr\" para \"qmgr\" e vocÍ est· "
+#~ "O Postfix vers√£o 2.1 renomeou o \"nqmgr\" para \"qmgr\" e voc√™ est√° "
 #~ "usando o \"nqmgr\"."
 
 #~ msgid ""
@@ -688,11 +728,11 @@ msgstr ""
 #~ "configuration yourself.  Accept this option to automatically make master."
 #~ "cf compatible with Postfix 2.1 in this respect."
 #~ msgstr ""
-#~ "Caso isto n„o seja corrigido, vocÍ ter· um servidor de e-mail quebrado. "
-#~ "N„o aceite esta opÁ„o para abortar a atualizaÁ„o, o que lhe dar· a "
-#~ "oportunidade de adicionar a configuraÁ„o manualmente. Aceite esta opÁ„o "
-#~ "para automaticamente tornar o master.cf compatÌvel com o Postfix 2.1 em "
-#~ "relaÁ„o a esse detalhe."
+#~ "Caso isto n√£o seja corrigido, voc√™ ter√° um servidor de e-mail quebrado. "
+#~ "N√£o aceite esta op√ß√£o para abortar a atualiza√ß√£o, o que lhe dar√° a "
+#~ "oportunidade de adicionar a configura√ß√£o manualmente. Aceite esta op√ß√£o "
+#~ "para automaticamente tornar o master.cf compat√≠vel com o Postfix 2.1 em "
+#~ "rela√ß√£o a esse detalhe."
 
 #~ msgid "Should Postfix upgrade hash and btree maps?"
 #~ msgstr "O Postfix deve atualizar os mapas hash e btree ?"
@@ -704,7 +744,7 @@ msgstr ""
 #~ "atualizados."
 
 #~ msgid "Do you want to automatically attempt the conversion?"
-#~ msgstr "VocÍ deseja tentar a convers„o autom·tica ?"
+#~ msgstr "Voc√™ deseja tentar a convers√£o autom√°tica ?"
 
 #~ msgid "Transport map incompatibility"
 #~ msgstr "Incompatibilidade de mapa de transporte"
@@ -713,8 +753,8 @@ msgstr ""
 #~ "You have a transport map defined, and there is an incompatible change in "
 #~ "how transport maps are used.  Postfix will not be restarted automatically."
 #~ msgstr ""
-#~ "VocÍ tem um mapa de transporte definido e existe uma mudanÁa incompatÌvel "
-#~ "na maneira como os mapas de transporte s„o usados. O Postfix n„o ser· "
+#~ "Voc√™ tem um mapa de transporte definido e existe uma mudan√ßa incompat√≠vel "
+#~ "na maneira como os mapas de transporte s√£o usados. O Postfix n√£o ser√° "
 #~ "reiniciado automaticamente."
 
 #~ msgid ""
@@ -725,16 +765,16 @@ msgstr ""
 #~ "anything delivered locally, you will probably need to add specific "
 #~ "entries for the destination domains before you restart Postfix."
 #~ msgstr ""
-#~ "Entradas de mapa de transporte sobrepıem $mydestination. Caso vocÍ "
-#~ "utilize mapas de transporte, È melhor ter sempre entradas explÌcitas para "
-#~ "todos os nomes de domÌnios que vocÍ possui em $mydestination. Consulte as "
-#~ "seÁıes html/faq.html para firewalls e intranets. Caso vocÍ possua "
-#~ "entradas de transporte para domÌnios pais de qualquer coisa entregue "
-#~ "localmente, vocÍ provavelmente precisar· adicionar entradas especÌficas "
-#~ "para os domÌnios de destino antes de reiniciar o Postfix."
+#~ "Entradas de mapa de transporte sobrep√µem $mydestination. Caso voc√™ "
+#~ "utilize mapas de transporte, √© melhor ter sempre entradas expl√≠citas para "
+#~ "todos os nomes de dom√≠nios que voc√™ possui em $mydestination. Consulte as "
+#~ "se√ß√µes html/faq.html para firewalls e intranets. Caso voc√™ possua "
+#~ "entradas de transporte para dom√≠nios pais de qualquer coisa entregue "
+#~ "localmente, voc√™ provavelmente precisar√° adicionar entradas espec√≠ficas "
+#~ "para os dom√≠nios de destino antes de reiniciar o Postfix."
 
 #~ msgid "The string you have entered"
-#~ msgstr "A string que vocÍ informou"
+#~ msgstr "A string que voc√™ informou"
 
 #~ msgid "\"${enteredstring}\""
 #~ msgstr "\"${enteredstring}\""
@@ -743,8 +783,8 @@ msgstr ""
 #~ "No configuration, Internet Site, Internet with smarthost, Satellite "
 #~ "system, Local only"
 #~ msgstr ""
-#~ "Sem configuraÁ„o, Internet Site, Internet com smarthost, Sistema "
-#~ "satÈlite, Somente local"
+#~ "Sem configura√ß√£o, Internet Site, Internet com smarthost, Sistema "
+#~ "sat√©lite, Somente local"
 
 #~ msgid ""
 #~ "You have several choices for general configuration at this point.  If you "
@@ -753,10 +793,10 @@ msgstr ""
 #~ "priority=low postfix\" at a later point if you want to see these "
 #~ "questions again."
 #~ msgstr ""
-#~ "VocÍ possui diversas opÁıes para configuraÁ„o geral neste ponto. Caso "
-#~ "vocÍ possua a configuraÁ„o de prioridades de seu debconf definida como "
-#~ "'baixa' ou 'mÈdia', um n˙mero maior de perguntas ser„o exibidas "
-#~ "posteriormente. VocÍ poder· sempre executar o comando \"dpkg-reconfigure "
+#~ "Voc√™ possui diversas op√ß√µes para configura√ß√£o geral neste ponto. Caso "
+#~ "voc√™ possua a configura√ß√£o de prioridades de seu debconf definida como "
+#~ "'baixa' ou 'm√©dia', um n√∫mero maior de perguntas ser√£o exibidas "
+#~ "posteriormente. Voc√™ poder√° sempre executar o comando \"dpkg-reconfigure "
 #~ "--priority=low postfix\" posteriormente caso queira ver essas perguntas "
 #~ "novamente."
 
@@ -769,25 +809,25 @@ msgstr ""
 #~ "postfix/main.cf, or by running dpkg-reconfigure Postfix.  main.cf will "
 #~ "not be modified by the Postfix install process."
 #~ msgstr ""
-#~ "Sem configuraÁ„o - CASO VOC  QUEIRA QUE A INSTALA«¬O DEIXE SUA "
-#~ "CONFIGURA«¬O INTOCADA, ESCOLHA ESTA OP«√O. Nenhuma mudanÁa de "
-#~ "configuraÁ„o ser· feita agora. Caso vocÍ j· n„o tenha configurado o "
-#~ "Postfix, seu sistema de e-mail ficar· em um estado n„o funcional e n„o "
-#~ "poder· ser usado. VocÍ dever· ent„o fazer a configuraÁ„o manualmente "
-#~ "editando o arquivo de configuraÁ„o /usr/share/postfix/main.cf.dist e "
-#~ "salvando suas modificaÁıes como /etc/postfix/main.cf ou executando o "
-#~ "comando 'dpkg-reconfigure postfix'. O arquivo main.cf n„o ser· modificado "
-#~ "pelo processo de instalaÁ„o do Postfix quando esta opÁ„o for escolhida."
+#~ "Sem configura√ß√£o - CASO VOC√ä QUEIRA QUE A INSTALA√á√ÇO DEIXE SUA "
+#~ "CONFIGURA√á√ÇO INTOCADA, ESCOLHA ESTA OP√á√ÉO. Nenhuma mudan√ßa de "
+#~ "configura√ß√£o ser√° feita agora. Caso voc√™ j√° n√£o tenha configurado o "
+#~ "Postfix, seu sistema de e-mail ficar√° em um estado n√£o funcional e n√£o "
+#~ "poder√° ser usado. Voc√™ dever√° ent√£o fazer a configura√ß√£o manualmente "
+#~ "editando o arquivo de configura√ß√£o /usr/share/postfix/main.cf.dist e "
+#~ "salvando suas modifica√ß√µes como /etc/postfix/main.cf ou executando o "
+#~ "comando 'dpkg-reconfigure postfix'. O arquivo main.cf n√£o ser√° modificado "
+#~ "pelo processo de instala√ß√£o do Postfix quando esta op√ß√£o for escolhida."
 
 #~ msgid ""
 #~ "Internet site - mail is sent and received directly using SMTP. If your "
 #~ "needs don't fit neatly into any category, you probably want to start with "
 #~ "this one and then edit the config file by hand."
 #~ msgstr ""
-#~ "Internet Site - as mensagens s„o enviadas e recebidas diretamente usando "
-#~ "o protocolo SMTP. Caso suas necessidades n„o se encaixem em nenhuma outra "
-#~ "opÁ„o apresentada, vocÍ provavelmente iniciar· com esta opÁ„o e ent„o "
-#~ "poder· editar o arquivo de configuraÁ„o manualmente para personaliz·-lo."
+#~ "Internet Site - as mensagens s√£o enviadas e recebidas diretamente usando "
+#~ "o protocolo SMTP. Caso suas necessidades n√£o se encaixem em nenhuma outra "
+#~ "op√ß√£o apresentada, voc√™ provavelmente iniciar√° com esta op√ß√£o e ent√£o "
+#~ "poder√° editar o arquivo de configura√ß√£o manualmente para personaliz√°-lo."
 
 #~ msgid ""
 #~ "Internet site using smarthost - You receive Internet mail on this "
@@ -795,27 +835,27 @@ msgstr ""
 #~ "fetchmail. Outgoing mail is sent using a smarthost. optionally with "
 #~ "addresses rewritten. This is probably what you want for a dialup system."
 #~ msgstr ""
-#~ "Internet site usando smarthost - VocÍ recebe e-mail Internet nesta "
-#~ "m·quina diretamente via SMTP ou executando um utilit·rio como o "
-#~ "fetchmail. As mensagens com destino externo s„o enviadas usando um "
-#~ "smarthost, opcionalmente com os endereÁos reescritos. Esta È "
-#~ "provavelmente a opÁ„o que vocÍ precisa para um sistema com conex„o "
+#~ "Internet site usando smarthost - Voc√™ recebe e-mail Internet nesta "
+#~ "m√°quina diretamente via SMTP ou executando um utilit√°rio como o "
+#~ "fetchmail. As mensagens com destino externo s√£o enviadas usando um "
+#~ "smarthost, opcionalmente com os endere√ßos reescritos. Esta √© "
+#~ "provavelmente a op√ß√£o que voc√™ precisa para um sistema com conex√£o "
 #~ "discada (dialup)."
 
 #~ msgid ""
 #~ "Satellite system - All mail is sent to another machine, called a \"smart "
 #~ "host\" for delivery.  No mail is received locally."
 #~ msgstr ""
-#~ "Sistema satÈlite - Todas as mensagens ser„o enviadas para uma outra "
-#~ "m·quina, conhecida como \"smart host\" para entrega. Nenhuma mensagem "
-#~ "ser· recebida localmente."
+#~ "Sistema sat√©lite - Todas as mensagens ser√£o enviadas para uma outra "
+#~ "m√°quina, conhecida como \"smart host\" para entrega. Nenhuma mensagem "
+#~ "ser√° recebida localmente."
 
 #~ msgid ""
 #~ "Local delivery only - You are not on a network.  Mail for local users is "
 #~ "delivered."
 #~ msgstr ""
-#~ "Entrega somente local - VocÍ n„o est· em uma rede. As mensagens para "
-#~ "usu·rios locais ser„o entregues."
+#~ "Entrega somente local - Voc√™ n√£o est√° em uma rede. As mensagens para "
+#~ "usu√°rios locais ser√£o entregues."
 
 #~ msgid "1) Editing /etc/postfix/main.cf to your liking"
 #~ msgstr ""
@@ -831,20 +871,20 @@ msgstr ""
 #~ "Your `mail name' is the hostname portion of the address to be shown on "
 #~ "outgoing news and mail messages (following the username and @ sign)."
 #~ msgstr ""
-#~ "Seu `nome de mensagens' (mail name) È a porÁ„o nome de m·quina (hostname) "
-#~ "do endereÁo que ser· exibido em mensagens de e-mail (apÛs o nome de "
-#~ "usu·rio e o sÌmbolo @)."
+#~ "Seu `nome de mensagens' (mail name) √© a por√ß√£o nome de m√°quina (hostname) "
+#~ "do endere√ßo que ser√° exibido em mensagens de e-mail (ap√≥s o nome de "
+#~ "usu√°rio e o s√≠mbolo @)."
 
 #, fuzzy
 #~ msgid "ipv6 - listen only on ipv6 addresses"
-#~ msgstr "Incluir .domÌnio para endereÁos simples"
+#~ msgstr "Incluir .dom√≠nio para endere√ßos simples"
 
 #, fuzzy
 #~ msgid "ipv4 - listen only on ipv4 addresses"
-#~ msgstr "Incluir .domÌnio para endereÁos simples"
+#~ msgstr "Incluir .dom√≠nio para endere√ßos simples"
 
 #~ msgid "The default is \"no\"."
-#~ msgstr "O padr„o È \"no\" (n„o forÁar atualizaÁıes sÌncronas)."
+#~ msgstr "O padr√£o √© \"no\" (n√£o for√ßar atualiza√ß√µes s√≠ncronas)."
 
 #~ msgid "Where should mail for root go"
 #~ msgstr "Onde as mensagens para o root devem ser entregues ?"
@@ -855,10 +895,10 @@ msgstr ""
 #~ "nobody.  This is by design:  mail is not delivered to external delivery "
 #~ "agents as root."
 #~ msgstr ""
-#~ "Todas as mensagens destinadas ao usu·rio root (e quaisquer outros "
-#~ "usu·rios com um uid 0) devem ser redirecionadas atravÈs de um alias, ou "
-#~ "as mensagens ser„o entregues em /var/spool/mail/nobody. Este "
-#~ "comportamento È o padr„o : nenhuma mensagem È entregue para agentes de "
+#~ "Todas as mensagens destinadas ao usu√°rio root (e quaisquer outros "
+#~ "usu√°rios com um uid 0) devem ser redirecionadas atrav√©s de um alias, ou "
+#~ "as mensagens ser√£o entregues em /var/spool/mail/nobody. Este "
+#~ "comportamento √© o padr√£o : nenhuma mensagem √© entregue para agentes de "
 #~ "entrega externa como root."
 
 #, fuzzy
@@ -866,8 +906,8 @@ msgstr ""
 #~ "What address should be added to /etc/aliases, if the file is created? "
 #~ "(Leave this blank to not add one.)"
 #~ msgstr ""
-#~ "Qual endereÁo dever· ser adicionado ao arquivo /etc/aliases caso o "
-#~ "arquivo seja criado ? (Informe NONE para n„o adicionar nenhum.)"
+#~ "Qual endere√ßo dever√° ser adicionado ao arquivo /etc/aliases caso o "
+#~ "arquivo seja criado ? (Informe NONE para n√£o adicionar nenhum.)"
 
 #~ msgid "+"
 #~ msgstr "+"
@@ -893,14 +933,14 @@ msgstr ""
 #~ "but looks largely like 'Internet site using smarthost'.  This option will "
 #~ "modify /etc/postfix/transport and install it as a transport map."
 #~ msgstr ""
-#~ "HP - ConfiguraÁ„o usada internamente na HP. Esta opÁ„o somente forÁa "
-#~ "diversos par‚metros de configuraÁ„o baseados nos componentes finais do "
-#~ "hostname, mas se parece principalmente com a opÁ„o 'Internet site usando "
-#~ "smarthost'. Esta opÁ„o ir· modificar o arquivo /etc/postfix/transport e "
-#~ "instal·-lo como uma mapa de transporte."
+#~ "HP - Configura√ß√£o usada internamente na HP. Esta op√ß√£o somente for√ßa "
+#~ "diversos par√¢metros de configura√ß√£o baseados nos componentes finais do "
+#~ "hostname, mas se parece principalmente com a op√ß√£o 'Internet site usando "
+#~ "smarthost'. Esta op√ß√£o ir√° modificar o arquivo /etc/postfix/transport e "
+#~ "instal√°-lo como uma mapa de transporte."
 
 #~ msgid "The default is \"off\", see the changelog for an explanation."
-#~ msgstr "O padr„o È \"off\", consulte o changelog para uma explicaÁ„o."
+#~ msgstr "O padr√£o √© \"off\", consulte o changelog para uma explica√ß√£o."
 
 #~ msgid ""
 #~ "When Postfix sees an address with only one component in the hostname, "
@@ -908,34 +948,34 @@ msgstr ""
 #~ "need to qualify destinations in your own domain, but breaks mail bound "
 #~ "for users at top-level domain addresses.  (yes, there are some of these.)"
 #~ msgstr ""
-#~ "Quando o Postfix vÍ um endereÁo com somente um componente no hostname, ."
-#~ "$mydomain deve ser adicionado ? Aceitar a inclus„o de .$mydomain signfica "
-#~ "que vocÍ n„o precisar· qualificar destinos em seu prÛprio domÌnio, mas "
-#~ "far· com que o envio de mensagens para usu·rios em endereÁos de domÌnios "
-#~ "de alto nÌvel n„o funcione. (sim, existem alguns desses.)"
+#~ "Quando o Postfix v√™ um endere√ßo com somente um componente no hostname, ."
+#~ "$mydomain deve ser adicionado ? Aceitar a inclus√£o de .$mydomain signfica "
+#~ "que voc√™ n√£o precisar√° qualificar destinos em seu pr√≥prio dom√≠nio, mas "
+#~ "far√° com que o envio de mensagens para usu√°rios em endere√ßos de dom√≠nios "
+#~ "de alto n√≠vel n√£o funcione. (sim, existem alguns desses.)"
 
 #~ msgid ""
 #~ "If you are forwarding mail out of your organization, you should almost "
 #~ "certainly not append .$mydomain. If you're the only user of mail on your "
 #~ "system, choose whichever is more convenient for you."
 #~ msgstr ""
-#~ "Caso vocÍ esteja encaminhando mensagens para fora de sua organizaÁ„o vocÍ "
-#~ "certmamente n„o dever· incluir .$mydomain. Caso vocÍ seja o ˙nico usu·rio "
-#~ "de e-mail em seu sistema, escolha qualquer opÁ„o que lhe seja mais "
+#~ "Caso voc√™ esteja encaminhando mensagens para fora de sua organiza√ß√£o voc√™ "
+#~ "certmamente n√£o dever√° incluir .$mydomain. Caso voc√™ seja o √∫nico usu√°rio "
+#~ "de e-mail em seu sistema, escolha qualquer op√ß√£o que lhe seja mais "
 #~ "conveniente."
 
 #~ msgid ""
 #~ "If you answer no, you almost certainly need to add 'localhost' to the "
 #~ "list of local destinations."
 #~ msgstr ""
-#~ "Caso vocÍ n„o responda positivamente, vocÍ certamente precisar· adicionar "
+#~ "Caso voc√™ n√£o responda positivamente, voc√™ certamente precisar√° adicionar "
 #~ "'localhost' a lista de destinos locais."
 
 #~ msgid ""
 #~ "Postfix has converted from libdb2 format to libdb3 format.  This change "
 #~ "requires that all Postfix hash and btree maps be regenerated."
 #~ msgstr ""
-#~ "O Postfix converteu do formato libdb2 para o formato libdb3. Esta mudanÁa "
+#~ "O Postfix converteu do formato libdb2 para o formato libdb3. Esta mudan√ßa "
 #~ "requer que todos os mapas hash e btree do Postfix sejam gerados novamente."
 
 #~ msgid ""
@@ -943,7 +983,7 @@ msgstr ""
 #~ "files still need to be converted.  If you answer yes, all hash and btree "
 #~ "maps used by Postfix will be rebuilt prior to restarting Postfix."
 #~ msgstr ""
-#~ "Se vocÍ responder n„o, o Postfix ser· reiniciado, mas pode falhar caso "
-#~ "seus arquivos db continuem precisando ser convertidos. Se vocÍ responder "
-#~ "sim, todos os mapas hash e btree usados pelo Postfix ser„o reconstruÌdos "
+#~ "Se voc√™ responder n√£o, o Postfix ser√° reiniciado, mas pode falhar caso "
+#~ "seus arquivos db continuem precisando ser convertidos. Se voc√™ responder "
+#~ "sim, todos os mapas hash e btree usados pelo Postfix ser√£o reconstru√≠dos "
 #~ "antes que o Postfix seja reiniciado."

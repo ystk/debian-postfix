@@ -47,7 +47,7 @@ def add_info(report, ui):
     extra_info['PostconfMydomain'] = apport.hookutils.command_output(['/usr/sbin/postconf','-h','mydomain'])
 
     """ Note that even if the user opts not to send the info, we get this key """
-    for k,v in extra_info.iteritems():
+    for k,v in extra_info.items():
         if not host_re.match(v):
             report['DuplicateSignature'] = 'InvalidHostOrDomain'
             break
@@ -60,7 +60,7 @@ def add_info(report, ui):
     else:
         extra_info['ResolvConf'] = _('*** /etc/resolv.conf does not exist ***')
 
-    eeinfo = [("%s: %s" % (k,v)) for k,v in extra_info.iteritems()]
+    eeinfo = [("%s: %s" % (k,v)) for k,v in extra_info.items()]
     answer = ui.yesno("%s\n\n%s\n\n%s" % (msg, msg2 ,"\n".join(eeinfo)))
     if answer:
         report.update(extra_info)

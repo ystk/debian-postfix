@@ -11,6 +11,17 @@ _Description: Add a 'mydomain' entry in main.cf for upgrade?
  yourself. Accept this option to automatically set mydomain based on the
  FQDN of the machine.
 
+Template: postfix/relay_restrictions_warning
+Type: boolean
+_Description: Set smtpd_relay_restrictions in main.cf for upgrade?
+ Postfix version 2.10 adds smtpd_relay_restrictions, to separate relaying
+ restrictions from recipient restrictions, and you have a non-default value
+ for smtpd_recipient_restrictions.
+ .
+ Failure to do this may result in deferred or bounced mail after the
+ upgrade.  Accept this option to set smtpd_relay_restrictions equal to
+ smtpd_recipient_restrictions.
+
 Template: postfix/sqlite_warning
 Type: boolean
 _Description: add 'sqlite' entry to dynamicmaps.cf?
