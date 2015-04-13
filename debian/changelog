@@ -1,3 +1,19 @@
+postfix (2.11.3-1) unstable; urgency=medium
+
+  [Wietse Venema]
+
+  * New upstream release: 2.11.3
+
+ -- LaMont Jones <lamont@debian.org>  Mon, 20 Oct 2014 17:11:58 -0600
+
+postfix (2.11.2-1) unstable; urgency=medium
+
+  [Wietse Venema]
+
+  * 2.11.2
+
+ -- LaMont Jones <lamont@debian.org>  Fri, 17 Oct 2014 11:43:32 -0600
+
 postfix (2.11.1-1) unstable; urgency=medium
 
   [LaMont Jones]
