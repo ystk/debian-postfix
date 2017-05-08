@@ -3,6 +3,8 @@
 # Debian Postfix prerm
 # LaMont Jones <lamont@debian.org>
 
+. /usr/share/postfix/postinst.functions
+
 case "$1" in
     upgrade)
 	new=$2			# get new version
@@ -23,6 +25,8 @@ case "$1" in
 		mv ${MASTER}.$$ ${MASTER}
 	    fi
 	fi
+	delmap tcp
+	delmap sqlite
 	;;
 
     deconfigure)

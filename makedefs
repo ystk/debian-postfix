@@ -369,7 +369,7 @@ EOF
 		       fi;;
 		esac
 		;;
-    Linux.3*)	SYSTYPE=LINUX3
+    Linux.[34].*) SYSTYPE=LINUX3
 		case "$CCARGS" in
 		 *-DNO_DB*) ;;
 		 *-DHAS_DB*) ;;

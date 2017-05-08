@@ -1,3 +1,18 @@
+postfix (2.11.3-1+deb8u2) stable; urgency=medium
+
+  * Add fixes in makedefs to recognize Linux 4 as the LINUX3 system type so
+    the package will build with both jessie and jessie-bpo/stretch kernels
+
+ -- Scott Kitterman <scott@kitterman.com>  Sat, 29 Apr 2017 11:38:28 -0400
+
+postfix (2.11.3-1+deb8u1) stable; urgency=medium
+
+  * Add delmap to .prerm for all packages that contain map data types exposed
+    through external .so files so that upgrades to stretch (where the
+    associated files have moved) will be functional (Closes: #859805)
+
+ -- Scott Kitterman <scott@kitterman.com>  Mon, 24 Apr 2017 13:15:36 -0400
+
 postfix (2.11.3-1) unstable; urgency=medium
 
   [Wietse Venema]

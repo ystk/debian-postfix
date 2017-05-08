@@ -15,8 +15,11 @@ set -e
 #          <conflicting-package> <version>
 # for details, see /usr/share/doc/packaging-manual/
 
+. /usr/share/postfix/postinst.functions
+
 case "$1" in
     remove|upgrade|deconfigure)
+        delmap cdb
 #       install-info --quiet --remove /usr/info/#PACKAGE#.info.gz
         ;;
     failed-upgrade)
